@@ -12,8 +12,8 @@ function Navbar({ fees }) {
   const walletMatches = normalized ? wallets.filter((wallet) => (wallet.address || wallet).toUpperCase().startsWith(normalized)).slice(0, 3) : [];
 
   function toggleDarkMode() {
-    const dark = localStorage.theme !== 'dark';
-    localStorage.theme = dark ? 'dark' : 'light';
+    const dark = !document.documentElement.classList.contains('dark');
+    localStorage.setItem('color-theme', dark ? 'dark' : 'light');
     document.documentElement.classList.toggle('dark', dark);
   }
 
