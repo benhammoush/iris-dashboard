@@ -20,6 +20,6 @@ Use `CI=true npm test -- --watchAll=false` for a non-watch test run and `npm run
 
 ## Vercel
 
-Vercel uses Node 20 (`.nvmrc`) and `vercel.json` to build `dist/`. The SPA fallback explicitly excludes `/api` so it cannot return `index.html` for API requests. This app does not configure an `/api/:path*` proxy because it calls the Worker directly.
+Vercel uses Node 24 (`.nvmrc`) and `vercel.json` to build `dist/`. The SPA fallback explicitly excludes `/api` so it cannot return `index.html` for API requests. This app does not configure an `/api/:path*` proxy because it calls the Worker directly.
 
 In Vercel Project Settings -> Environment Variables, set `VITE_API_BASE` to the public Worker origin for Production, Preview, and Development as needed. Redeploy after changing it because Vite embeds `VITE_*` values at build time. Production without this value renders `CONFIGURATION_ERROR` instead of guessing a Worker hostname. Set `VITE_ENABLE_FIXTURES=true` only for an intentional emergency display-fixture deployment; otherwise leave it unset or `false`. These values are public browser configuration, not secrets.

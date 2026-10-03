@@ -1,9 +1,9 @@
 {
   "name": "project-iris",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "engines": {
-    "node": "20.x"
+    "node": "24.x"
   },
   "dependencies": {
     "apexcharts": "^4.7.0",
