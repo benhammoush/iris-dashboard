@@ -15,3 +15,9 @@ test('identifies live DEX pricing and CoinGecko history for supported assets', (
   expect(screen.getByText(/supported stacks assets use live dex prices and coingecko chart history/i)).toBeInTheDocument();
   expect(screen.getByText(/unsupported assets remain clearly snapshot-backed/i)).toBeInTheDocument();
 });
+
+test('identifies CoinGecko-only market data when DEX pricing is rate-limited', () => {
+  render(<DataStatus meta={{ marketDataSource: 'coingecko' }} />);
+
+  expect(screen.getByText(/supported stacks assets use coingecko chart history/i)).toBeInTheDocument();
+});
