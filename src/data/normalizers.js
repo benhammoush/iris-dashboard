@@ -7,10 +7,10 @@ export function assetsFrom(data) {
        name: asset.name || asset.symbol || asset.ticker,
        image_uri: asset.image_uri || asset.imageUrl || asset.image,
        mint: asset.mint || asset.mintAddress || asset.mint_address || asset.address || asset.asset_identifier || asset.identifier,
-      price_usd: asset.price_usd ?? asset.price ?? asset.usd_price,
-       total_supply: asset.total_supply ?? asset.totalSupply ?? asset.supply,
-       normalized_supply: asset.normalized_supply ?? asset.supply,
-      market_cap_usd: asset.market_cap_usd ?? asset.marketCap ?? asset.market_cap,
+       price_usd: asset.price_usd !== undefined ? asset.price_usd : asset.price !== undefined ? asset.price : asset.usd_price ?? null,
+        total_supply: asset.total_supply !== undefined ? asset.total_supply : asset.totalSupply !== undefined ? asset.totalSupply : asset.supply ?? null,
+        normalized_supply: asset.normalized_supply !== undefined ? asset.normalized_supply : asset.supply ?? null,
+       market_cap_usd: asset.market_cap_usd !== undefined ? asset.market_cap_usd : asset.marketCap !== undefined ? asset.marketCap : asset.market_cap ?? null,
        change_24h: asset.change_24h ?? asset.change24h ?? asset.changes?.['24h'] ?? asset.change?.day ?? null,
        change_7d: asset.change_7d ?? asset.change7d ?? asset.changes?.['7d'] ?? asset.change?.week ?? null,
        change_30d: asset.change_30d ?? asset.change30d ?? asset.changes?.['30d'] ?? asset.change?.month ?? null,
@@ -120,37 +120,8 @@ function swapFromParts({ date, transaction, maker, type, input, output }) {
   };
 }
 
-export function marketHistoryFrom(data, assets) {
-  const history = data?.market_cap_history || data?.marketCapHistory || data?.history || data?.market_history || [];
-  if (history.length && history[0]?.points) {
-    const valuesByDate = {};
-    history.forEach((entry) => {
-      const asset = assets.find((item) => item.symbol === entry.symbol);
-      const supply = asset?.normalized_supply ?? asset?.total_supply;
-      (entry.points || []).forEach((point) => {
-        const date = point.date || point.timestamp || point.sync_at;
-        if (!date || supply === undefined) return;
-        const marketCap = Number(point.marketCap);
-        valuesByDate[date] = (valuesByDate[date] || 0) + (Number.isFinite(marketCap) ? marketCap : point.price * supply);
-      });
-    });
-    return Object.entries(valuesByDate).map(([date, value]) => [date, value]);
-  }
-  if (history.length) return history.map((point) => [point.date || point.timestamp || point.sync_at, point.value ?? point.market_cap_usd ?? point.market_cap]);
-  if (!Array.isArray(data)) return [];
-
-  const valuesByDate = {};
-  data.forEach((entry) => {
-    const supply = assets.find((asset) => asset.symbol === entry[0])?.total_supply;
-    (entry[1] || []).forEach((point) => {
-      const date = new Date(point.sync_at).toLocaleDateString('en-US');
-      valuesByDate[date] = (valuesByDate[date] || 0) + point.avg_price_usd * supply;
-    });
-  });
-  return Object.entries(valuesByDate).map(([date, value]) => [date, value]);
-}
-
 export function assetHistoryFrom(asset) {
-  const history = asset?.price_history || asset?.history || asset?.priceHistory || [];
-  return history.map((point) => [point.date || point.timestamp || point.sync_at, point.price_usd ?? point.price ?? point.avg_price_usd]);
+  const history = asset?.price_history || asset?.history || asset?.priceHistory;
+  if (!Array.isArray(history)) return [];
+  return history.map((point) => [point.date || point.timestamp || point.sync_at, point.price_usd ?? point.price ?? point.avg_price_usd]).filter(([date, price]) => date && Number.isFinite(Number(price)));
 }

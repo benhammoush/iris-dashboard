@@ -26,14 +26,14 @@ function DataStatus({ meta, error, showPriceNotice = true, onRetry, refreshing =
   }, []);
 
   if (!meta && !error) return null;
-  const source = meta?.source === 'fixture' ? 'Fixture data' : meta?.stale ? 'Stale Worker data' : 'Fresh Worker data';
+  const source = meta?.source === 'fixture' || meta?.snapshotState === 'fixture' ? 'Fixture data' : meta?.stale || meta?.snapshotState === 'stale' ? 'Stale Worker data' : 'Fresh Worker data';
   const asOf = snapshotAsOf(meta);
-  const liveMarket = meta?.marketDataSource === 'mixed' || meta?.marketDataSource === 'coingecko';
+  const liveMarket = ['jupiter', 'mixed', 'coingecko'].includes(meta?.marketDataSource);
   const lastRefresh = formatUtc(meta?.snapshotCreatedAt);
   const nextRefresh = formatUtc(nextScheduledRefresh(meta, now));
   return (
     <div className="iris-data-status" role="status">
-      {showPriceNotice && <p><strong>Market data:</strong> {liveMarket ? `Supported Solana assets use ${meta?.marketDataSource === 'mixed' ? 'live DEX prices and ' : ''}CoinGecko chart history${asOf ? ` refreshed ${asOf}` : ''}; unsupported assets remain clearly snapshot-backed.` : `Price and chart data use a fixed market snapshot${asOf ? ` as of ${asOf}` : ''}. Blockchain slots, balances, and activity remain live.`}</p>}
+      {showPriceNotice && <p><strong>Market data:</strong> {liveMarket ? `Supported Solana assets use ${meta?.marketDataSource === 'jupiter' ? 'Jupiter prices and GeckoTerminal price history' : meta?.marketDataSource === 'mixed' ? 'live DEX prices and CoinGecko chart history' : 'CoinGecko chart history'}${asOf ? ` refreshed ${asOf}` : ''}; unavailable provider values remain blank.` : `Price and chart data use a fixed market snapshot${asOf ? ` as of ${asOf}` : ''}. Blockchain slots, balances, and activity remain live.`}</p>}
       <p className={showPriceNotice ? 'iris-data-status-detail' : ''}>{source}{meta?.as_of ? ` as of ${meta.as_of}` : ''}{error ? `: ${error.message}` : ''}{error?.requestId ? ` (request ${error.requestId})` : ''}{onRetry && <button className="iris-retry" onClick={onRetry} disabled={refreshing}>{refreshing ? 'Refreshing...' : 'Retry'}</button>}</p>
       {(lastRefresh || nextRefresh) && <p className="iris-data-status-detail">{lastRefresh && `Last completed API refresh: ${lastRefresh}.`}{lastRefresh && nextRefresh && ' '}{nextRefresh && `Next scheduled API refresh: ${nextRefresh}.`}</p>}
     </div>

@@ -13,13 +13,20 @@ test('identifies live DEX pricing and CoinGecko history for supported assets', (
   render(<DataStatus meta={{ marketDataSource: 'mixed', marketDataAsOf: '2026-10-03T12:00:00Z' }} />);
 
   expect(screen.getByText(/supported solana assets use live dex prices and coingecko chart history/i)).toBeInTheDocument();
-  expect(screen.getByText(/unsupported assets remain clearly snapshot-backed/i)).toBeInTheDocument();
+  expect(screen.getByText(/unavailable provider values remain blank/i)).toBeInTheDocument();
 });
 
 test('identifies CoinGecko-only market data when DEX pricing is rate-limited', () => {
   render(<DataStatus meta={{ marketDataSource: 'coingecko' }} />);
 
   expect(screen.getByText(/supported solana assets use coingecko chart history/i)).toBeInTheDocument();
+});
+
+test('identifies Jupiter current data and GeckoTerminal price history', () => {
+  render(<DataStatus meta={{ marketDataSource: 'jupiter', marketDataAsOf: '2026-10-03T12:00:00Z' }} />);
+
+  expect(screen.getByText(/jupiter prices and geckoterminal price history/i)).toBeInTheDocument();
+  expect(screen.getByText(/unavailable provider values remain blank/i)).toBeInTheDocument();
 });
 
 test('shows the last completed and next scheduled API refresh', () => {

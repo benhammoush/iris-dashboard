@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { workerApi } from '../api/worker'
-import { marketHistoryFrom, swapsFrom } from '../data/normalizers'
+import { assetHistoryFrom, swapsFrom } from '../data/normalizers'
 import { useWorkerResource } from '../hooks/useWorkerResource'
 import { useCatalog } from '../contexts/CatalogContext'
 import DataStatus from './DataStatus'
@@ -10,6 +9,7 @@ import Navbar from './Navbar'
 import { AreaChart, MetricCard, VirtualTable, type VirtualTableColumn } from '../design-system'
 
 type Asset = {
+  mint: string
   symbol: string
   name?: string
   image_uri?: string
@@ -32,33 +32,35 @@ const assetColumns: VirtualTableColumn<Asset>[] = [
 
 export default function Home() {
   const [rangeDays, setRangeDays] = useState(365)
+  const [selectedMint, setSelectedMint] = useState('So11111111111111111111111111111111111111112')
   const { assets, loading: catalogLoading, meta: catalogMeta, error: catalogError } = useCatalog() as any
-  const navigate = useNavigate()
-  const market = useWorkerResource(workerApi.market, []) as any
+  const selectedAssetResult = useWorkerResource((options: any) => workerApi.asset(selectedMint, options), [selectedMint]) as any
   const swaps = useWorkerResource(workerApi.swaps, []) as any
-  const sortedAssets = [...assets].sort((left: Asset, right: Asset) => Number(right.market_cap_usd || 0) - Number(left.market_cap_usd || 0)) as Asset[]
-  const history = marketHistoryFrom(market.data, sortedAssets).sort((left: [string, number], right: [string, number]) => new Date(left[0]).valueOf() - new Date(right[0]).valueOf()) as [string, number][]
+  const catalogAssets = assets as Asset[]
+  const selectedAsset = selectedAssetResult.data ? (selectedAssetResult.data.asset || selectedAssetResult.data) : null
+  const history = assetHistoryFrom(selectedAsset).sort((left, right) => new Date(left[0]).valueOf() - new Date(right[0]).valueOf()) as [string, number][]
   const firstDate = new Date()
   firstDate.setDate(firstDate.getDate() - rangeDays)
   const visibleHistory = history.filter(([date]) => rangeDays === 1000 || new Date(date) >= firstDate).map(([date, value]) => ({ date, value: Number(value) }))
-  const latestMarketCap = visibleHistory.at(-1)?.value || history.at(-1)?.[1] || 0
+  const selectedPrice = selectedAsset?.price ?? selectedAsset?.price_usd
+  const selectedSymbol = selectedAsset?.symbol || catalogAssets.find((asset) => asset.mint === selectedMint)?.symbol || 'SOL'
   const recentSwaps = swapsFrom(swaps.data).slice(0, 5)
 
   return <div className="iris-shell">
     <Navbar />
-    <DataStatus meta={market.meta || catalogMeta} error={market.error || catalogError} onRetry={() => { market.refetch(); swaps.refetch(); }} refreshing={market.refreshing || swaps.refreshing} />
-    {(market.loading || catalogLoading) ? <main className="iris-loading">Loading market data...</main> : <main className="iris-page">
-      <section className="iris-page-heading"><div><p className="iris-eyebrow">Solana explorer</p><h1>Market overview</h1><p>Public market, asset, and on-demand wallet data from the Iris Worker.</p></div><span className="iris-block">{market.data?.slot ? `Slot ${market.data.slot}` : 'Slot unavailable'}</span></section>
+    <DataStatus meta={selectedAssetResult.meta || catalogMeta} error={selectedAssetResult.error || catalogError} onRetry={() => { selectedAssetResult.refetch(); swaps.refetch(); }} refreshing={selectedAssetResult.refreshing || swaps.refreshing} />
+    {(selectedAssetResult.loading || catalogLoading) ? <main className="iris-loading">Loading market data...</main> : <main className="iris-page">
+      <section className="iris-page-heading"><div><p className="iris-eyebrow">Solana explorer</p><h1>Market overview</h1><p>Public market, asset, and on-demand wallet data from the Iris Worker.</p></div><span className="iris-block">{selectedAssetResult.meta?.marketDataAsOf ? `Updated ${selectedAssetResult.meta.marketDataAsOf}` : 'Market time unavailable'}</span></section>
       <section className="iris-metrics">
-        <MetricCard label="Solana market cap" value={currency(latestMarketCap)} detail="Supported assets, aggregated from current history" />
-        <MetricCard label="Tracked assets" value={sortedAssets.length.toLocaleString()} detail="Public assets in the Worker catalog" />
+        <MetricCard label={`${selectedSymbol} price`} value={currency(selectedPrice, 5)} detail="Selected asset's current Jupiter price" />
+        <MetricCard label="Tracked assets" value={catalogAssets.length.toLocaleString()} detail="Verified public assets in the Worker catalog" />
         <MetricCard label="Wallet lookup" value="Public" detail="No connection or private data required" />
       </section>
       <section className="iris-dashboard-grid">
-        <div className="iris-panel iris-chart-panel"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Market history</p><h2>{currency(latestMarketCap)}</h2></div><div className="iris-range" aria-label="Market history range">{[[7, '1W'], [30, '1M'], [365, '1Y'], [1000, 'MAX']].map(([days, label]) => <button key={label} className={rangeDays === days ? 'active' : ''} onClick={() => setRangeDays(days as number)}>{label}</button>)}</div></div>{visibleHistory.length ? <AreaChart points={visibleHistory} valueFormatter={(value) => currency(value)} /> : <p className="iris-empty">No market history available.</p>}</div>
+        <div className="iris-panel iris-chart-panel"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Price history</p><h2>{selectedSymbol} / USD</h2></div><div className="iris-range" aria-label="Asset price history range">{[[7, '1W'], [30, '1M'], [365, '1Y'], [1000, 'MAX']].map(([days, label]) => <button key={label} className={rangeDays === days ? 'active' : ''} onClick={() => setRangeDays(days as number)}>{label}</button>)}</div></div>{visibleHistory.length ? <AreaChart points={visibleHistory} valueFormatter={(value) => currency(value)} /> : <p className="iris-empty">No price history available.</p>}</div>
         <div className="iris-panel iris-activity-panel"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Recent swaps</p><h2>Activity feed</h2></div><span>{recentSwaps.length} events</span></div>{recentSwaps.length ? <div className="iris-activity-list">{recentSwaps.map((swap: any, index: number) => <div className="iris-activity-row" key={`${swap.transaction || swap.date}-${index}`}><div><strong>{swap.type || 'SWAP'}</strong><span>{swap.asset?.symbol || swap.maker || 'Verified DEX transaction'}</span></div><div><strong>{swap.value?.amount === undefined ? 'Details unavailable' : currency(swap.value.amount)}</strong><small>{swap.date || 'Date unavailable'}</small></div></div>)}</div> : <p className="iris-empty">No recent indexed Solana DEX swaps are available.</p>}</div>
       </section>
-      <section className="iris-section"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Market catalog</p><h2>Assets</h2></div><span>{sortedAssets.length} tracked</span></div><VirtualTable columns={assetColumns} data={sortedAssets} emptyLabel="No assets are available." filterPlaceholder="Filter assets" onRowClick={(asset: any) => navigate(`/asset/${encodeURIComponent(asset.mint || asset.symbol)}`)} /></section>
+      <section className="iris-section"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Market catalog</p><h2>Assets</h2></div><span>{catalogAssets.length} tracked</span></div><VirtualTable columns={assetColumns} data={catalogAssets} emptyLabel="No assets are available." filterPlaceholder="Filter assets" onRowClick={(asset: Asset) => setSelectedMint(asset.mint)} /></section>
     </main>}
   </div>
 }

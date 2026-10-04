@@ -1,4 +1,4 @@
-import { assetsFrom, swapsFrom, walletFrom } from './normalizers';
+import { assetHistoryFrom, assetsFrom, swapsFrom, walletFrom } from './normalizers';
 
 test('normalizes canonical Worker object swaps for the table', () => {
   const [swap] = swapsFrom({ swaps: [{
@@ -16,6 +16,16 @@ test('normalizes canonical Worker object swaps for the table', () => {
     value: expect.objectContaining({ symbol: 'SOL', amount: 125 }),
     categoryAmount: 125,
   }));
+});
+
+test('keeps nullable Worker market fields and ignores unavailable history', () => {
+  const [asset] = assetsFrom([{ mint: 'MintCaseSensitiveABC', symbol: 'TEST', price: null, marketCap: null, supply: null }]);
+
+  expect(asset.price_usd).toBeNull();
+  expect(asset.market_cap_usd).toBeNull();
+  expect(asset.normalized_supply).toBeNull();
+  expect(assetHistoryFrom({ priceHistory: null })).toEqual([]);
+  expect(assetHistoryFrom({ priceHistory: [{ date: '2026-10-01T00:00:00Z', price: 2 }] })).toEqual([['2026-10-01T00:00:00Z', 2]]);
 });
 
 test('normalizes Solana mint aliases without changing case', () => {

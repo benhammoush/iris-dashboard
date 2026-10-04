@@ -1,14 +1,14 @@
 # Iris
 
-Iris is a Create React App portfolio dashboard backed only by the Iris Worker API. The browser never contacts chain, pricing, or legacy application providers directly.
+Iris is a Vite portfolio dashboard backed only by the Iris Worker API. The browser never contacts chain, pricing, or legacy application providers directly.
 
 ## Architecture
 
 `src/api/client.js` is the sole HTTP client. It reads `VITE_API_BASE`, adds request IDs, applies a 10-second timeout, parses Worker response envelopes (`{ data, meta }`), and normalizes failures. `src/api/worker.js` calls the Worker `/v2` Solana routes. The client adapts mint-identified assets, market history, prices, wallet activity, and registered-pool swaps for the UI.
 
-Worker errors are shown to users. Market, asset catalog, and swap requests use local, non-sensitive emergency display fixtures only when `REACT_APP_ENABLE_FIXTURES=true`; the status line identifies fixture data. Wallet details never use a fixture address: an unconfigured or unknown address is shown as not tracked.
+Worker errors are shown to users. Market, asset catalog, and swap requests use local, non-sensitive emergency display fixtures only when `VITE_ENABLE_FIXTURES=true`; the status line identifies fixture data. Wallet details never use a fixture address: an unconfigured or unknown address is shown as not tracked.
 
-Supported Solana assets use Jupiter metadata/prices and GeckoTerminal history where available. Assets without verified provider coverage remain snapshot-backed and are identified in the Worker response. Any public Solana address can be queried for Helius balances and decoded activity through the Worker. The Recent Swaps feed covers reviewed registered pools, not the entire chain.
+The catalog shows up to 50 Jupiter-verified top-traded assets plus SOL. The Home chart defaults to SOL and changes when a catalog row is selected; it shows per-asset GeckoTerminal price history, not aggregate market-cap history. Provider market cap and supply are displayed directly when available; missing values remain unavailable rather than showing `$0`. Any public Solana address can be queried for Helius balances and decoded activity through the Worker. The Recent Swaps feed covers reviewed registered pools, not the entire chain.
 
 The data-status banner shows the last completed Worker refresh and the next scheduled 15-minute UTC cron boundary. The displayed next schedule advances locally and does not imply that the cron refresh succeeded.
 
