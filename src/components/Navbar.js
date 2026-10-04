@@ -10,7 +10,7 @@ function Navbar({ fees = null }) {
   const navigate = useNavigate();
   const { mode, setMode } = useTheme();
   const normalized = query.trim().toUpperCase();
-  const assetMatches = normalized ? assets.filter((asset) => asset.symbol?.startsWith(normalized)).slice(0, 5) : [];
+  const assetMatches = normalized ? assets.filter((asset) => [asset.symbol, asset.name, asset.contractId, asset.asset_identifier].some((value) => value?.toUpperCase().includes(normalized))).slice(0, 5) : [];
   const walletMatches = normalized ? wallets.filter((wallet) => (wallet.address || wallet).toUpperCase().startsWith(normalized)).slice(0, 3) : [];
 
   function go(path) {
@@ -26,7 +26,7 @@ function Navbar({ fees = null }) {
       <div className="iris-search">
         <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search assets or tracked wallets" aria-label="Search assets or tracked wallets" />
         {query && <ul className="iris-results">
-          {assetMatches.map((asset) => <li key={asset.symbol}><button onClick={() => go(`/asset/${asset.symbol}`)}>{asset.symbol} · ${Number(asset.price_usd || 0).toFixed(5)}</button></li>)}
+           {assetMatches.map((asset) => <li key={asset.contractId || asset.asset_identifier || asset.symbol}><button onClick={() => go(`/asset/${encodeURIComponent(asset.contractId || asset.asset_identifier || asset.symbol)}`)}>{asset.symbol} · {asset.price_usd === null || asset.price_usd === undefined ? 'Price unavailable' : `$${Number(asset.price_usd).toFixed(5)}`}</button></li>)}
           {walletMatches.map((wallet) => { const address = wallet.address || wallet; return <li key={address}><button onClick={() => go(`/wallet/${address}`)}>{wallet.label || address}</button></li>; })}
           {!assetMatches.length && !walletMatches.length && <li><button disabled>No loaded matches.</button></li>}
         </ul>}

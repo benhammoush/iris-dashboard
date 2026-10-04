@@ -25,7 +25,7 @@ export default function Asset() {
   return <div className="iris-shell">
     <Navbar />
     <DataStatus meta={result.meta} error={result.error} onRetry={() => { result.refetch(); swaps.refetch(); }} refreshing={result.refreshing || swaps.refreshing} />
-    {result.loading ? <main className="iris-loading">Loading asset data...</main> : !asset ? <main className="iris-loading">No Worker data for {symbol}.</main> : <main className="iris-page">
+    {result.loading ? <main className="iris-loading">Loading asset data...</main> : result.error ? <main className="iris-loading"><div><p>{result.error.code === 'ASSET_NOT_FOUND' ? 'This asset is not in the Worker catalog.' : result.error.code === 'ASSET_SYMBOL_AMBIGUOUS' ? 'This symbol matches multiple contracts. Select the asset from the catalog.' : 'Asset data is currently unavailable from the Worker.'}</p>{result.error.requestId && <p className="iris-wallet-address">Request {result.error.requestId}</p>}<button className="iris-retry" onClick={result.refetch}>Retry</button></div></main> : !asset ? <main className="iris-loading">No asset was returned for {symbol}.</main> : <main className="iris-page">
       <section className="iris-asset-heading"><div className="iris-asset-identity"><AssetIcon src={asset.image_uri} symbol={asset.symbol} /><div><p className="iris-eyebrow">Stacks asset</p><h1>{asset.name} <span>{asset.symbol}</span></h1><p title={asset.contract_principal || asset.asset_identifier}>{asset.contract_principal || asset.asset_identifier || 'No contract identifier available'}</p></div></div><Change value={asset.change_24h} /></section>
       <section className="iris-metrics">
         <MetricCard label="Price" value={currency(asset.price_usd)} detail="Current Worker market price" />
