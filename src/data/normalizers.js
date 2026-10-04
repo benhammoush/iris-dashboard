@@ -10,10 +10,10 @@ export function assetsFrom(data) {
        total_supply: asset.total_supply ?? asset.totalSupply ?? asset.supply,
        normalized_supply: asset.normalized_supply ?? asset.supply,
       market_cap_usd: asset.market_cap_usd ?? asset.marketCap ?? asset.market_cap,
-      change_24h: asset.change_24h ?? asset.changes?.['24h'] ?? asset.change?.day,
-      change_7d: asset.change_7d ?? asset.changes?.['7d'] ?? asset.change?.week,
-      change_30d: asset.change_30d ?? asset.changes?.['30d'] ?? asset.change?.month,
-      asset_identifier: asset.asset_identifier || asset.identifier || asset.contract_principal,
+       change_24h: asset.change_24h ?? asset.change24h ?? asset.changes?.['24h'] ?? asset.change?.day ?? null,
+       change_7d: asset.change_7d ?? asset.change7d ?? asset.changes?.['7d'] ?? asset.change?.week ?? null,
+       change_30d: asset.change_30d ?? asset.change30d ?? asset.changes?.['30d'] ?? asset.change?.month ?? null,
+       asset_identifier: asset.asset_identifier || asset.identifier || asset.contract_principal || asset.contractId,
     };
     return {
       symbol: asset[0], price_usd: asset[1], image_uri: asset[2], total_supply: asset[3],
@@ -44,7 +44,7 @@ export function walletFrom(data) {
     address: wallet.address || wallet.wallet_address,
     label: wallet.label || wallet.name || wallet.address,
     description: wallet.description || wallet.summary || '',
-    totalValue: wallet.totalValue ?? wallet.total_value_usd ?? wallet.value_usd,
+    totalValue: wallet.totalValue ?? wallet.portfolioTotal ?? wallet.total_value_usd ?? wallet.value_usd,
     assets: (wallet.assets || []).map((asset) => ({
       ...asset,
       symbol: asset.symbol || asset.ticker || asset.asset,
@@ -55,14 +55,15 @@ export function walletFrom(data) {
       price: asset.price ?? asset.price_usd ?? asset.usd_price,
       value: asset.value ?? asset.value_usd ?? asset.valueUsd,
     })),
-    transactions: (wallet.transactions || wallet.activity || []).slice(0, 25).map((transaction) => ({
+    transactions: (wallet.activity || wallet.transactions || []).slice(0, 25).map((transaction) => ({
       ...transaction,
       timestamp: transaction.timestamp || transaction.occurredAt || transaction.date || transaction.time || transaction.block_time,
       id: transaction.id || transaction.txId || transaction.txid || transaction.tx_id || transaction.transactionId || transaction.transaction_id || transaction.hash,
       type: transaction.type || transaction.action || transaction.activity_type || transaction.category || transaction.direction,
       symbol: transaction.symbol || transaction.assetSymbol || transaction.asset_symbol || transaction.asset?.symbol || transaction.token?.symbol || transaction.token_symbol,
       amount: transaction.displayAmount ?? transaction.amountDisplay ?? transaction.display_amount ?? transaction.amount ?? transaction.quantity,
-      value: transaction.value ?? transaction.value_usd ?? transaction.valueUsd ?? transaction.usd_value,
+       value: transaction.value ?? transaction.value_usd ?? transaction.valueUsd ?? transaction.usd_value,
+       transfers: transaction.transfers || { stx: transaction.stxTransfers || [], fungible: transaction.ftTransfers || [], nft: transaction.nftTransfers || [] },
     })),
   };
 }
@@ -78,9 +79,9 @@ export function swapsFrom(data) {
     }
     return swapFromParts({
       date: swap.date || swap.timestamp || swap.sync_at || swap.block_time,
-      transaction: swap.transaction || swap.tx_id || swap.txid || swap.transaction_id,
+       transaction: swap.transaction || swap.id || swap.txId || swap.tx_id || swap.txid || swap.transaction_id,
       maker: swap.maker || swap.sender || swap.wallet || swap.address,
-      type: swap.type || swap.side || swap.direction,
+       type: swap.type || swap.side || swap.direction || 'SWAP',
       input: tokenFrom(swap.input || swap.asset_in || swap.token_in || swap.from || swap.sold),
       output: tokenFrom(swap.output || swap.asset_out || swap.token_out || swap.to || swap.bought),
     });
@@ -100,17 +101,18 @@ function tokenFrom(token) {
 function swapFromParts({ date, transaction, maker, type, input, output }) {
   const normalizedType = String(type || '').toUpperCase();
   const isBuy = normalizedType === 'BUY';
-  const asset = isBuy ? output : input;
-  const value = isBuy ? input : output;
+  const hasDirection = normalizedType === 'BUY' || normalizedType === 'SELL';
+  const asset = hasDirection ? (isBuy ? output : input) : null;
+  const value = hasDirection ? (isBuy ? input : output) : null;
   return {
     date,
     transaction,
     maker,
     type: normalizedType,
     asset,
-    amount: asset.amount,
+    amount: asset?.amount,
     value,
-    categoryAmount: value.amount,
+    categoryAmount: value?.amount,
   };
 }
 

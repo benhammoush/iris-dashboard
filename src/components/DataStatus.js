@@ -18,7 +18,7 @@ function nextScheduledRefresh(meta, now) {
   return new Date(scheduledAt + (Math.floor((now - scheduledAt) / intervalMs) + 1) * intervalMs).toISOString();
 }
 
-function DataStatus({ meta, error, showPriceNotice = true }) {
+function DataStatus({ meta, error, showPriceNotice = true, onRetry, refreshing = false }) {
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 1_000);
@@ -34,7 +34,7 @@ function DataStatus({ meta, error, showPriceNotice = true }) {
   return (
     <div className="iris-data-status" role="status">
       {showPriceNotice && <p><strong>Market data:</strong> {liveMarket ? `Supported Stacks assets use ${meta?.marketDataSource === 'mixed' ? 'live DEX prices and ' : ''}CoinGecko chart history${asOf ? ` refreshed ${asOf}` : ''}; unsupported assets remain clearly snapshot-backed.` : `Price and chart data use a fixed market snapshot${asOf ? ` as of ${asOf}` : ''}. Blockchain fees, blocks, balances, and activity remain live.`}</p>}
-      <p className={showPriceNotice ? 'iris-data-status-detail' : ''}>{source}{meta?.as_of ? ` as of ${meta.as_of}` : ''}{error ? `: ${error.message}` : ''}</p>
+      <p className={showPriceNotice ? 'iris-data-status-detail' : ''}>{source}{meta?.as_of ? ` as of ${meta.as_of}` : ''}{error ? `: ${error.message}` : ''}{error?.requestId ? ` (request ${error.requestId})` : ''}{onRetry && <button className="iris-retry" onClick={onRetry} disabled={refreshing}>{refreshing ? 'Refreshing...' : 'Retry'}</button>}</p>
       {(lastRefresh || nextRefresh) && <p className="iris-data-status-detail">{lastRefresh && `Last completed API refresh: ${lastRefresh}.`}{lastRefresh && nextRefresh && ' '}{nextRefresh && `Next scheduled API refresh: ${nextRefresh}.`}</p>}
     </div>
   );

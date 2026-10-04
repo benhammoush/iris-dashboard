@@ -4,17 +4,18 @@ import { walletFrom } from '../data/normalizers'
 import { useWorkerResource } from '../hooks/useWorkerResource'
 import DataStatus from './DataStatus'
 import Navbar from './Navbar'
+import AssetIcon from './AssetIcon'
 import { MetricCard, VirtualTable, type VirtualTableColumn } from '../design-system'
 
 type Holding = { symbol?: string; imageUrl?: string; price?: number; value?: number; displayBalance?: string; balance?: number; rawBalance?: number }
 type Activity = { id?: string; timestamp?: string; type?: string; symbol?: string; amount?: number; value?: number }
 
-const currency = (value: number | undefined) => `$${Number(value || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })}`
+const currency = (value: number | undefined | null) => value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : `$${Number(value).toLocaleString('en-US', { maximumFractionDigits: 2 })}`
 const balance = (asset: Holding) => asset.displayBalance || Number(asset.balance ?? asset.rawBalance ?? 0).toLocaleString('en-US', { maximumFractionDigits: 8 })
 const dateTime = (value: string | undefined) => { const date = value && new Date(value); return date && !Number.isNaN(date.valueOf()) ? date.toLocaleString('en-US') : value || '-' }
 
 const holdingsColumns: VirtualTableColumn<Holding>[] = [
-  { id: 'asset', label: 'Asset', width: 190, value: (asset) => asset.symbol || '', cell: (asset) => <span className="iris-asset-cell">{asset.imageUrl && <img src={asset.imageUrl} alt="" />}<strong>{asset.symbol || 'Unknown asset'}</strong></span> },
+  { id: 'asset', label: 'Asset', width: 190, value: (asset) => asset.symbol || '', cell: (asset) => <span className="iris-asset-cell"><AssetIcon src={asset.imageUrl} symbol={asset.symbol} /><strong>{asset.symbol || 'Unknown asset'}</strong></span> },
   { id: 'price', label: 'Price', width: 130, align: 'right', value: (asset) => asset.price || 0, cell: (asset) => currency(asset.price) },
   { id: 'balance', label: 'Balance', width: 160, align: 'right', value: (asset) => balance(asset), cell: balance },
   { id: 'value', label: 'Value', width: 150, align: 'right', value: (asset) => asset.value || 0, cell: (asset) => currency(asset.value) },
@@ -36,7 +37,7 @@ export default function Wallet() {
   const wallet = walletFrom(result.data) as any
   const notTracked = result.error?.code === 'NOT_FOUND' || result.error?.code === 'NOT_TRACKED' || result.error?.status === 404
 
-  return <div className="iris-shell"><Navbar /><DataStatus meta={result.meta} error={result.error} />
+  return <div className="iris-shell"><Navbar /><DataStatus meta={result.meta} error={result.error} onRetry={result.refetch} refreshing={result.refreshing} />
     {result.loading ? <main className="iris-loading">Loading tracked wallet...</main> : notTracked ? <Unavailable address={address} text="This address is not tracked. Featured wallets have not been configured." /> : result.error ? <Unavailable address={address} text="Wallet data is currently unavailable from the Worker." /> : !wallet ? <Unavailable address={address} text="This address is not tracked." /> : <main className="iris-page">
       <section className="iris-page-heading"><div><p className="iris-eyebrow">Public wallet</p><h1>{wallet.label || address}</h1>{wallet.description && <p>{wallet.description}</p>}<p className="iris-wallet-address">{address}</p></div><span className="iris-block">On-chain data only</span></section>
       <p className="iris-disclosure">Public on-chain data only. Balances and activity are provided by the Worker, may be delayed or incomplete, and do not require a wallet connection or private information.</p>
