@@ -15,7 +15,8 @@ export default function Asset() {
   const [rangeDays, setRangeDays] = useState(365)
   const result = useWorkerResource((options: any) => workerApi.asset(symbol, options), [symbol]) as any
   const swaps = useWorkerResource(workerApi.swaps, []) as any
-  const asset = assetsFrom(result.data?.asset ? [result.data.asset] : result.data)[0] as any
+  const assetPayload = result.data?.asset ? [result.data.asset] : Array.isArray(result.data) ? result.data : result.data ? [result.data] : []
+  const asset = assetsFrom(assetPayload)[0] as any
   const history = assetHistoryFrom(result.data?.asset || result.data).sort((left: [string, number], right: [string, number]) => new Date(left[0]).valueOf() - new Date(right[0]).valueOf()) as [string, number][]
   const fromDate = new Date()
   fromDate.setDate(fromDate.getDate() - rangeDays)
