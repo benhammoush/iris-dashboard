@@ -6,7 +6,7 @@ import NoMatch from './components/NoMatch';
 import Catalog from './components/Catalog';
 import { CatalogProvider } from './contexts/CatalogContext';
 import { apiConfigurationError } from './api/client';
-import { ThemeProvider } from './contexts/ThemeContext';
+import { ThemeProvider } from './design-system';
 function App() {
   const location = useLocation(); // utilisez useLocation pour obtenir l'URL actuelle
 

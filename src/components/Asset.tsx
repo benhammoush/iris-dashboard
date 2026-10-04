@@ -3,10 +3,9 @@ import { useParams } from 'react-router-dom'
 import { workerApi } from '../api/worker'
 import { assetHistoryFrom, assetsFrom, swapsFrom } from '../data/normalizers'
 import { useWorkerResource } from '../hooks/useWorkerResource'
-import HistoryChart from './charts/HistoryChart'
 import DataStatus from './DataStatus'
 import Navbar from './Navbar'
-import MetricCard from './ui/MetricCard'
+import { AreaChart, MetricCard } from '../design-system'
 
 const currency = (value: number, digits = 5) => `$${Number(value || 0).toLocaleString('en-US', { maximumFractionDigits: digits })}`
 
@@ -32,7 +31,7 @@ export default function Asset() {
         <MetricCard label="Market cap" value={currency(asset.market_cap_usd, 2)} detail="Market-cap estimate" />
         <MetricCard label="Supply" value={Number(asset.normalized_supply ?? asset.total_supply ?? 0).toLocaleString('en-US', { maximumFractionDigits: 2 })} detail="Reported token supply" />
       </section>
-      <section className="iris-section iris-asset-chart"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Price history</p><h2>{asset.symbol} / USD</h2></div><div className="iris-range" aria-label="Asset price history range">{[[7, '1W'], [30, '1M'], [365, '1Y'], [1000, 'MAX']].map(([days, label]) => <button key={label} className={rangeDays === days ? 'active' : ''} onClick={() => setRangeDays(days as number)}>{label}</button>)}</div></div>{visibleHistory.length ? <HistoryChart points={visibleHistory} valueFormatter={(value) => currency(value)} /> : <p className="iris-empty">No price history available.</p>}</section>
+      <section className="iris-section iris-asset-chart"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Price history</p><h2>{asset.symbol} / USD</h2></div><div className="iris-range" aria-label="Asset price history range">{[[7, '1W'], [30, '1M'], [365, '1Y'], [1000, 'MAX']].map(([days, label]) => <button key={label} className={rangeDays === days ? 'active' : ''} onClick={() => setRangeDays(days as number)}>{label}</button>)}</div></div>{visibleHistory.length ? <AreaChart points={visibleHistory} valueFormatter={(value) => currency(value)} /> : <p className="iris-empty">No price history available.</p>}</section>
       <section className="iris-section"><div className="iris-panel-heading"><div><p className="iris-eyebrow">DEX activity</p><h2>Recent {asset.symbol} swaps</h2></div><span>{assetSwaps.length} events</span></div>{assetSwaps.length ? <div className="iris-activity-list">{assetSwaps.map((swap: any, index: number) => <div className="iris-activity-row" key={`${swap.transaction || swap.date}-${index}`}><div><strong className={swap.type === 'BUY' ? 'iris-positive' : 'iris-negative'}>{swap.type || 'SWAP'}</strong><span>{Number(swap.amount || 0).toLocaleString('en-US')} {asset.symbol}</span></div><div><strong>{currency(swap.value?.amount || 0)}</strong><small>{swap.date || 'Date unavailable'}</small></div></div>)}</div> : <p className="iris-empty">No matching swap activity is available.</p>}</section>
     </main>}
   </div>

@@ -1,19 +1,19 @@
 import { AreaSeries, ColorType, createChart, type Time } from 'lightweight-charts'
 import { useEffect, useRef } from 'react'
-import { useTheme } from '../../contexts/ThemeContext'
+import { useTheme } from '../ThemeProvider'
 
-export interface HistoryPoint {
+export interface AreaChartPoint {
   date: string
   value: number
 }
 
 interface Props {
-  points: HistoryPoint[]
+  points: AreaChartPoint[]
   height?: number
   valueFormatter?: (value: number) => string
 }
 
-function asChartPoints(points: HistoryPoint[]) {
+function asChartPoints(points: AreaChartPoint[]) {
   return points.flatMap(({ date, value }) => {
     const timestamp = new Date(date).getTime()
     return Number.isFinite(timestamp) && Number.isFinite(value)
@@ -22,7 +22,7 @@ function asChartPoints(points: HistoryPoint[]) {
   })
 }
 
-export default function HistoryChart({ points, height = 360, valueFormatter }: Props) {
+export default function AreaChart({ points, height = 360, valueFormatter }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const { mode } = useTheme()
 

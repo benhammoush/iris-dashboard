@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useCatalog } from '../contexts/CatalogContext';
 import { APP_DISPLAY_VERSION } from '../appVersion';
-import { useTheme } from '../contexts/ThemeContext';
+import { useTheme } from '../design-system';
 
 function Navbar({ fees = null }) {
   const { assets, wallets } = useCatalog();

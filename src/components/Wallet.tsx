@@ -4,8 +4,7 @@ import { walletFrom } from '../data/normalizers'
 import { useWorkerResource } from '../hooks/useWorkerResource'
 import DataStatus from './DataStatus'
 import Navbar from './Navbar'
-import VirtualTable, { type VirtualTableColumn } from './tables/VirtualTable'
-import MetricCard from './ui/MetricCard'
+import { MetricCard, VirtualTable, type VirtualTableColumn } from '../design-system'
 
 type Holding = { symbol?: string; imageUrl?: string; price?: number; value?: number; displayBalance?: string; balance?: number; rawBalance?: number }
 type Activity = { id?: string; timestamp?: string; type?: string; symbol?: string; amount?: number; value?: number }

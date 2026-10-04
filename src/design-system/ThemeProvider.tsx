@@ -1,5 +1,5 @@
 import { createContext, type ReactNode, useContext, useState } from 'react'
-import { applyThemeMode, getThemeMode, type UiThemeMode } from '../theme'
+import { applyThemeMode, getThemeMode, type UiThemeMode } from './theme'
 
 interface ThemeContextValue {
   mode: UiThemeMode

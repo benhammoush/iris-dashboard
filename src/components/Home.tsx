@@ -4,11 +4,9 @@ import { workerApi } from '../api/worker'
 import { marketHistoryFrom, swapsFrom } from '../data/normalizers'
 import { useWorkerResource } from '../hooks/useWorkerResource'
 import { useCatalog } from '../contexts/CatalogContext'
-import HistoryChart from './charts/HistoryChart'
 import DataStatus from './DataStatus'
 import Navbar from './Navbar'
-import MetricCard from './ui/MetricCard'
-import VirtualTable, { type VirtualTableColumn } from './tables/VirtualTable'
+import { AreaChart, MetricCard, VirtualTable, type VirtualTableColumn } from '../design-system'
 
 type Asset = {
   symbol: string
@@ -56,7 +54,7 @@ export default function Home() {
         <MetricCard label="Curated wallets" value={wallets.length.toLocaleString()} detail="No connection or private data required" />
       </section>
       <section className="iris-dashboard-grid">
-        <div className="iris-panel iris-chart-panel"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Market history</p><h2>{currency(latestMarketCap)}</h2></div><div className="iris-range" aria-label="Market history range">{[[7, '1W'], [30, '1M'], [365, '1Y'], [1000, 'MAX']].map(([days, label]) => <button key={label} className={rangeDays === days ? 'active' : ''} onClick={() => setRangeDays(days as number)}>{label}</button>)}</div></div>{visibleHistory.length ? <HistoryChart points={visibleHistory} valueFormatter={(value) => currency(value)} /> : <p className="iris-empty">No market history available.</p>}</div>
+        <div className="iris-panel iris-chart-panel"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Market history</p><h2>{currency(latestMarketCap)}</h2></div><div className="iris-range" aria-label="Market history range">{[[7, '1W'], [30, '1M'], [365, '1Y'], [1000, 'MAX']].map(([days, label]) => <button key={label} className={rangeDays === days ? 'active' : ''} onClick={() => setRangeDays(days as number)}>{label}</button>)}</div></div>{visibleHistory.length ? <AreaChart points={visibleHistory} valueFormatter={(value) => currency(value)} /> : <p className="iris-empty">No market history available.</p>}</div>
         <div className="iris-panel iris-activity-panel"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Recent swaps</p><h2>Activity feed</h2></div><span>{recentSwaps.length} events</span></div>{recentSwaps.length ? <div className="iris-activity-list">{recentSwaps.map((swap: any, index: number) => <div className="iris-activity-row" key={`${swap.transaction || swap.date}-${index}`}><div><strong className={swap.type === 'BUY' ? 'iris-positive' : 'iris-negative'}>{swap.type || 'SWAP'}</strong><span>{swap.asset?.symbol || 'Unknown asset'}</span></div><div><strong>{currency(swap.value?.amount || 0)}</strong><small>{swap.date || 'Date unavailable'}</small></div></div>)}</div> : <p className="iris-empty">No recent swaps available.</p>}</div>
       </section>
       <section className="iris-section"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Market catalog</p><h2>Assets</h2></div><span>{sortedAssets.length} tracked</span></div><VirtualTable columns={assetColumns} data={sortedAssets} emptyLabel="No assets are available." filterPlaceholder="Filter assets" onRowClick={(asset) => navigate(`/asset/${asset.symbol}`)} /></section>

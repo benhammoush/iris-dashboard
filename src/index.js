@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
-import { applyThemeMode } from './theme';
+import { applyThemeMode } from './design-system';
 
 applyThemeMode(localStorage.getItem('color-theme') === 'dark' ? 'dark' : 'light');
 
