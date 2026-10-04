@@ -10,6 +10,8 @@ Worker errors are shown to users. Market, asset catalog, and swap requests use l
 
 Supported Stacks assets use live DEX Screener prices with CoinGecko historical charts. Assets without verified provider coverage remain snapshot-backed and are identified in the Worker response. Blockchain fees, blocks, wallet balances, and activity remain live.
 
+The data-status banner shows the last completed Worker refresh and the next scheduled 15-minute UTC cron boundary. The displayed next schedule advances locally and does not imply that the cron refresh succeeded.
+
 ## Local Development
 
 1. Copy `.env.example` to `.env.local` and set the Worker origin. Do not put credentials in browser environment variables.

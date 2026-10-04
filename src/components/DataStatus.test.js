@@ -21,3 +21,14 @@ test('identifies CoinGecko-only market data when DEX pricing is rate-limited', (
 
   expect(screen.getByText(/supported stacks assets use coingecko chart history/i)).toBeInTheDocument();
 });
+
+test('shows the last completed and next scheduled API refresh', () => {
+  render(<DataStatus meta={{
+    snapshotCreatedAt: '2026-10-04T12:00:00.000Z',
+    nextScheduledRefreshAt: '2099-10-04T12:15:00.000Z',
+    refreshIntervalMinutes: 15,
+  }} />);
+
+  expect(screen.getByText(/last completed api refresh: 04\/10\/2026 12:00 utc/i)).toBeInTheDocument();
+  expect(screen.getByText(/next scheduled api refresh: 04\/10\/2099 12:15 utc/i)).toBeInTheDocument();
+});
