@@ -43,10 +43,10 @@ test('renders a populated Worker wallet portfolio summary', async () => {
   const { container } = renderWallet();
 
   expect(await screen.findByText('Curated Wallet')).toBeInTheDocument();
-  expect(screen.getByText('1,234.56 $')).toBeInTheDocument();
+  expect(screen.getByText('$1,234.56')).toBeInTheDocument();
   expect(screen.getByText(/public on-chain data only/i)).toBeInTheDocument();
   expect(screen.getByText('42.5 STX')).toBeInTheDocument();
-  expect(screen.getByText('106.25 $')).toBeInTheDocument();
+  expect(screen.getByText('$106.25')).toBeInTheDocument();
   expect(container.querySelector('img[src="/stx.png"]')).toBeInTheDocument();
 });
 
@@ -55,6 +55,6 @@ test('renders normalized Worker transactions and limits recent activity to 25 ro
 
   expect(await screen.findByText('0xtx-1')).toBeInTheDocument();
   expect(screen.getByText('Sent')).toBeInTheDocument();
-  expect(screen.getByText('3.5 $')).toBeInTheDocument();
+  expect(screen.getByText('$3.5')).toBeInTheDocument();
   expect(screen.queryByText('0xtx-26')).not.toBeInTheDocument();
 });
