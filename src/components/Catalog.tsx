@@ -1,19 +1,24 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import { useCatalog } from '../contexts/CatalogContext'
 import Navbar from './Navbar'
 import AssetIcon from './AssetIcon'
+import { looksLikeSolanaAddress } from '../data/solana'
 
 export default function Catalog({ kind }: { kind: 'assets' | 'wallets' }) {
-  const { assets, wallets, loading, error } = useCatalog() as any
+  const { assets, loading, error } = useCatalog() as any
+  const [address, setAddress] = useState('')
+  const navigate = useNavigate()
   const showingAssets = kind === 'assets'
-  const items = showingAssets ? assets : wallets
+  const trimmedAddress = address.trim()
+  const validAddress = looksLikeSolanaAddress(trimmedAddress)
 
   return <div className="iris-shell"><Navbar />
     <main className="iris-page">
-      <section className="iris-page-heading"><div><p className="iris-eyebrow">Solana explorer</p><h1>{showingAssets ? 'Asset catalog' : 'Curated wallets'}</h1><p>{showingAssets ? 'Assets available through the public Iris Worker catalog.' : 'Public addresses selected for portfolio and activity monitoring.'}</p></div><span className="iris-block">{items.length} tracked</span></section>
-      {loading ? <p className="iris-empty">Loading catalog...</p> : error ? <p className="iris-empty">Catalog data is currently unavailable.</p> : <section className="iris-catalog-grid">
-        {showingAssets ? items.map((asset: any) => <Link key={asset.mint || asset.symbol} className="iris-catalog-card" to={`/asset/${encodeURIComponent(asset.mint || asset.symbol)}`}><AssetIcon src={asset.image_uri} symbol={asset.symbol} /><div><strong>{asset.symbol}</strong><small>{asset.name}</small></div><span>{asset.price_usd === null || asset.price_usd === undefined ? 'Price unavailable' : `$${Number(asset.price_usd).toLocaleString('en-US', { maximumFractionDigits: 5 })}`}</span></Link>) : items.map((wallet: any) => <Link key={wallet.address} className="iris-catalog-card" to={`/wallet/${wallet.address}`}><span className="iris-live-dot" /><div><strong>{wallet.label || wallet.address}</strong><small>{wallet.description || wallet.address}</small></div><span>View</span></Link>)}
-      </section>}
+      <section className="iris-page-heading"><div><p className="iris-eyebrow">Solana explorer</p><h1>{showingAssets ? 'Asset catalog' : 'Public wallet lookup'}</h1><p>{showingAssets ? 'Assets available through the public Iris Worker catalog.' : 'Paste any public Solana address to view its current portfolio and activity.'}</p></div>{showingAssets && <span className="iris-block">{assets.length} tracked</span>}</section>
+      {showingAssets ? (loading ? <p className="iris-empty">Loading catalog...</p> : error ? <p className="iris-empty">Catalog data is currently unavailable.</p> : <section className="iris-catalog-grid">
+        {assets.map((asset: any) => <Link key={asset.mint || asset.symbol} className="iris-catalog-card" to={`/asset/${encodeURIComponent(asset.mint || asset.symbol)}`}><AssetIcon src={asset.image_uri} symbol={asset.symbol} /><div><strong>{asset.symbol}</strong><small>{asset.name}</small></div><span>{asset.price_usd === null || asset.price_usd === undefined ? 'Price unavailable' : `$${Number(asset.price_usd).toLocaleString('en-US', { maximumFractionDigits: 5 })}`}</span></Link>)}
+      </section>) : <section className="iris-section"><div className="iris-search"><input value={address} onChange={(event) => setAddress(event.target.value)} placeholder="Solana wallet address" aria-label="Solana wallet address" /><button className="iris-retry" disabled={!validAddress} onClick={() => navigate(`/wallet/${encodeURIComponent(trimmedAddress)}`)}>View wallet</button></div>{address && !validAddress && <p className="iris-empty">Enter a valid Base58 Solana address.</p>}</section>}
     </main>
   </div>
 }

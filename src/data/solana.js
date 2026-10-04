@@ -3,3 +3,7 @@ export function solanaExplorerUrl(kind, value) {
   const path = kind === 'tx' ? 'tx' : kind === 'address' ? 'address' : null;
   return path ? `https://explorer.solana.com/${path}/${encodeURIComponent(value)}` : null;
 }
+
+export function looksLikeSolanaAddress(value) {
+  return typeof value === 'string' && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(value);
+}

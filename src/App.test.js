@@ -13,7 +13,7 @@ beforeEach(() => {
 
 test('renders the Worker-backed portfolio shell', async () => {
   const { unmount } = render(<BrowserRouter><App /></BrowserRouter>);
-  expect(await screen.findByPlaceholderText(/search assets or tracked wallets/i)).toBeInTheDocument();
+  expect(await screen.findByPlaceholderText(/search assets or paste a wallet address/i)).toBeInTheDocument();
   await waitFor(() => expect(screen.getByText(/no market history available/i)).toBeInTheDocument());
   unmount();
 });
