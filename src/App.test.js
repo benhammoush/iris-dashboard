@@ -22,5 +22,5 @@ test('asset table navigation uses the router', async () => {
   render(<BrowserRouter><App /></BrowserRouter>);
   await screen.findByText('STX');
   await act(async () => { await userEvent.click(screen.getByText('STX')); });
-  expect(await screen.findByText(/Stacks \| STX/)).toBeInTheDocument();
+  expect(await screen.findByRole('heading', { name: /Stacks STX/ })).toBeInTheDocument();
 });

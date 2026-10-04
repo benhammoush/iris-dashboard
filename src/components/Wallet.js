@@ -1,4 +1,3 @@
-import '../App.css';
 import { useParams, useNavigate } from 'react-router-dom';
 import { workerApi } from '../api/worker';
 import { walletFrom } from '../data/normalizers';

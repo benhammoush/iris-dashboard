@@ -1,19 +1,125 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+* { box-sizing: border-box; }
+html, body, #root { min-height: 100%; }
+body { margin: 0; background: var(--app-bg, #f5f7fb); color: var(--app-fg, #17212f); font-family: system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.iris-shell { min-height: 100vh; background: var(--app-bg, #f5f7fb); color: var(--app-fg, #17212f); padding-bottom: 64px; }
+.iris-header { position: sticky; top: 0; z-index: 50; display: flex; height: 46px; align-items: stretch; gap: 8px; padding: 0 14px; background: var(--iris-secondary); border-bottom: 1px solid var(--iris-border); }
+.iris-brand, .iris-header-actions, .iris-nav, .iris-search { display: flex; align-items: center; }
+.iris-brand { gap: 8px; padding-right: 8px; color: var(--iris-text); text-decoration: none; }
+.iris-brand-mark { display: grid; width: 24px; height: 24px; place-items: center; overflow: hidden; border: 1px solid var(--iris-border-strong); border-radius: 5px; background: var(--iris-surface); }
+.iris-brand-mark img { width: 20px; height: 20px; object-fit: contain; }
+.iris-brand-name { font: 700 14px 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif; letter-spacing: .4px; }
+.iris-version, .iris-status, .iris-theme-button { font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; color: var(--iris-muted); }
+.iris-divider { align-self: stretch; width: 1px; margin: 9px 2px; background: var(--iris-border); }
+.iris-nav { gap: 2px; }
+.iris-nav a { padding: 4px 9px; border: 1px solid transparent; border-radius: 3px; color: var(--iris-secondary-text); font-size: 12px; text-decoration: none; }
+.iris-nav a:hover, .iris-nav a.active { border-color: var(--iris-border-strong); background: var(--iris-hover); color: var(--iris-text); }
+.iris-search { position: relative; width: min(360px, 30vw); margin-left: 4px; }
+.iris-search input { width: 100%; border: 1px solid var(--iris-border); border-radius: 4px; outline: none; background: var(--iris-input); color: var(--iris-text); padding: 5px 9px; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 11px; }
+.iris-search input:focus { border-color: var(--iris-border-strong); }
+.iris-results { position: absolute; top: calc(100% + 5px); right: 0; left: 0; margin: 0; padding: 4px; list-style: none; border: 1px solid var(--iris-border); border-radius: 4px; background: var(--iris-secondary); box-shadow: var(--iris-dropdown-shadow); }
+.iris-results button { width: 100%; border: 0; border-radius: 3px; background: transparent; color: var(--iris-text); cursor: pointer; padding: 6px 8px; text-align: left; font-size: 11px; }
+.iris-results button:hover { background: var(--iris-hover); }
+.iris-header-actions { gap: 8px; margin-left: auto; }
+.iris-live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--iris-green); box-shadow: 0 0 5px var(--iris-green); }
+.iris-theme-button { cursor: pointer; border: 1px solid var(--iris-border); border-radius: 3px; background: transparent; padding: 3px 8px; }
+.iris-theme-button:hover { background: var(--iris-hover); color: var(--iris-text); }
+.iris-mobile-nav { display: none; }
+.iris-data-status { border-bottom: 1px solid var(--iris-border); background: var(--iris-secondary); color: var(--iris-secondary-text); padding: 7px 14px; font-size: 11px; }
+.iris-data-status p { margin: 0; }
+.iris-data-status strong { color: var(--iris-text); }
+.iris-data-status-detail { margin-top: 3px !important; color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; }
+
+.iris-page { width: min(1440px, 100%); margin: 0 auto; padding: 28px; }
+.iris-loading { display: grid; min-height: calc(100vh - 46px); place-items: center; color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 12px; }
+.iris-page-heading, .iris-panel-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.iris-page-heading { margin-bottom: 22px; }
+.iris-page-heading h1, .iris-panel-heading h2 { margin: 2px 0 0; color: var(--iris-text); font-family: 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif; }
+.iris-page-heading h1 { font-size: 24px; letter-spacing: -.4px; }
+.iris-page-heading p:not(.iris-eyebrow) { margin: 6px 0 0; color: var(--iris-secondary-text); font-size: 13px; }
+.iris-eyebrow { margin: 0; color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; }
+.iris-block, .iris-panel-heading > span { padding: 4px 7px; border: 1px solid var(--iris-border); border-radius: 3px; color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; white-space: nowrap; }
+.iris-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
+.iris-metric-card, .iris-panel, .iris-section { border: 1px solid var(--iris-border); border-radius: 7px; background: var(--app-surface); box-shadow: 0 2px 12px rgba(15, 23, 42, .06); }
+.iris-metric-card { min-height: 112px; padding: 15px; }
+.iris-metric-value { margin: 8px 0 3px; color: var(--iris-text); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 21px; font-weight: 700; letter-spacing: -.5px; }
+.iris-metric-value--positive, .iris-positive { color: var(--iris-green); }
+.iris-metric-value--negative, .iris-negative { color: var(--iris-red, #dc2626); }
+.iris-metric-detail, .iris-asset-cell small, .iris-wallet-card small, .iris-activity-row small { display: block; margin: 0; color: var(--iris-muted); font-size: 11px; }
+.iris-dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(280px, .85fr); gap: 14px; }
+.iris-panel { overflow: hidden; }
+.iris-panel-heading { padding: 14px 15px; border-bottom: 1px solid var(--iris-border); }
+.iris-panel-heading h2 { font-size: 16px; }
+.iris-range { display: flex; gap: 3px; }
+.iris-range button { border: 1px solid transparent; border-radius: 3px; background: transparent; color: var(--iris-muted); cursor: pointer; padding: 3px 7px; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; }
+.iris-range button:hover, .iris-range button.active { border-color: var(--iris-border-strong); background: var(--iris-hover); color: var(--iris-text); }
+.iris-empty { margin: 0; padding: 40px 20px; color: var(--iris-muted); text-align: center; font-size: 12px; }
+.iris-activity-list { padding: 0 14px; }
+.iris-activity-row { display: flex; justify-content: space-between; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--iris-border); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 11px; }
+.iris-activity-row:last-child { border-bottom: 0; }
+.iris-activity-row strong, .iris-activity-row span { display: block; }
+.iris-activity-row span { margin-top: 3px; color: var(--iris-secondary-text); }
+.iris-activity-row > div:last-child { text-align: right; }
+.iris-section { margin-top: 14px; overflow: hidden; }
+.iris-table-card { overflow: hidden; }
+.iris-table-toolbar { display: flex; align-items: center; gap: 12px; padding: 9px 14px; border-bottom: 1px solid var(--iris-border); background: var(--iris-secondary); }
+.iris-table-toolbar input { width: min(320px, 100%); border: 1px solid var(--iris-border); border-radius: 4px; outline: none; background: var(--iris-input); color: var(--iris-text); padding: 5px 8px; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 11px; }
+.iris-table-toolbar span { margin-left: auto; color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; }
+.iris-table-head { display: flex; min-width: max-content; border-bottom: 1px solid var(--iris-border); background: var(--iris-secondary); }
+.iris-table-head button { flex: 0 0 auto; border: 0; border-right: 1px solid var(--iris-border); background: transparent; color: var(--iris-muted); cursor: pointer; padding: 9px 10px; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; }
+.iris-table-head button:hover { color: var(--iris-text); background: var(--iris-hover); }
+.iris-table-scroll { overflow: auto; }
+.iris-table-row { position: absolute; display: flex; min-width: max-content; width: 100%; border-bottom: 1px solid var(--iris-border); background: var(--app-surface); }
+.iris-table-row:nth-child(even) { background: var(--iris-secondary); }
+.iris-table-row--clickable { cursor: pointer; }
+.iris-table-row--clickable:hover { background: var(--iris-hover); }
+.iris-table-cell { flex: 0 0 auto; display: flex; align-items: center; overflow: hidden; padding: 0 10px; color: var(--iris-text); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.iris-table-cell--right { justify-content: flex-end; text-align: right; }
+.iris-asset-cell { display: grid; grid-template-columns: 25px auto; column-gap: 7px; align-items: center; }
+.iris-asset-cell img { grid-row: span 2; width: 23px; height: 23px; border-radius: 50%; object-fit: cover; }
+.iris-asset-cell strong { color: var(--iris-text); }
+.iris-wallet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; padding: 14px; }
+.iris-wallet-card { display: grid; grid-template-columns: 6px 1fr; column-gap: 8px; align-items: start; border: 1px solid var(--iris-border); border-radius: 5px; color: var(--iris-text); padding: 12px; text-decoration: none; }
+.iris-wallet-card:hover { border-color: var(--iris-border-strong); background: var(--iris-hover); }
+.iris-wallet-card .iris-live-dot { margin-top: 5px; }
+.iris-wallet-card small { grid-column: 2; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.iris-asset-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 22px; }
+.iris-asset-identity { display: flex; align-items: center; gap: 13px; min-width: 0; }
+.iris-asset-identity > img { width: 46px; height: 46px; border-radius: 9px; object-fit: cover; }
+.iris-asset-identity h1 { margin: 2px 0; color: var(--iris-text); font-size: 24px; letter-spacing: -.4px; }
+.iris-asset-identity h1 span { color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 15px; font-weight: 500; }
+.iris-asset-identity p:not(.iris-eyebrow) { max-width: 650px; margin: 0; overflow: hidden; color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.iris-change { padding: 5px 8px; border: 1px solid var(--iris-border); border-radius: 3px; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 11px; white-space: nowrap; }
+.iris-asset-chart { overflow: hidden; }
+.iris-catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.iris-catalog-card { display: flex; align-items: center; gap: 10px; min-height: 66px; border: 1px solid var(--iris-border); border-radius: 6px; background: var(--app-surface); color: var(--iris-text); padding: 10px 12px; text-decoration: none; }
+.iris-catalog-card:hover { border-color: var(--iris-border-strong); background: var(--iris-hover); }
+.iris-catalog-card img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+.iris-catalog-card .iris-live-dot { flex: 0 0 auto; }
+.iris-catalog-card div { min-width: 0; }
+.iris-catalog-card strong, .iris-catalog-card small { display: block; }
+.iris-catalog-card small { overflow: hidden; color: var(--iris-muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.iris-catalog-card > span:last-child { margin-left: auto; color: var(--iris-secondary-text); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 11px; white-space: nowrap; }
+
+@media (max-width: 720px) {
+  .iris-header { height: 48px; padding: 0 14px; }
+  .iris-header .iris-divider, .iris-nav, .iris-search, .iris-status { display: none; }
+  .iris-brand-name { font-size: 13px; }
+  .iris-header-actions { margin-left: auto; }
+  .iris-mobile-nav { position: fixed; right: 0; bottom: 0; left: 0; z-index: 50; display: flex; height: calc(56px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); background: var(--iris-secondary); border-top: 1px solid var(--iris-border); }
+  .iris-mobile-nav a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--iris-muted); font-size: 10px; text-decoration: none; }
+  .iris-mobile-nav a.active { color: var(--iris-text); font-weight: 700; }
+  .iris-page { padding: 18px 14px; }
+  .iris-asset-heading { display: block; }
+  .iris-change { display: inline-block; margin-top: 14px; }
+  .iris-page-heading { display: block; }
+  .iris-block { display: inline-block; margin-top: 12px; }
+  .iris-metrics, .iris-dashboard-grid { grid-template-columns: 1fr; }
+  .iris-metric-card { min-height: 96px; }
+  .iris-chart-panel { min-height: 350px; }
 }

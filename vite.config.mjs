@@ -4,9 +4,9 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   esbuild: {
-    include: /src\/.*\.js$/,
+    include: /src\/.*\.(js|ts|tsx)$/,
     exclude: [],
-    loader: 'jsx',
+    loader: 'tsx',
     jsx: 'automatic'
   },
   test: {

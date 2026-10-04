@@ -1,11 +1,12 @@
-import './App.css';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import Home from './components/Home';
 import Wallet from './components/Wallet';
 import Asset from './components/Asset';
 import NoMatch from './components/NoMatch';
+import Catalog from './components/Catalog';
 import { CatalogProvider } from './contexts/CatalogContext';
 import { apiConfigurationError } from './api/client';
+import { ThemeProvider } from './contexts/ThemeContext';
 function App() {
   const location = useLocation(); // utilisez useLocation pour obtenir l'URL actuelle
 
@@ -14,9 +15,11 @@ function App() {
   }
 
   return (
-    <CatalogProvider><div className="scroll-smooth">
+    <ThemeProvider><CatalogProvider><div className="scroll-smooth">
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/assets" element={<Catalog kind="assets" />} />
+        <Route path="/wallets" element={<Catalog kind="wallets" />} />
         <Route
           key={location.pathname}
           path="/wallet/:address"
@@ -31,7 +34,7 @@ function App() {
           {' '}
         </Route>
       </Routes>
-    </div></CatalogProvider>
+    </div></CatalogProvider></ThemeProvider>
   );
 }
 export default App;

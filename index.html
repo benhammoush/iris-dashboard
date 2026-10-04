@@ -3,17 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.ico" />
-    <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#f5f7fb" />
     <meta name="description" content="Iris is a Stacks market and public-wallet dashboard." />
     <link rel="apple-touch-icon" href="/logo192.png" />
     <link rel="manifest" href="/manifest.json" />
     <title>Iris | Stacks Explorer</title>
     <script>
-      if (localStorage.getItem('color-theme') === 'dark') {
-        document.documentElement.classList.add('dark');
-      }
+      document.documentElement.dataset.theme = localStorage.getItem('color-theme') === 'dark' ? 'dark' : 'light';
     </script>
   </head>
   <body>

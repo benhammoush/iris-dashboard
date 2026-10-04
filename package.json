@@ -1,20 +1,21 @@
 {
   "name": "project-iris",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "private": true,
   "engines": {
     "node": "24.x"
   },
   "dependencies": {
-    "apexcharts": "^4.7.0",
+    "@tanstack/react-virtual": "^3.13.13",
+    "lightweight-charts": "^5.0.9",
     "react": "^18.3.1",
-    "react-apexcharts": "^1.7.0",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.9.4"
   },
   "scripts": {
     "start": "vite",
-    "build": "vite build",
+    "build": "tsc --noEmit && vite build",
+    "check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -34,14 +35,16 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.4.1",
     "autoprefixer": "^10.4.21",
-    "daisyui": "^4.12.24",
     "jsdom": "^26.1.0",
     "prettier": "^3.2.5",
     "prettier-eslint": "^16.3.0",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3",
     "vite": "^6.3.6",
     "vitest": "^3.2.4"
   }
