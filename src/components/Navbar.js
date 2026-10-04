@@ -4,14 +4,15 @@ import { useCatalog } from '../contexts/CatalogContext';
 import { APP_DISPLAY_VERSION } from '../appVersion';
 import { useTheme } from '../design-system';
 
-function Navbar({ fees = null }) {
+function Navbar() {
   const { assets, wallets } = useCatalog();
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
   const { mode, setMode } = useTheme();
-  const normalized = query.trim().toUpperCase();
-  const assetMatches = normalized ? assets.filter((asset) => [asset.symbol, asset.name, asset.contractId, asset.asset_identifier].some((value) => value?.toUpperCase().includes(normalized))).slice(0, 5) : [];
-  const walletMatches = normalized ? wallets.filter((wallet) => (wallet.address || wallet).toUpperCase().startsWith(normalized)).slice(0, 3) : [];
+  const queryValue = query.trim();
+  const normalized = queryValue.toUpperCase();
+  const assetMatches = queryValue ? assets.filter((asset) => asset.mint?.includes(queryValue) || [asset.symbol, asset.name].some((value) => value?.toUpperCase().includes(normalized))).slice(0, 5) : [];
+  const walletMatches = queryValue ? wallets.filter((wallet) => (wallet.address || wallet).startsWith(queryValue) || wallet.label?.toUpperCase().includes(normalized)).slice(0, 3) : [];
 
   function go(path) {
     navigate(path);
@@ -26,13 +27,12 @@ function Navbar({ fees = null }) {
       <div className="iris-search">
         <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search assets or tracked wallets" aria-label="Search assets or tracked wallets" />
         {query && <ul className="iris-results">
-           {assetMatches.map((asset) => <li key={asset.contractId || asset.asset_identifier || asset.symbol}><button onClick={() => go(`/asset/${encodeURIComponent(asset.contractId || asset.asset_identifier || asset.symbol)}`)}>{asset.symbol} · {asset.price_usd === null || asset.price_usd === undefined ? 'Price unavailable' : `$${Number(asset.price_usd).toFixed(5)}`}</button></li>)}
+            {assetMatches.map((asset) => <li key={asset.mint || asset.symbol}><button onClick={() => go(`/asset/${encodeURIComponent(asset.mint || asset.symbol)}`)}>{asset.symbol} · {asset.price_usd === null || asset.price_usd === undefined ? 'Price unavailable' : `$${Number(asset.price_usd).toFixed(5)}`}</button></li>)}
           {walletMatches.map((wallet) => { const address = wallet.address || wallet; return <li key={address}><button onClick={() => go(`/wallet/${address}`)}>{wallet.label || address}</button></li>; })}
           {!assetMatches.length && !walletMatches.length && <li><button disabled>No loaded matches.</button></li>}
         </ul>}
       </div>
       <div className="iris-header-actions">
-        {fees?.all?.medium_priority && <span className="iris-status">{(fees.all.medium_priority / 1000000).toFixed(2)} STX</span>}
         <span className="iris-live-dot" aria-label="Worker connected" title="Worker data available" />
         <button className="iris-theme-button" onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')} aria-label="Toggle color theme">{mode === 'dark' ? 'LIGHT' : 'DARK'}</button>
       </div>

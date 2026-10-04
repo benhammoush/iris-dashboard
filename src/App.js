@@ -27,7 +27,7 @@ function App() {
         />
         <Route
           key={location.pathname}
-          path="/asset/:symbol"
+          path="/asset/:mint"
           element={<Asset />}
         />
         <Route path="*" element={<NoMatch />}>

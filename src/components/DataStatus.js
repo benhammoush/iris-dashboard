@@ -33,7 +33,7 @@ function DataStatus({ meta, error, showPriceNotice = true, onRetry, refreshing =
   const nextRefresh = formatUtc(nextScheduledRefresh(meta, now));
   return (
     <div className="iris-data-status" role="status">
-      {showPriceNotice && <p><strong>Market data:</strong> {liveMarket ? `Supported Stacks assets use ${meta?.marketDataSource === 'mixed' ? 'live DEX prices and ' : ''}CoinGecko chart history${asOf ? ` refreshed ${asOf}` : ''}; unsupported assets remain clearly snapshot-backed.` : `Price and chart data use a fixed market snapshot${asOf ? ` as of ${asOf}` : ''}. Blockchain fees, blocks, balances, and activity remain live.`}</p>}
+      {showPriceNotice && <p><strong>Market data:</strong> {liveMarket ? `Supported Solana assets use ${meta?.marketDataSource === 'mixed' ? 'live DEX prices and ' : ''}CoinGecko chart history${asOf ? ` refreshed ${asOf}` : ''}; unsupported assets remain clearly snapshot-backed.` : `Price and chart data use a fixed market snapshot${asOf ? ` as of ${asOf}` : ''}. Blockchain slots, balances, and activity remain live.`}</p>}
       <p className={showPriceNotice ? 'iris-data-status-detail' : ''}>{source}{meta?.as_of ? ` as of ${meta.as_of}` : ''}{error ? `: ${error.message}` : ''}{error?.requestId ? ` (request ${error.requestId})` : ''}{onRetry && <button className="iris-retry" onClick={onRetry} disabled={refreshing}>{refreshing ? 'Refreshing...' : 'Retry'}</button>}</p>
       {(lastRefresh || nextRefresh) && <p className="iris-data-status-detail">{lastRefresh && `Last completed API refresh: ${lastRefresh}.`}{lastRefresh && nextRefresh && ' '}{nextRefresh && `Next scheduled API refresh: ${nextRefresh}.`}</p>}
     </div>

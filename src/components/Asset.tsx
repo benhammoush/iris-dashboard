@@ -7,13 +7,14 @@ import DataStatus from './DataStatus'
 import Navbar from './Navbar'
 import AssetIcon from './AssetIcon'
 import { AreaChart, MetricCard } from '../design-system'
+import { solanaExplorerUrl } from '../data/solana'
 
 const currency = (value: number | null | undefined, digits = 5) => value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : `$${Number(value).toLocaleString('en-US', { maximumFractionDigits: digits })}`
 
 export default function Asset() {
-  const { symbol = '' } = useParams()
+  const { mint = '' } = useParams()
   const [rangeDays, setRangeDays] = useState(365)
-  const result = useWorkerResource((options: any) => workerApi.asset(symbol, options), [symbol]) as any
+  const result = useWorkerResource((options: any) => workerApi.asset(mint, options), [mint]) as any
   const swaps = useWorkerResource(workerApi.swaps, []) as any
   const assetPayload = result.data?.asset ? [result.data.asset] : Array.isArray(result.data) ? result.data : result.data ? [result.data] : []
   const asset = assetsFrom(assetPayload)[0] as any
@@ -21,13 +22,14 @@ export default function Asset() {
   const fromDate = new Date()
   fromDate.setDate(fromDate.getDate() - rangeDays)
   const visibleHistory = history.filter(([date]) => rangeDays === 1000 || new Date(date) >= fromDate).map(([date, value]) => ({ date, value: Number(value) }))
-  const assetSwaps = swapsFrom(swaps.data).filter((swap: any) => swap.asset?.symbol === asset?.symbol).slice(0, 8)
+  const assetSwaps = swapsFrom(swaps.data).filter((swap: any) => swap.asset?.mint ? swap.asset.mint === asset?.mint : swap.asset?.symbol === asset?.symbol).slice(0, 8)
+  const explorerUrl = solanaExplorerUrl('address', asset?.mint)
 
   return <div className="iris-shell">
     <Navbar />
     <DataStatus meta={result.meta} error={result.error} onRetry={() => { result.refetch(); swaps.refetch(); }} refreshing={result.refreshing || swaps.refreshing} />
-    {result.loading ? <main className="iris-loading">Loading asset data...</main> : result.error ? <main className="iris-loading"><div><p>{result.error.code === 'ASSET_NOT_FOUND' ? 'This asset is not in the Worker catalog.' : result.error.code === 'ASSET_SYMBOL_AMBIGUOUS' ? 'This symbol matches multiple contracts. Select the asset from the catalog.' : 'Asset data is currently unavailable from the Worker.'}</p>{result.error.requestId && <p className="iris-wallet-address">Request {result.error.requestId}</p>}<button className="iris-retry" onClick={result.refetch}>Retry</button></div></main> : !asset ? <main className="iris-loading">No asset was returned for {symbol}.</main> : <main className="iris-page">
-      <section className="iris-asset-heading"><div className="iris-asset-identity"><AssetIcon src={asset.image_uri} symbol={asset.symbol} /><div><p className="iris-eyebrow">Stacks asset</p><h1>{asset.name} <span>{asset.symbol}</span></h1><p title={asset.contract_principal || asset.asset_identifier}>{asset.contract_principal || asset.asset_identifier || 'No contract identifier available'}</p></div></div><Change value={asset.change_24h} /></section>
+    {result.loading ? <main className="iris-loading">Loading asset data...</main> : result.error ? <main className="iris-loading"><div><p>{result.error.code === 'ASSET_NOT_FOUND' ? 'This mint is not in the Worker catalog.' : 'Asset data is currently unavailable from the Worker.'}</p>{result.error.requestId && <p className="iris-wallet-address">Request {result.error.requestId}</p>}<button className="iris-retry" onClick={result.refetch}>Retry</button></div></main> : !asset ? <main className="iris-loading">No asset was returned for {mint}.</main> : <main className="iris-page">
+      <section className="iris-asset-heading"><div className="iris-asset-identity"><AssetIcon src={asset.image_uri} symbol={asset.symbol} /><div><p className="iris-eyebrow">Solana asset</p><h1>{asset.name} <span>{asset.symbol}</span></h1>{explorerUrl ? <a href={explorerUrl} target="_blank" rel="noopener noreferrer" title={asset.mint}>{asset.mint}</a> : <p>No mint address available</p>}</div></div><Change value={asset.change_24h} /></section>
       <section className="iris-metrics">
         <MetricCard label="Price" value={currency(asset.price_usd)} detail="Current Worker market price" />
         <MetricCard label="Market cap" value={currency(asset.market_cap_usd, 2)} detail="Market-cap estimate" />

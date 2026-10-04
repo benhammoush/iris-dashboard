@@ -21,4 +21,15 @@ describe('worker fixture behavior', () => {
 
     await expect(workerApi.assets()).resolves.toMatchObject({ data: expect.any(Array), meta: { source: 'fixture', stale: true } });
   });
+
+  test('uses mint-addressed v2 Worker routes', async () => {
+    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ data: {} }) })));
+    const { workerApi } = await import('./worker');
+
+    await workerApi.asset('MintCaseSensitive123');
+    await workerApi.wallet('WalletCaseSensitive123');
+
+    expect(fetch).toHaveBeenNthCalledWith(1, expect.stringContaining('/v2/assets/mint/MintCaseSensitive123'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(2, expect.stringContaining('/v2/wallets/WalletCaseSensitive123'), expect.any(Object));
+  });
 });

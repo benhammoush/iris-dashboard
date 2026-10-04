@@ -4,11 +4,11 @@ Iris is a Create React App portfolio dashboard backed only by the Iris Worker AP
 
 ## Architecture
 
-`src/api/client.js` is the sole HTTP client. It reads `VITE_API_BASE`, adds request IDs, applies a 10-second timeout, parses Worker response envelopes (`{ data, meta }`), and normalizes failures. `src/api/worker.js` calls `/v1/market`, `/v1/assets`, `/v1/assets/:symbol`, `/v1/swaps`, and `/v1/wallets`. The client adapts normalized Worker asset, market-history, price-history, and swap objects for the UI.
+`src/api/client.js` is the sole HTTP client. It reads `VITE_API_BASE`, adds request IDs, applies a 10-second timeout, parses Worker response envelopes (`{ data, meta }`), and normalizes failures. `src/api/worker.js` calls the Worker `/v2` Solana routes. The client adapts mint-identified assets, market history, prices, wallet activity, and registered-pool swaps for the UI.
 
 Worker errors are shown to users. Market, asset catalog, and swap requests use local, non-sensitive emergency display fixtures only when `REACT_APP_ENABLE_FIXTURES=true`; the status line identifies fixture data. Wallet details never use a fixture address: an unconfigured or unknown address is shown as not tracked.
 
-Supported Stacks assets use live DEX Screener prices with CoinGecko historical charts. Assets without verified provider coverage remain snapshot-backed and are identified in the Worker response. Blockchain fees, blocks, wallet balances, and activity remain live.
+Supported Solana assets use Jupiter metadata/prices and GeckoTerminal history where available. Assets without verified provider coverage remain snapshot-backed and are identified in the Worker response. Wallet balances and decoded activity are supplied by Helius through the Worker. The Recent Swaps feed covers reviewed registered pools, not the entire chain.
 
 The data-status banner shows the last completed Worker refresh and the next scheduled 15-minute UTC cron boundary. The displayed next schedule advances locally and does not imply that the cron refresh succeeded.
 

@@ -17,17 +17,10 @@ async function withFixture(path, fixture, options) {
 }
 
 export const workerApi = {
-  market: (options) => withFixture('/v1/market', fixtures.market, options),
-  assets: (options) => withFixture('/v1/assets', fixtures.assets, options),
-  asset: async (contractId, options) => {
-    try {
-      return await apiGet(`/v1/assets/id/${encodeURIComponent(contractId)}`, options);
-    } catch (error) {
-      if (error.status !== 404) throw error;
-      return withFixture(`/v1/assets/${encodeURIComponent(contractId)}`, fixtures.assets.find((asset) => asset.symbol === contractId) || null, options);
-    }
-  },
-  swaps: (options) => withFixture('/v1/swaps', fixtures.swaps, options),
-  wallets: (options) => withFixture('/v1/wallets', fixtures.wallets, options),
-  wallet: (address, options) => apiGet(`/v1/wallets/${encodeURIComponent(address)}`, options),
+  market: (options) => withFixture('/v2/market', fixtures.market, options),
+  assets: (options) => withFixture('/v2/assets', fixtures.assets, options),
+  asset: (mint, options) => withFixture(`/v2/assets/mint/${encodeURIComponent(mint)}`, fixtures.assets.find((asset) => asset.mint === mint) || null, options),
+  swaps: (options) => withFixture('/v2/swaps', fixtures.swaps, options),
+  wallets: (options) => withFixture('/v2/wallets', fixtures.wallets, options),
+  wallet: (address, options) => apiGet(`/v2/wallets/${encodeURIComponent(address)}`, options),
 };
