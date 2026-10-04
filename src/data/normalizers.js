@@ -124,7 +124,8 @@ export function marketHistoryFrom(data, assets) {
       (entry.points || []).forEach((point) => {
         const date = point.date || point.timestamp || point.sync_at;
         if (!date || supply === undefined) return;
-        valuesByDate[date] = (valuesByDate[date] || 0) + point.price * supply;
+        const marketCap = Number(point.marketCap);
+        valuesByDate[date] = (valuesByDate[date] || 0) + (Number.isFinite(marketCap) ? marketCap : point.price * supply);
       });
     });
     return Object.entries(valuesByDate).map(([date, value]) => [date, value]);

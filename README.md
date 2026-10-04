@@ -8,7 +8,7 @@ Iris is a Create React App portfolio dashboard backed only by the Iris Worker AP
 
 Worker errors are shown to users. Market, asset catalog, and swap requests use local, non-sensitive emergency display fixtures only when `REACT_APP_ENABLE_FIXTURES=true`; the status line identifies fixture data. Wallet details never use a fixture address: an unconfigured or unknown address is shown as not tracked.
 
-Live ALEX price data is currently unavailable. Dashboard and asset prices and charts therefore use a fixed market snapshot, with an optional snapshot time supplied by Worker metadata. Blockchain fees, blocks, wallet balances, and activity remain live.
+Supported Stacks assets use live DEX Screener prices with CoinGecko historical charts. Assets without verified provider coverage remain snapshot-backed and are identified in the Worker response. Blockchain fees, blocks, wallet balances, and activity remain live.
 
 ## Local Development
 
