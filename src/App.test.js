@@ -7,7 +7,7 @@ import { vi } from 'vitest';
 beforeEach(() => {
   window.history.pushState({}, '', '/');
   global.fetch = vi.fn((url) => {
-    const data = url.includes('/history') ? { data: { history: [] } } : url.includes('/v3/swaps') ? { data: { swaps: [{ signature: 'pool-swap-1', timestamp: '2026-10-03T12:00:00Z', type: 'Swap', maker: 'ReviewedPoolWallet' }] } } : url.includes('/v3/assets/mint/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN') ? { data: { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 } } : url.includes('/v3/assets/mint/') ? { data: { mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1, activity: { volume24hUsd: 25 } } } : url.includes('/v3/assets') ? { data: [{ mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1 }, { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 }] } : { data: [] };
+    const data = url.includes('/history') ? { data: { history: [] } } : url.includes('/v3/swaps') ? { data: { swaps: [{ signature: 'pool-swap-1', timestamp: '2026-10-03T12:00:00Z', type: 'Swap', maker: 'ReviewedPoolWallet' }] } } : url.includes('/v3/assets/mint/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN') ? { data: { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 } } : url.includes('/v3/assets/mint/') ? { data: { mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1, change24hPct: 3.5, marketCapUsd: 100, liquidityUsd: 50, activity: { volume24hUsd: 25 } } } : url.includes('/v3/assets') ? { data: [{ mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1 }, { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 }] } : { data: [] };
     return Promise.resolve({ ok: true, json: () => Promise.resolve(data) });
   });
 });
@@ -18,21 +18,28 @@ test('renders the Worker-backed portfolio shell', async () => {
   await waitFor(() => expect(screen.getByText(/no price history is available/i)).toBeInTheDocument());
   expect(screen.getByText(/global reviewed-pool activity/i)).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Market pulse' })).toBeInTheDocument();
-  expect(screen.getByText('Highest 24H volume')).toBeInTheDocument();
+  expect(screen.getByText('Strongest 24H')).toBeInTheDocument();
+  expect(screen.getByText('Weakest 24H')).toBeInTheDocument();
+  expect(screen.queryByText('Tracked assets')).not.toBeInTheDocument();
+  expect(screen.queryByText('Assets priced')).not.toBeInTheDocument();
+  expect(screen.queryByText('Highest 24H volume')).not.toBeInTheDocument();
   expect(screen.getByText(/no price history is available for the 1D range/i)).toBeInTheDocument();
   expect(screen.getByText('24H volume')).toBeInTheDocument();
   expect(fetch.mock.calls.some(([url]) => String(url).includes('/v3/wallets'))).toBe(false);
   unmount();
 });
 
-test('uses Home-only navigation and exposes the expanded market metrics', async () => {
-  render(<BrowserRouter><App /></BrowserRouter>);
+test('uses Home-only navigation and shows four compact market metrics', async () => {
+  const { container } = render(<BrowserRouter><App /></BrowserRouter>);
   await screen.findByRole('heading', { name: 'SOL / USD' });
   expect(screen.getAllByRole('link', { name: 'Home' }).length).toBeGreaterThan(0);
   expect(screen.queryByRole('link', { name: 'Market' })).not.toBeInTheDocument();
   expect(screen.getByRole('button', { name: /FDV/i })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /Volume 24H/i })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /Organic score/i })).toBeInTheDocument();
+  expect(screen.getByText('SOL price')).toBeInTheDocument();
+  expect(screen.getByText('+3.50%')).toBeInTheDocument();
+  expect(container.querySelectorAll('.iris-metric-card')).toHaveLength(4);
   expect(screen.queryByRole('button', { name: /Chart/i })).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /Preview/i })).not.toBeInTheDocument();
   expect(screen.getByText('Data from Jupiter and CoinGecko')).toBeInTheDocument();
@@ -61,5 +68,4 @@ test('chart range and selected mint persist in the URL', async () => {
   expect(window.location.search).toContain('mint=So111');
   expect(window.location.search).toContain('range=7d');
   expect(screen.queryByText(/wallet lookup/i)).not.toBeInTheDocument();
-  expect(screen.queryByText('Liquidity')).not.toBeInTheDocument();
 });

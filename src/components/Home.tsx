@@ -13,7 +13,7 @@ const SOL_MINT = 'So11111111111111111111111111111111111111112'
 const currency = (value: number | null | undefined, digits = 2) => value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : `$${Number(value).toLocaleString('en-US', { maximumFractionDigits: digits })}`
 const quantity = (value: number | null | undefined) => value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : Number(value).toLocaleString('en-US', { maximumFractionDigits: 2 })
 const audit = (asset: Asset) => Object.entries(asset.quality?.audit || {}).filter(([, value]) => value === true).map(([key]) => key).join(', ') || '—'
-const finiteAssets = (assets: Asset[], value: (asset: Asset) => unknown) => assets.filter((asset) => Number.isFinite(Number(value(asset))))
+const assetsWithChange = (assets: Asset[]) => assets.filter((asset) => Number.isFinite(Number(asset.change24hPct)))
 
 const assetColumns: VirtualTableColumn<Asset>[] = [
   { id: 'asset', label: 'Asset', width: 210, value: (asset) => `${asset.symbol} ${asset.name || ''}`, cell: (asset) => <span className="iris-asset-cell"><AssetIcon src={asset.imageUrl} symbol={asset.symbol} /><strong>{asset.symbol}</strong><small>{asset.name}</small></span> },
@@ -51,21 +51,16 @@ export default function Home() {
   const lookbackMs = { '1h': 60 * 60 * 1000, '4h': 4 * 60 * 60 * 1000, '1d': 24 * 60 * 60 * 1000, '7d': 7 * 24 * 60 * 60 * 1000 }[range] || 24 * 60 * 60 * 1000
   const visibleHistory = history.filter(([date]) => new Date(date).valueOf() >= Date.now() - lookbackMs).map(([date, value]) => ({ date, value: Number(value) }))
   const metrics = [
-    selectedAsset?.priceUsd != null && <MetricCard key="price" label={`${selectedAsset.symbol} price`} value={currency(selectedAsset.priceUsd, 5)} />,
+    selectedAsset?.priceUsd != null && <MetricCard key="price" label={`${selectedAsset.symbol} price`} value={currency(selectedAsset.priceUsd, 5)} detail={selectedAsset.change24hPct != null ? <Change value={selectedAsset.change24hPct} /> : undefined} />,
     selectedAsset?.marketCapUsd != null && <MetricCard key="cap" label="Market cap" value={currency(selectedAsset.marketCapUsd)} />,
-    selectedAsset?.change24hPct != null && <MetricCard key="change" label="24H change" value={<Change value={selectedAsset.change24hPct} />} />,
     selectedAsset?.activity?.volume24hUsd != null && <MetricCard key="volume" label="24H volume" value={currency(selectedAsset.activity.volume24hUsd)} />,
     selectedAsset?.liquidityUsd != null && <MetricCard key="liquidity" label="Liquidity" value={currency(selectedAsset.liquidityUsd)} />,
-    selectedAsset?.quality?.organicScore != null && <MetricCard key="quality" label="Organic score" value={String(selectedAsset.quality.organicScore)} detail={selectedAsset.quality.organicScoreLabel || 'Worker quality signal'} />,
   ].filter(Boolean)
   const setSelection = (mint: string, nextRange = range) => setSearchParams({ mint, range: nextRange })
   const recentSwaps = swapsFrom(swapsResult.data).slice(0, 5)
-  const pricedAssets = finiteAssets(catalogAssets, (asset) => asset.priceUsd)
-  const assetsWithChange = finiteAssets(catalogAssets, (asset) => asset.change24hPct)
-  const assetsWithVolume = finiteAssets(catalogAssets, (asset) => asset.activity?.volume24hUsd)
-  const strongestAsset = assetsWithChange.reduce<Asset | null>((best, asset) => !best || Number(asset.change24hPct) > Number(best.change24hPct) ? asset : best, null)
-  const weakestAsset = assetsWithChange.reduce<Asset | null>((worst, asset) => !worst || Number(asset.change24hPct) < Number(worst.change24hPct) ? asset : worst, null)
-  const highestVolumeAsset = assetsWithVolume.reduce<Asset | null>((highest, asset) => !highest || Number(asset.activity?.volume24hUsd) > Number(highest.activity?.volume24hUsd) ? asset : highest, null)
+  const movers = assetsWithChange(catalogAssets)
+  const strongestAsset = movers.reduce<Asset | null>((best, asset) => !best || Number(asset.change24hPct) > Number(best.change24hPct) ? asset : best, null)
+  const weakestAsset = movers.reduce<Asset | null>((worst, asset) => !worst || Number(asset.change24hPct) < Number(worst.change24hPct) ? asset : worst, null)
 
   return <div className="iris-shell"><Navbar />
     <DataStatus meta={selectedResult.meta || historyResult.meta || catalogMeta} error={selectedResult.error || historyResult.error || catalogError} />
@@ -75,11 +70,8 @@ export default function Home() {
        <section className="iris-dashboard-grid">
          <section className="iris-section iris-asset-chart"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Price history</p><h2>{selectedAsset?.symbol || 'SOL'} / USD</h2></div><div className="iris-range" aria-label="Asset price history range">{[['1h', '1H'], ['4h', '4H'], ['1d', '1D'], ['7d', '7D']].map(([value, label]) => <button key={value} className={range === value ? 'active' : ''} onClick={() => setSelection(selectedMint, value)}>{label}</button>)}</div></div>{visibleHistory.length ? <AreaChart points={visibleHistory} valueFormatter={(value) => currency(value)} /> : <div className="iris-chart-empty"><strong>No price history is available for the {range.toUpperCase()} range.</strong><p>Try another range or select a different asset from the catalog.</p></div>}</section>
          <aside className="iris-section iris-market-pulse" aria-label="Market pulse"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Catalog signal</p><h2>Market pulse</h2></div></div><dl className="iris-pulse-list">
-           <PulseItem label="Tracked assets" value={quantity(catalogAssets.length)} />
-           <PulseItem label="Assets priced" value={quantity(pricedAssets.length)} />
            <PulseItem label="Strongest 24H" value={strongestAsset?.symbol || '—'} detail={strongestAsset ? <Change value={strongestAsset.change24hPct} /> : undefined} />
            <PulseItem label="Weakest 24H" value={weakestAsset?.symbol || '—'} detail={weakestAsset ? <Change value={weakestAsset.change24hPct} /> : undefined} />
-           <PulseItem label="Highest 24H volume" value={highestVolumeAsset?.symbol || '—'} detail={highestVolumeAsset ? currency(highestVolumeAsset.activity?.volume24hUsd) : undefined} />
          </dl></aside>
        </section>
       {recentSwaps.length > 0 && <section className="iris-section"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Global reviewed-pool activity</p><h2>Recent swaps</h2></div><span>{recentSwaps.length} events</span></div><div className="iris-activity-list">{recentSwaps.map((swap: any, index: number) => <div className="iris-activity-row" key={`${swap.id || swap.timestamp}-${index}`}><div><strong>{swap.type}</strong><span>{swap.maker || 'Reviewed pool participant'}</span></div><div><small>{swap.timestamp || 'Time unavailable'}</small></div></div>)}</div></section>}

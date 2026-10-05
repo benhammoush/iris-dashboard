@@ -41,7 +41,7 @@ button, input { font: inherit; }
 .iris-page-heading p:not(.iris-eyebrow) { margin: 6px 0 0; color: var(--iris-secondary-text); font-size: 13px; }
 .iris-eyebrow { margin: 0; color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; }
 .iris-block, .iris-panel-heading > span { padding: 4px 7px; border: 1px solid var(--iris-border); border-radius: 3px; color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; white-space: nowrap; }
-.iris-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
+.iris-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
 .iris-metric-card, .iris-panel, .iris-section { border: 1px solid var(--iris-border); border-radius: 7px; background: var(--app-surface); box-shadow: 0 2px 12px rgba(15, 23, 42, .06); }
 .iris-metric-card { min-height: 112px; padding: 15px; }
 .iris-metric-value { margin: 8px 0 3px; color: var(--iris-text); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 21px; font-weight: 700; letter-spacing: -.5px; }
