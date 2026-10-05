@@ -15,9 +15,9 @@ beforeEach(() => {
 test('renders the Worker-backed portfolio shell', async () => {
   const { unmount } = render(<BrowserRouter><App /></BrowserRouter>);
   expect(await screen.findByPlaceholderText(/search assets or paste a wallet address/i)).toBeInTheDocument();
-  await waitFor(() => expect(screen.getByText(/no coingecko history is available/i)).toBeInTheDocument());
+  await waitFor(() => expect(screen.getByText(/no price history is available/i)).toBeInTheDocument());
   expect(screen.getByText(/global reviewed-pool activity/i)).toBeInTheDocument();
-  expect(screen.getByText('Jupiter activity')).toBeInTheDocument();
+  expect(screen.getByText('24H volume')).toBeInTheDocument();
   expect(fetch.mock.calls.some(([url]) => String(url).includes('/v3/wallets'))).toBe(false);
   unmount();
 });
