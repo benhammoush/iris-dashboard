@@ -17,6 +17,9 @@ test('renders the Worker-backed portfolio shell', async () => {
   expect(await screen.findByPlaceholderText(/search assets or paste a wallet address/i)).toBeInTheDocument();
   await waitFor(() => expect(screen.getByText(/no price history is available/i)).toBeInTheDocument());
   expect(screen.getByText(/global reviewed-pool activity/i)).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Market pulse' })).toBeInTheDocument();
+  expect(screen.getByText('Highest 24H volume')).toBeInTheDocument();
+  expect(screen.getByText(/no price history is available for the 1D range/i)).toBeInTheDocument();
   expect(screen.getByText('24H volume')).toBeInTheDocument();
   expect(fetch.mock.calls.some(([url]) => String(url).includes('/v3/wallets'))).toBe(false);
   unmount();
@@ -24,7 +27,7 @@ test('renders the Worker-backed portfolio shell', async () => {
 
 test('uses Home-only navigation and exposes the expanded market metrics', async () => {
   render(<BrowserRouter><App /></BrowserRouter>);
-  await screen.findByText('SOL');
+  await screen.findByRole('heading', { name: 'SOL / USD' });
   expect(screen.getAllByRole('link', { name: 'Home' }).length).toBeGreaterThan(0);
   expect(screen.queryByRole('link', { name: 'Market' })).not.toBeInTheDocument();
   expect(screen.getByRole('button', { name: /FDV/i })).toBeInTheDocument();
