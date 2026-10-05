@@ -17,10 +17,15 @@ async function withFixture(path, fixture, options) {
 }
 
 export const workerApi = {
-  market: (options) => withFixture('/v2/market', fixtures.market, options),
-  assets: (options) => withFixture('/v2/assets', fixtures.assets, options),
-  asset: (mint, options) => withFixture(`/v2/assets/mint/${encodeURIComponent(mint)}`, fixtures.assets.find((asset) => asset.mint === mint) || null, options),
-  swaps: (options) => withFixture('/v2/swaps', fixtures.swaps, options),
-  wallets: (options) => withFixture('/v2/wallets', fixtures.wallets, options),
-  wallet: (address, options) => apiGet(`/v2/wallets/${encodeURIComponent(address)}`, options),
+  assets: (options) => withFixture('/v3/assets', fixtures.assets, options),
+  asset: (mint, options) => withFixture(`/v3/assets/mint/${encodeURIComponent(mint)}`, fixtures.assets.find((asset) => asset.mint === mint) || null, options),
+  assetHistory: (mint, options) => withFixture(`/v3/assets/mint/${encodeURIComponent(mint)}/history`, [], options),
+  swaps: (options) => withFixture('/v3/swaps', fixtures.swaps, options),
+  wallet: (address, options) => apiGet(`/v3/wallets/${encodeURIComponent(address)}`, options),
+  walletTransactions: (address, options = {}) => {
+    const { cursor, limit = 25, ...requestOptions } = options;
+    const query = new URLSearchParams({ limit: String(limit) });
+    if (cursor) query.set('cursor', cursor);
+    return apiGet(`/v3/wallets/${encodeURIComponent(address)}/transactions?${query}`, requestOptions);
+  },
 };

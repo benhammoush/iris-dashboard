@@ -26,7 +26,6 @@ button, input { font: inherit; }
 .iris-results button { width: 100%; border: 0; border-radius: 3px; background: transparent; color: var(--iris-text); cursor: pointer; padding: 6px 8px; text-align: left; font-size: 11px; }
 .iris-results button:hover { background: var(--iris-hover); }
 .iris-header-actions { gap: 8px; margin-left: auto; }
-.iris-live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--iris-green); box-shadow: 0 0 5px var(--iris-green); }
 .iris-theme-button { cursor: pointer; border: 1px solid var(--iris-border); border-radius: 3px; background: transparent; padding: 3px 8px; }
 .iris-theme-button:hover { background: var(--iris-hover); color: var(--iris-text); }
 .iris-mobile-nav { display: none; }
@@ -35,6 +34,8 @@ button, input { font: inherit; }
 .iris-data-status strong { color: var(--iris-text); }
 .iris-data-status-detail { margin-top: 3px !important; color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; }
 .iris-retry { margin-left: 8px; border: 1px solid var(--iris-border-strong); border-radius: 3px; background: transparent; color: var(--iris-text); cursor: pointer; padding: 1px 5px; font: inherit; }
+.iris-preview { border: 1px solid var(--iris-border); border-radius: 3px; background: transparent; color: var(--iris-secondary-text); cursor: pointer; padding: 3px 6px; font: inherit; font-size: 10px; }
+.iris-preview:hover, .iris-preview:focus-visible { border-color: var(--iris-border-strong); color: var(--iris-text); }
 
 .iris-page { width: min(1440px, 100%); margin: 0 auto; padding: 28px; }
 .iris-loading { display: grid; min-height: calc(100vh - 46px); place-items: center; color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 12px; }
@@ -100,6 +101,8 @@ button, input { font: inherit; }
 .iris-asset-identity p:not(.iris-eyebrow) { max-width: 650px; margin: 0; overflow: hidden; color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .iris-change { padding: 5px 8px; border: 1px solid var(--iris-border); border-radius: 3px; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 11px; white-space: nowrap; }
 .iris-asset-chart { overflow: hidden; }
+.iris-panel-metrics { margin: 0; padding: 14px; }
+.iris-load-more { padding: 10px 14px; border-top: 1px solid var(--iris-border); text-align: center; }
 .iris-catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
 .iris-catalog-card { display: flex; align-items: center; gap: 10px; min-height: 66px; border: 1px solid var(--iris-border); border-radius: 6px; background: var(--app-surface); color: var(--iris-text); padding: 10px 12px; text-decoration: none; }
 .iris-catalog-card:hover { border-color: var(--iris-border-strong); background: var(--iris-hover); }

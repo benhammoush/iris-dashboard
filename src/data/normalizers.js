@@ -1,40 +1,18 @@
 export function assetsFrom(data) {
-  const items = Array.isArray(data) ? data : data?.assets || data?.tokens || [];
-  return items.map((asset) => {
-    if (!Array.isArray(asset)) return {
-      ...asset,
-       symbol: asset.symbol || asset.ticker,
-       name: asset.name || asset.symbol || asset.ticker,
-       image_uri: asset.image_uri || asset.imageUrl || asset.image,
-       mint: asset.mint || asset.mintAddress || asset.mint_address || asset.address || asset.asset_identifier || asset.identifier,
-       price_usd: asset.price_usd !== undefined ? asset.price_usd : asset.price !== undefined ? asset.price : asset.usd_price ?? null,
-        total_supply: asset.total_supply !== undefined ? asset.total_supply : asset.totalSupply !== undefined ? asset.totalSupply : asset.supply ?? null,
-        normalized_supply: asset.normalized_supply !== undefined ? asset.normalized_supply : asset.supply ?? null,
-       market_cap_usd: asset.market_cap_usd !== undefined ? asset.market_cap_usd : asset.marketCap !== undefined ? asset.marketCap : asset.market_cap ?? null,
-       change_24h: asset.change_24h ?? asset.change24h ?? asset.changes?.['24h'] ?? asset.change?.day ?? null,
-       change_7d: asset.change_7d ?? asset.change7d ?? asset.changes?.['7d'] ?? asset.change?.week ?? null,
-       change_30d: asset.change_30d ?? asset.change30d ?? asset.changes?.['30d'] ?? asset.change?.month ?? null,
-       asset_identifier: asset.asset_identifier || asset.identifier,
-    };
-    return {
-      symbol: asset[0], price_usd: asset[1], image_uri: asset[2], total_supply: asset[3],
-       market_cap_usd: asset[4], change_24h: asset[6], change_7d: asset[8],
-       change_30d: asset[10], mint: asset[11], decimals: asset[12], name: asset[0],
-    };
-  });
-}
-
-export function walletsFrom(data) {
-  const wallets = Array.isArray(data) ? data : data?.wallets || data?.featured || [];
-  return wallets.map((wallet) => {
-    if (typeof wallet === 'string') return { address: wallet, label: wallet };
-    return {
-      ...wallet,
-       address: wallet.address || wallet.wallet_address || wallet.owner,
-      label: wallet.label || wallet.name || wallet.address,
-      description: wallet.description || wallet.summary || '',
-    };
-  });
+  const items = Array.isArray(data) ? data : data?.assets || [];
+  return items.filter((asset) => asset && !Array.isArray(asset)).map((asset) => ({
+    ...asset,
+    mint: asset.mint,
+    symbol: asset.symbol,
+    name: asset.name || asset.symbol,
+    imageUrl: asset.iconUrl,
+    priceUsd: asset.priceUsd ?? null,
+    marketCapUsd: asset.marketCapUsd ?? null,
+    change24hPct: asset.change24hPct ?? null,
+    activity: asset.activity || {},
+    quality: asset.quality || {},
+    verification: asset.verification || {},
+  }));
 }
 
 export function walletFrom(data) {
@@ -42,86 +20,68 @@ export function walletFrom(data) {
   if (!wallet || typeof wallet !== 'object') return null;
   return {
     ...wallet,
-     address: wallet.address || wallet.wallet_address || wallet.owner,
-    label: wallet.label || wallet.name || wallet.address,
-    description: wallet.description || wallet.summary || '',
-    totalValue: wallet.totalValue ?? wallet.portfolioTotal ?? wallet.total_value_usd ?? wallet.value_usd,
-    assets: (wallet.assets || wallet.holdings || wallet.token_balances || wallet.tokenBalances || []).map((asset) => ({
+    address: wallet.address,
+    label: wallet.label || wallet.address,
+    description: wallet.description || '',
+    totalValue: wallet.valuation?.pricedSubtotalUsd ?? null,
+    valuation: wallet.valuation || {},
+    truncated: Boolean(wallet.holdingsTruncated),
+    assets: (Array.isArray(wallet.balances) ? wallet.balances : []).map((asset) => ({
       ...asset,
-       symbol: asset.symbol || asset.ticker || asset.asset,
-       mint: asset.mint || asset.mintAddress || asset.mint_address || asset.address || asset.asset_identifier || asset.identifier,
-      imageUrl: asset.imageUrl || asset.image_uri || asset.image,
-      rawBalance: asset.rawBalance ?? asset.raw_balance ?? asset.balance,
-      balance: asset.balance ?? asset.rawBalance ?? asset.raw_balance,
-      displayBalance: asset.displayBalance ?? asset.display_balance ?? asset.balance,
-      price: asset.price ?? asset.price_usd ?? asset.usd_price,
-      value: asset.value ?? asset.value_usd ?? asset.valueUsd,
+      symbol: asset.symbol,
+      mint: asset.mint,
+      imageUrl: asset.iconUrl,
+      rawBalance: asset.rawBalance,
+      balance: asset.balance,
+      displayBalance: asset.displayBalance,
+      price: asset.priceUsd,
+      value: asset.valueUsd,
     })),
-    transactions: (wallet.decoded_activity || wallet.decodedActivity || wallet.activity || wallet.transactions || wallet.events || []).slice(0, 25).map((transaction) => ({
-      ...transaction,
-       timestamp: transaction.timestamp || transaction.occurredAt || transaction.date || transaction.time || transaction.block_time || transaction.blockTime,
-       id: transaction.id || transaction.signature || transaction.txId || transaction.txid || transaction.tx_id || transaction.transactionId || transaction.transaction_id || transaction.hash,
-       type: transaction.type || transaction.action || transaction.activity_type || transaction.category || transaction.direction || transaction.instruction?.type || transaction.parsed?.type,
-       symbol: transaction.symbol || transaction.assetSymbol || transaction.asset_symbol || transaction.asset?.symbol || transaction.token?.symbol || transaction.token_symbol,
-       mint: transaction.mint || transaction.mintAddress || transaction.mint_address || transaction.asset?.mint || transaction.token?.mint,
-      amount: transaction.displayAmount ?? transaction.amountDisplay ?? transaction.display_amount ?? transaction.amount ?? transaction.quantity,
-       value: transaction.value ?? transaction.value_usd ?? transaction.valueUsd ?? transaction.usd_value,
-       transfers: transaction.transfers || transaction.tokenTransfers || transaction.token_transfers || [],
-    })),
+    transactions: (wallet.transactions || wallet.events || []).map(transactionFrom),
   };
+}
+
+export function transactionsFrom(data) {
+  const page = data?.transactions || data?.events || (Array.isArray(data) ? data : []);
+  return page.map(transactionFrom);
 }
 
 export function swapsFrom(data) {
-  const swaps = Array.isArray(data) ? data : data?.swaps || data?.trades || [];
-  return swaps.map((swap) => {
-    if (Array.isArray(swap)) {
-      const type = swap[4];
-      const input = tokenFrom(swap[3]?.[0]);
-      const output = tokenFrom(swap[3]?.[1]);
-      return swapFromParts({ date: swap[0], transaction: swap[1], maker: swap[2], type, input, output });
-    }
-    return swapFromParts({
-       date: swap.date || swap.timestamp || swap.sync_at || swap.block_time || swap.blockTime,
-       transaction: swap.transaction || swap.signature || swap.id || swap.txId || swap.tx_id || swap.txid || swap.transaction_id,
-       maker: swap.maker || swap.sender || swap.wallet || swap.address || swap.owner,
-       type: swap.type || swap.side || swap.direction || 'SWAP',
-       input: tokenFrom(swap.input || swap.asset_in || swap.token_in || swap.tokenIn || swap.from || swap.sold),
-       output: tokenFrom(swap.output || swap.asset_out || swap.token_out || swap.tokenOut || swap.to || swap.bought),
-    });
-  });
+  const events = Array.isArray(data) ? data : data?.swaps || data?.events || [];
+  return events.map((event) => ({
+    id: event.id || event.signature,
+    timestamp: event.timestamp,
+    type: event.type || event.side || 'Swap',
+    maker: event.maker || event.wallet,
+  }));
 }
 
-function tokenFrom(token) {
-  if (Array.isArray(token)) return { symbol: token[0], image_uri: token[1], amount: token[3] };
+function transactionFrom(transaction) {
   return {
-    ...(token || {}),
-     symbol: token?.symbol || token?.ticker || token?.asset,
-     mint: token?.mint || token?.mintAddress || token?.mint_address || token?.address || token?.asset_identifier || token?.identifier,
-    image_uri: token?.image_uri || token?.imageUrl || token?.image,
-    amount: token?.amount ?? token?.amount_display ?? token?.quantity ?? token?.value,
+    ...transaction,
+    timestamp: transaction.timestamp,
+    id: transaction.id,
+    type: transaction.type || 'Activity',
+    source: transaction.source,
+    status: transaction.status,
+    description: transaction.description,
+    transfers: transfersFrom(transaction.transfers),
   };
 }
 
-function swapFromParts({ date, transaction, maker, type, input, output }) {
-  const normalizedType = String(type || '').toUpperCase();
-  const isBuy = normalizedType === 'BUY';
-  const hasDirection = normalizedType === 'BUY' || normalizedType === 'SELL';
-  const asset = hasDirection ? (isBuy ? output : input) : null;
-  const value = hasDirection ? (isBuy ? input : output) : null;
-  return {
-    date,
-    transaction,
-    maker,
-    type: normalizedType,
-    asset,
-    amount: asset?.amount,
-    value,
-    categoryAmount: value?.amount,
-  };
+function transfersFrom(transfers) {
+  if (Array.isArray(transfers)) return transfers.map((transfer) => ({
+    ...transfer,
+    kind: transfer.kind || (transfer.mint ? 'token' : transfer.symbol === 'SOL' ? 'native' : 'token'),
+  }));
+  if (!transfers || typeof transfers !== 'object') return [];
+  const native = Array.isArray(transfers.native) ? transfers.native.map((transfer) => ({ ...transfer, symbol: 'SOL', kind: 'native' })) : [];
+  const tokens = Array.isArray(transfers.tokens) ? transfers.tokens.map((transfer) => ({ ...transfer, kind: 'token' })) : [];
+  return [...native, ...tokens];
 }
 
 export function assetHistoryFrom(asset) {
-  const history = asset?.price_history || asset?.history || asset?.priceHistory;
+  const history = Array.isArray(asset) ? asset : asset?.history || asset?.points || asset?.priceHistory;
   if (!Array.isArray(history)) return [];
-  return history.map((point) => [point.date || point.timestamp || point.sync_at, point.price_usd ?? point.price ?? point.avg_price_usd]).filter(([date, price]) => date && Number.isFinite(Number(price)));
+  return history.map((point) => [point.date || point.timestamp, point.priceUsd ?? point.price]).filter(([date, price]) => date && Number.isFinite(Number(price)));
 }

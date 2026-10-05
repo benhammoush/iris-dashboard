@@ -1,17 +1,16 @@
 import { createContext, useContext } from 'react';
 import { workerApi } from '../api/worker';
-import { assetsFrom, walletsFrom } from '../data/normalizers';
+import { assetsFrom } from '../data/normalizers';
 import { useWorkerResource } from '../hooks/useWorkerResource';
 
-const CatalogContext = createContext({ assets: [], wallets: [], loading: true });
+const CatalogContext = createContext({ assets: [], loading: true });
 
 export function CatalogProvider({ children }) {
   const assets = useWorkerResource(workerApi.assets, []);
-  const wallets = useWorkerResource(workerApi.wallets, []);
   return (
     <CatalogContext.Provider value={{
-      assets: assetsFrom(assets.data), wallets: walletsFrom(wallets.data),
-      loading: assets.loading || wallets.loading, meta: assets.meta, error: assets.error || wallets.error,
+      assets: assetsFrom(assets.data),
+      loading: assets.loading, meta: assets.meta, error: assets.error,
     }}>
       {children}
     </CatalogContext.Provider>

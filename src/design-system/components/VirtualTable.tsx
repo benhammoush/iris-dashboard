@@ -49,7 +49,7 @@ export default function VirtualTable<T>({ columns, data, emptyLabel, filterPlace
         <div style={{ height: virtualizer.getTotalSize(), position: 'relative', minWidth: columns.reduce((width, column) => width + column.width, 0) }}>
           {renderedRows.map((virtualRow) => {
             const row = rows[virtualRow.index]
-            return <div key={virtualRow.key} className={`iris-table-row${onRowClick ? ' iris-table-row--clickable' : ''}`} style={{ height: rowHeight, transform: `translateY(${virtualRow.start}px)` }} onClick={() => onRowClick?.(row)} role={onRowClick ? 'button' : 'row'}>
+            return <div key={virtualRow.key} className={`iris-table-row${onRowClick ? ' iris-table-row--clickable' : ''}`} style={{ height: rowHeight, transform: `translateY(${virtualRow.start}px)` }} onClick={() => onRowClick?.(row)} onKeyDown={(event) => { if (onRowClick && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); onRowClick(row) } }} role={onRowClick ? 'button' : 'row'} tabIndex={onRowClick ? 0 : undefined}>
               {columns.map((column) => <div key={column.id} style={{ width: column.width }} className={`iris-table-cell iris-table-cell--${column.align || 'left'}`}>{column.cell(row)}</div>)}
             </div>
           })}
