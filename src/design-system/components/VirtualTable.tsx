@@ -49,10 +49,10 @@ export default function VirtualTable<T>({ columns, data, emptyLabel, filterPlace
   return <section className="iris-table-card">
     <div className="iris-table-toolbar"><input value={filter} onChange={(event) => setFilter(event.target.value)} placeholder={filterPlaceholder} aria-label={filterPlaceholder} /><span>{filter ? `${rows.length} / ${data.length}` : data.length} rows</span></div>
     {!rows.length ? <p className="iris-empty">{filter ? 'No rows match this search.' : emptyLabel}</p> : <>
-      <div className="iris-table-head" role="row">
-        {columns.map((column) => <button key={column.id} style={{ width: column.width }} className={`iris-table-cell iris-table-cell--${column.align || 'left'}`} onClick={() => toggleSort(column.id)}>{column.label} {sort?.id === column.id ? (sort.direction === 'asc' ? '▲' : '▼') : '⇅'}</button>)}
-      </div>
-      <div ref={scrollRef} className="iris-table-scroll" style={{ height: Math.min(Math.max(displayedRows.length * rowHeight, rowHeight), 360) }}>
+      <div ref={scrollRef} className="iris-table-scroll" style={{ height: Math.min(Math.max(displayedRows.length * rowHeight + rowHeight, rowHeight * 2), 360) }}>
+        <div className="iris-table-head" role="row">
+          {columns.map((column) => <button key={column.id} style={{ width: column.width }} className={`iris-table-cell iris-table-cell--${column.align || 'left'}`} onClick={() => toggleSort(column.id)}>{column.label} {sort?.id === column.id ? (sort.direction === 'asc' ? '▲' : '▼') : '⇅'}</button>)}
+        </div>
         <div style={{ height: virtualizer.getTotalSize(), position: 'relative', minWidth: columns.reduce((width, column) => width + column.width, 0) }}>
           {renderedRows.map((virtualRow) => {
             const row = displayedRows[virtualRow.index]
