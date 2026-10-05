@@ -132,6 +132,7 @@ button, input { font: inherit; }
 .iris-catalog-list-rows img, .iris-catalog-list-rows .iris-asset-icon-fallback { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
 .iris-catalog-list-rows strong, .iris-catalog-list-rows small { display: block; }
 .iris-catalog-list-rows small { overflow: hidden; color: var(--iris-muted); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.iris-catalog-list-rows em { display: block; margin-top: 2px; color: var(--iris-red, #dc2626); font-size: 9px; font-style: normal; }
 .iris-catalog-list-price { display: grid; justify-items: end; color: var(--iris-secondary-text); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; }
 .iris-catalog-list-price .iris-positive, .iris-catalog-list-price .iris-negative, .iris-catalog-list-price .iris-muted { margin-top: 2px; }
 .iris-wallet-address { margin-top: 8px !important; color: var(--iris-muted) !important; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 11px !important; overflow-wrap: anywhere; }
