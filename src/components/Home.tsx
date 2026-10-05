@@ -75,7 +75,7 @@ export default function Home() {
          </dl></aside>
        </section>
       {recentSwaps.length > 0 && <section className="iris-section"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Global reviewed-pool activity</p><h2>Recent swaps</h2></div><span>{recentSwaps.length} events</span></div><div className="iris-activity-list">{recentSwaps.map((swap: any, index: number) => <div className="iris-activity-row" key={`${swap.id || swap.timestamp}-${index}`}><div><strong>{swap.type}</strong><span>{swap.maker || 'Reviewed pool participant'}</span></div><div><small>{swap.timestamp || 'Time unavailable'}</small></div></div>)}</div></section>}
-      <section className="iris-section"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Market catalog</p><h2>Assets</h2></div><span>{catalogAssets.length} tracked</span></div><VirtualTable columns={assetColumns} data={catalogAssets} emptyLabel="No assets are available." filterPlaceholder="Filter assets" pageSize={25} onRowClick={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} /></section>
+       <section className="iris-section"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Jupiter Tokens V2</p><h2>Top traded on Jupiter</h2></div><span>{catalogAssets.length} assets</span></div><VirtualTable columns={assetColumns} data={catalogAssets} emptyLabel="No assets are available." filterPlaceholder="Filter assets" pageSize={25} onRowClick={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} /></section>
     </main>}
   </div>
 }
