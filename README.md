@@ -8,7 +8,7 @@ Iris is a Vite portfolio dashboard backed only by the Iris Worker API. The brows
 
 Worker errors are shown to users. Market, asset catalog, and swap requests use local, non-sensitive emergency display fixtures only when `VITE_ENABLE_FIXTURES=true`; the status line identifies fixture data. Wallet details never use a fixture address: an unconfigured or unknown address is shown as not tracked.
 
-The catalog shows up to 50 Jupiter-verified top-traded assets plus SOL. The Home chart defaults to SOL and changes when a catalog row is selected; it shows per-asset GeckoTerminal price history, not aggregate market-cap history. Provider market cap and supply are displayed directly when available; missing values remain unavailable rather than showing `$0`. Any public Solana address can be queried for Helius balances and decoded activity through the Worker. The Recent Swaps feed covers reviewed registered pools, not the entire chain.
+The catalog shows up to 50 Jupiter-verified top-traded assets plus SOL. The Home chart defaults to SOL and changes when a catalog row is selected; it shows per-asset CoinGecko price history, not aggregate market-cap history. CoinGecko-unlisted assets show history as unavailable. Provider market cap and supply are displayed directly when available; missing values remain unavailable rather than showing `$0`. Any public Solana address can be queried for Helius balances and decoded activity through the Worker. The Recent Swaps feed covers reviewed registered pools, not the entire chain.
 
 The data-status banner shows the last completed Worker refresh and the next scheduled 15-minute UTC cron boundary. The displayed next schedule advances locally and does not imply that the cron refresh succeeded.
 

@@ -22,10 +22,10 @@ test('identifies CoinGecko-only market data when DEX pricing is rate-limited', (
   expect(screen.getByText(/supported solana assets use coingecko chart history/i)).toBeInTheDocument();
 });
 
-test('identifies Jupiter current data and GeckoTerminal price history', () => {
+test('identifies Jupiter current data and CoinGecko price history', () => {
   render(<DataStatus meta={{ marketDataSource: 'jupiter', marketDataAsOf: '2026-10-03T12:00:00Z' }} />);
 
-  expect(screen.getByText(/jupiter prices and geckoterminal price history/i)).toBeInTheDocument();
+  expect(screen.getByText(/jupiter prices and coingecko price history/i)).toBeInTheDocument();
   expect(screen.getByText(/unavailable provider values remain blank/i)).toBeInTheDocument();
 });
 
