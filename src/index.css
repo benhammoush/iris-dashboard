@@ -48,7 +48,7 @@ button, input { font: inherit; }
 .iris-metric-value--positive, .iris-positive { color: var(--iris-green); }
 .iris-metric-value--negative, .iris-negative { color: var(--iris-red, #dc2626); }
 .iris-metric-detail, .iris-asset-cell small, .iris-wallet-card small, .iris-activity-row small { display: block; margin: 0; color: var(--iris-muted); font-size: 11px; }
-.iris-dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(280px, .85fr); gap: 14px; }
+.iris-dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
 .iris-dashboard-grid > .iris-section { margin-top: 0; }
 .iris-panel { overflow: hidden; }
 .iris-panel-heading { padding: 14px 15px; border-bottom: 1px solid var(--iris-border); }
@@ -60,13 +60,6 @@ button, input { font: inherit; }
 .iris-chart-empty { display: grid; min-height: 290px; place-content: center; gap: 8px; padding: 32px; color: var(--iris-secondary-text); text-align: center; font-size: 12px; }
 .iris-chart-empty strong { color: var(--iris-text); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 12px; }
 .iris-chart-empty p { max-width: 260px; margin: 0; color: var(--iris-muted); line-height: 1.5; }
-.iris-market-pulse { display: flex; flex-direction: column; }
-.iris-pulse-list { display: grid; grid-template-columns: 1fr; margin: 0; padding: 0 15px; }
-.iris-pulse-list > div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; min-height: 58px; border-bottom: 1px solid var(--iris-border); }
-.iris-pulse-list > div:last-child { border-bottom: 0; }
-.iris-pulse-list dt { color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; }
-.iris-pulse-list dd { display: grid; justify-items: end; margin: 0; color: var(--iris-text); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 12px; font-weight: 700; text-align: right; }
-.iris-pulse-list small { margin-top: 3px; color: var(--iris-muted); font-size: 10px; font-weight: 400; }
 .iris-activity-list { padding: 0 14px; }
 .iris-activity-row { display: flex; justify-content: space-between; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--iris-border); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 11px; }
 .iris-activity-row:last-child { border-bottom: 0; }

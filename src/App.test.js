@@ -17,13 +17,10 @@ test('renders the Worker-backed portfolio shell', async () => {
   expect(await screen.findByPlaceholderText(/search assets or paste a wallet address/i)).toBeInTheDocument();
   await waitFor(() => expect(screen.getByText(/no price history is available/i)).toBeInTheDocument());
   expect(screen.getByText(/global reviewed-pool activity/i)).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: 'Market pulse' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Jupiter DEX' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Top Volume' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Trending' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'New pools' })).toBeInTheDocument();
-  expect(screen.getByText('Strongest 24H')).toBeInTheDocument();
-  expect(screen.getByText('Weakest 24H')).toBeInTheDocument();
   expect(screen.queryByText('Tracked assets')).not.toBeInTheDocument();
   expect(screen.queryByText('Assets priced')).not.toBeInTheDocument();
   expect(screen.queryByText('Highest 24H volume')).not.toBeInTheDocument();
