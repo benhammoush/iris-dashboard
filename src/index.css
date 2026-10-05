@@ -29,13 +29,8 @@ button, input { font: inherit; }
 .iris-theme-button { cursor: pointer; border: 1px solid var(--iris-border); border-radius: 3px; background: transparent; padding: 3px 8px; }
 .iris-theme-button:hover { background: var(--iris-hover); color: var(--iris-text); }
 .iris-mobile-nav { display: none; }
-.iris-data-status { border-bottom: 1px solid var(--iris-border); background: var(--iris-secondary); color: var(--iris-secondary-text); padding: 7px 14px; font-size: 11px; }
+.iris-data-status { position: fixed; bottom: 12px; left: 14px; z-index: 60; pointer-events: none; color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; opacity: .55; }
 .iris-data-status p { margin: 0; }
-.iris-data-status strong { color: var(--iris-text); }
-.iris-data-status-detail { margin-top: 3px !important; color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; }
-.iris-retry { margin-left: 8px; border: 1px solid var(--iris-border-strong); border-radius: 3px; background: transparent; color: var(--iris-text); cursor: pointer; padding: 1px 5px; font: inherit; }
-.iris-preview { border: 1px solid var(--iris-border); border-radius: 3px; background: transparent; color: var(--iris-secondary-text); cursor: pointer; padding: 3px 6px; font: inherit; font-size: 10px; }
-.iris-preview:hover, .iris-preview:focus-visible { border-color: var(--iris-border-strong); color: var(--iris-text); }
 
 .iris-page { width: min(1440px, 100%); margin: 0 auto; padding: 28px; }
 .iris-loading { display: grid; min-height: calc(100vh - 46px); place-items: center; color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 12px; }
@@ -128,6 +123,7 @@ button, input { font: inherit; }
   .iris-mobile-nav { position: fixed; right: 0; bottom: 0; left: 0; z-index: 50; display: flex; height: calc(56px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); background: var(--iris-secondary); border-top: 1px solid var(--iris-border); }
   .iris-mobile-nav a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--iris-muted); font-size: 10px; text-decoration: none; }
   .iris-mobile-nav a.active { color: var(--iris-text); font-weight: 700; }
+  .iris-data-status { bottom: calc(68px + env(safe-area-inset-bottom)); }
   .iris-page { padding: 18px 14px; }
   .iris-asset-heading { display: block; }
   .iris-change { display: inline-block; margin-top: 14px; }

@@ -14,7 +14,7 @@ const currency = (value: number | null | undefined, digits = 2) => value === nul
 const quantity = (value: number | null | undefined) => value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : Number(value).toLocaleString('en-US', { maximumFractionDigits: 2 })
 const audit = (asset: Asset) => Object.entries(asset.quality?.audit || {}).filter(([, value]) => value === true).map(([key]) => key).join(', ') || '—'
 
-const assetColumns = (onPreview: (mint: string) => void): VirtualTableColumn<Asset>[] => [
+const assetColumns: VirtualTableColumn<Asset>[] = [
   { id: 'asset', label: 'Asset', width: 210, value: (asset) => `${asset.symbol} ${asset.name || ''}`, cell: (asset) => <span className="iris-asset-cell"><AssetIcon src={asset.imageUrl} symbol={asset.symbol} /><strong>{asset.symbol}</strong><small>{asset.name}</small></span> },
   { id: 'price', label: 'Price', width: 120, align: 'right', value: (asset) => asset.priceUsd ?? -1, cell: (asset) => currency(asset.priceUsd, 5) },
   { id: 'day', label: '24H', width: 90, align: 'right', value: (asset) => asset.change24hPct ?? -Infinity, cell: (asset) => <Change value={asset.change24hPct} /> },
@@ -32,7 +32,6 @@ const assetColumns = (onPreview: (mint: string) => void): VirtualTableColumn<Ass
   { id: 'verified', label: 'Verified', width: 100, value: (asset) => asset.verification?.isVerified ? 'yes' : 'no', cell: (asset) => asset.verification?.isVerified ? 'Yes' : 'No' },
   { id: 'tags', label: 'Tags', width: 180, value: (asset) => asset.verification?.tags?.join(' ') || '', cell: (asset) => asset.verification?.tags?.join(', ') || '—' },
   { id: 'audit', label: 'Audit', width: 200, value: audit, cell: audit },
-  { id: 'preview', label: 'Chart', width: 90, align: 'right', value: (asset) => asset.symbol, cell: (asset) => <button className="iris-preview" onClick={(event) => { event.stopPropagation(); onPreview(asset.mint) }} aria-label={`Preview ${asset.symbol}`}>Preview</button> },
 ]
 
 export default function Home() {
@@ -62,13 +61,13 @@ export default function Home() {
   const recentSwaps = swapsFrom(swapsResult.data).slice(0, 5)
 
   return <div className="iris-shell"><Navbar />
-    <DataStatus meta={selectedResult.meta || historyResult.meta || catalogMeta} error={selectedResult.error || historyResult.error || catalogError} onRetry={() => { selectedResult.refetch(); historyResult.refetch(); swapsResult.refetch() }} refreshing={selectedResult.refreshing || historyResult.refreshing || swapsResult.refreshing} />
+    <DataStatus meta={selectedResult.meta || historyResult.meta || catalogMeta} error={selectedResult.error || historyResult.error || catalogError} />
     {(selectedResult.loading || historyResult.loading || catalogLoading) ? <main className="iris-loading">Loading market data...</main> : <main className="iris-page">
       <section className="iris-page-heading"><div><p className="iris-eyebrow">Market monitor</p><h1>Market overview</h1><p>Current metrics, history, and reviewed-pool activity from the Iris Worker.</p></div></section>
       {metrics.length > 0 && <section className="iris-metrics">{metrics}</section>}
       <section className="iris-section iris-asset-chart"><div className="iris-panel-heading"><div><p className="iris-eyebrow">CoinGecko price history</p><h2>{selectedAsset?.symbol || 'SOL'} / USD</h2></div><div className="iris-range" aria-label="Asset price history range">{[['1h', '1H'], ['4h', '4H'], ['1d', '1D'], ['7d', '7D']].map(([value, label]) => <button key={value} className={range === value ? 'active' : ''} onClick={() => setSelection(selectedMint, value)}>{label}</button>)}</div></div>{visibleHistory.length ? <AreaChart points={visibleHistory} valueFormatter={(value) => currency(value)} /> : <p className="iris-empty">No CoinGecko history is available.</p>}</section>
       {recentSwaps.length > 0 && <section className="iris-section"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Global reviewed-pool activity</p><h2>Recent swaps</h2></div><span>{recentSwaps.length} events</span></div><div className="iris-activity-list">{recentSwaps.map((swap: any, index: number) => <div className="iris-activity-row" key={`${swap.id || swap.timestamp}-${index}`}><div><strong>{swap.type}</strong><span>{swap.maker || 'Reviewed pool participant'}</span></div><div><small>{swap.timestamp || 'Time unavailable'}</small></div></div>)}</div></section>}
-      <section className="iris-section"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Market catalog</p><h2>Assets</h2></div><span>{catalogAssets.length} tracked</span></div><VirtualTable columns={assetColumns(setSelection)} data={catalogAssets} emptyLabel="No assets are available." filterPlaceholder="Filter assets" pageSize={25} onRowClick={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} /></section>
+      <section className="iris-section"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Market catalog</p><h2>Assets</h2></div><span>{catalogAssets.length} tracked</span></div><VirtualTable columns={assetColumns} data={catalogAssets} emptyLabel="No assets are available." filterPlaceholder="Filter assets" pageSize={25} onRowClick={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} /></section>
     </main>}
   </div>
 }

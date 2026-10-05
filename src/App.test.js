@@ -30,6 +30,9 @@ test('uses Home-only navigation and exposes the expanded market metrics', async 
   expect(screen.getByRole('button', { name: /FDV/i })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /Volume 24H/i })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /Organic score/i })).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: /Chart/i })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: /Preview/i })).not.toBeInTheDocument();
+  expect(screen.getByText('Data from Jupiter and CoinGecko')).toBeInTheDocument();
 });
 
 test('asset table click and keyboard navigation open asset detail', async () => {
@@ -56,12 +59,4 @@ test('chart range and selected mint persist in the URL', async () => {
   expect(window.location.search).toContain('range=7d');
   expect(screen.queryByText(/wallet lookup/i)).not.toBeInTheDocument();
   expect(screen.queryByText('Liquidity')).not.toBeInTheDocument();
-});
-
-test('preview updates the selected chart URL without changing primary asset-detail navigation', async () => {
-  render(<BrowserRouter><App /></BrowserRouter>);
-  await screen.findByRole('button', { name: 'Preview JUP' });
-  await userEvent.click(screen.getByRole('button', { name: 'Preview JUP' }));
-  expect(window.location.pathname).toBe('/');
-  expect(window.location.search).toContain('mint=JUPyiwrY');
 });
