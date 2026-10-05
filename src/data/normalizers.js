@@ -85,3 +85,7 @@ export function assetHistoryFrom(asset) {
   if (!Array.isArray(history)) return [];
   return history.map((point) => [point.date || point.timestamp, point.priceUsd ?? point.price]).filter(([date, price]) => date && Number.isFinite(Number(price)));
 }
+
+export function networkFrom(data) {
+  return data && typeof data === 'object' && !Array.isArray(data) ? data : null;
+}
