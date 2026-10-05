@@ -123,6 +123,17 @@ button, input { font: inherit; }
 .iris-catalog-card strong, .iris-catalog-card small { display: block; }
 .iris-catalog-card small { overflow: hidden; color: var(--iris-muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .iris-catalog-card > span:last-child { margin-left: auto; color: var(--iris-secondary-text); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 11px; white-space: nowrap; }
+.iris-catalog-lists { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.iris-catalog-lists > .iris-section { margin-top: 14px; }
+.iris-catalog-list-rows { padding: 0 14px; }
+.iris-catalog-list-rows button { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; width: 100%; align-items: center; gap: 8px; border: 0; border-bottom: 1px solid var(--iris-border); background: transparent; color: var(--iris-text); cursor: pointer; padding: 10px 0; text-align: left; }
+.iris-catalog-list-rows button:last-child { border-bottom: 0; }
+.iris-catalog-list-rows button:hover { background: var(--iris-hover); }
+.iris-catalog-list-rows img, .iris-catalog-list-rows .iris-asset-icon-fallback { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
+.iris-catalog-list-rows strong, .iris-catalog-list-rows small { display: block; }
+.iris-catalog-list-rows small { overflow: hidden; color: var(--iris-muted); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.iris-catalog-list-price { display: grid; justify-items: end; color: var(--iris-secondary-text); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; }
+.iris-catalog-list-price .iris-positive, .iris-catalog-list-price .iris-negative, .iris-catalog-list-price .iris-muted { margin-top: 2px; }
 .iris-wallet-address { margin-top: 8px !important; color: var(--iris-muted) !important; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 11px !important; overflow-wrap: anywhere; }
 .iris-disclosure { margin: -9px 0 18px; color: var(--iris-secondary-text); font-size: 12px; line-height: 1.5; }
 
@@ -140,7 +151,7 @@ button, input { font: inherit; }
   .iris-change { display: inline-block; margin-top: 14px; }
   .iris-page-heading { display: block; }
   .iris-block { display: inline-block; margin-top: 12px; }
-  .iris-metrics, .iris-dashboard-grid { grid-template-columns: 1fr; }
+  .iris-metrics, .iris-dashboard-grid, .iris-catalog-lists { grid-template-columns: 1fr; }
   .iris-metric-card { min-height: 96px; }
   .iris-chart-panel { min-height: 350px; }
 }

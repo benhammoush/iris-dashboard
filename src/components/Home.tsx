@@ -6,34 +6,12 @@ import { useCatalog } from '../contexts/CatalogContext'
 import DataStatus from './DataStatus'
 import AssetIcon from './AssetIcon'
 import Navbar from './Navbar'
-import { AreaChart, MetricCard, VirtualTable, type VirtualTableColumn } from '../design-system'
+import { AreaChart, MetricCard } from '../design-system'
 
 type Asset = { mint: string; symbol: string; name?: string; imageUrl?: string; priceUsd?: number; marketCapUsd?: number; circulatingSupply?: number; totalSupply?: number; fullyDilutedValuationUsd?: number; change24hPct?: number; liquidityUsd?: number; holderCount?: number; activity?: { buyVolume24hUsd?: number; sellVolume24hUsd?: number; volume24hUsd?: number }; quality?: { organicScore?: number; organicScoreLabel?: string; audit?: Record<string, unknown> }; verification?: { isVerified?: boolean; tags?: string[] } }
 const SOL_MINT = 'So11111111111111111111111111111111111111112'
 const currency = (value: number | null | undefined, digits = 2) => value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : `$${Number(value).toLocaleString('en-US', { maximumFractionDigits: digits })}`
-const quantity = (value: number | null | undefined) => value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : Number(value).toLocaleString('en-US', { maximumFractionDigits: 2 })
-const audit = (asset: Asset) => Object.entries(asset.quality?.audit || {}).filter(([, value]) => value === true).map(([key]) => key).join(', ') || '—'
 const assetsWithChange = (assets: Asset[]) => assets.filter((asset) => Number.isFinite(Number(asset.change24hPct)))
-
-const assetColumns: VirtualTableColumn<Asset>[] = [
-  { id: 'asset', label: 'Asset', width: 210, value: (asset) => `${asset.symbol} ${asset.name || ''}`, cell: (asset) => <span className="iris-asset-cell"><AssetIcon src={asset.imageUrl} symbol={asset.symbol} /><strong>{asset.symbol}</strong><small>{asset.name}</small></span> },
-  { id: 'price', label: 'Price', width: 120, align: 'right', value: (asset) => asset.priceUsd ?? -1, cell: (asset) => currency(asset.priceUsd, 5) },
-  { id: 'day', label: '24H', width: 90, align: 'right', value: (asset) => asset.change24hPct ?? -Infinity, cell: (asset) => <Change value={asset.change24hPct} /> },
-  { id: 'marketCap', label: 'Market cap', width: 160, align: 'right', value: (asset) => asset.marketCapUsd ?? -1, cell: (asset) => currency(asset.marketCapUsd) },
-  { id: 'fdv', label: 'FDV', width: 160, align: 'right', value: (asset) => asset.fullyDilutedValuationUsd ?? -1, cell: (asset) => currency(asset.fullyDilutedValuationUsd) },
-  { id: 'circulatingSupply', label: 'Circulating', width: 150, align: 'right', value: (asset) => asset.circulatingSupply ?? -1, cell: (asset) => quantity(asset.circulatingSupply) },
-  { id: 'totalSupply', label: 'Total supply', width: 150, align: 'right', value: (asset) => asset.totalSupply ?? -1, cell: (asset) => quantity(asset.totalSupply) },
-  { id: 'liquidity', label: 'Liquidity', width: 140, align: 'right', value: (asset) => asset.liquidityUsd ?? -1, cell: (asset) => currency(asset.liquidityUsd) },
-  { id: 'holders', label: 'Holders', width: 110, align: 'right', value: (asset) => asset.holderCount ?? -1, cell: (asset) => quantity(asset.holderCount) },
-  { id: 'buyVolume', label: 'Buy 24H', width: 140, align: 'right', value: (asset) => asset.activity?.buyVolume24hUsd ?? -1, cell: (asset) => currency(asset.activity?.buyVolume24hUsd) },
-  { id: 'sellVolume', label: 'Sell 24H', width: 140, align: 'right', value: (asset) => asset.activity?.sellVolume24hUsd ?? -1, cell: (asset) => currency(asset.activity?.sellVolume24hUsd) },
-  { id: 'volume', label: 'Volume 24H', width: 140, align: 'right', value: (asset) => asset.activity?.volume24hUsd ?? -1, cell: (asset) => currency(asset.activity?.volume24hUsd) },
-  { id: 'organicScore', label: 'Organic score', width: 130, align: 'right', value: (asset) => asset.quality?.organicScore ?? -1, cell: (asset) => quantity(asset.quality?.organicScore) },
-  { id: 'organicLabel', label: 'Organic label', width: 130, value: (asset) => asset.quality?.organicScoreLabel || '', cell: (asset) => asset.quality?.organicScoreLabel || '—' },
-  { id: 'verified', label: 'Verified', width: 100, value: (asset) => asset.verification?.isVerified ? 'yes' : 'no', cell: (asset) => asset.verification?.isVerified ? 'Yes' : 'No' },
-  { id: 'tags', label: 'Tags', width: 180, value: (asset) => asset.verification?.tags?.join(' ') || '', cell: (asset) => asset.verification?.tags?.join(', ') || '—' },
-  { id: 'audit', label: 'Audit', width: 200, value: audit, cell: audit },
-]
 
 export default function Home() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -42,10 +20,12 @@ export default function Home() {
   const range = ['1h', '4h', '1d', '7d'].includes(searchParams.get('range') || '') ? searchParams.get('range')! : '1d'
   const { assets, loading: catalogLoading, meta: catalogMeta, error: catalogError } = useCatalog() as any
   const selectedResult = useWorkerResource((options: any) => workerApi.asset(selectedMint, options), [selectedMint]) as any
+  const catalogsResult = useWorkerResource(workerApi.catalogs, []) as any
   const historySourceRange = range === '7d' ? '7d' : '1d'
   const historyResult = useWorkerResource((options: any) => workerApi.assetHistory(selectedMint, historySourceRange, options), [selectedMint, historySourceRange]) as any
   const swapsResult = useWorkerResource(workerApi.swaps, []) as any
   const catalogAssets = assets as Asset[]
+  const catalogs = catalogsResult.data && typeof catalogsResult.data === 'object' ? catalogsResult.data : {}
   const selectedAsset = assetsFrom(selectedResult.data?.asset || selectedResult.data ? [selectedResult.data?.asset || selectedResult.data] : [])[0] || catalogAssets.find((asset) => asset.mint === selectedMint)
   const history = assetHistoryFrom(historyResult.data).sort((left, right) => new Date(left[0]).valueOf() - new Date(right[0]).valueOf()) as [string, number][]
   const lookbackMs = { '1h': 60 * 60 * 1000, '4h': 4 * 60 * 60 * 1000, '1d': 24 * 60 * 60 * 1000, '7d': 7 * 24 * 60 * 60 * 1000 }[range] || 24 * 60 * 60 * 1000
@@ -63,8 +43,8 @@ export default function Home() {
   const weakestAsset = movers.reduce<Asset | null>((worst, asset) => !worst || Number(asset.change24hPct) < Number(worst.change24hPct) ? asset : worst, null)
 
   return <div className="iris-shell"><Navbar />
-    <DataStatus meta={selectedResult.meta || historyResult.meta || catalogMeta} error={selectedResult.error || historyResult.error || catalogError} />
-    {(selectedResult.loading || historyResult.loading || catalogLoading) ? <main className="iris-loading">Loading market data...</main> : <main className="iris-page">
+    <DataStatus meta={selectedResult.meta || historyResult.meta || catalogsResult.meta || catalogMeta} error={selectedResult.error || historyResult.error || catalogsResult.error || catalogError} />
+    {(selectedResult.loading || historyResult.loading || catalogsResult.loading || catalogLoading) ? <main className="iris-loading">Loading market data...</main> : <main className="iris-page">
       <section className="iris-page-heading"><div><p className="iris-eyebrow">Market monitor</p><h1>Market overview</h1><p>Current metrics, history, and reviewed-pool activity from the Iris Worker.</p></div></section>
       {metrics.length > 0 && <section className="iris-metrics">{metrics}</section>}
        <section className="iris-dashboard-grid">
@@ -75,7 +55,11 @@ export default function Home() {
          </dl></aside>
        </section>
       {recentSwaps.length > 0 && <section className="iris-section"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Global reviewed-pool activity</p><h2>Recent swaps</h2></div><span>{recentSwaps.length} events</span></div><div className="iris-activity-list">{recentSwaps.map((swap: any, index: number) => <div className="iris-activity-row" key={`${swap.id || swap.timestamp}-${index}`}><div><strong>{swap.type}</strong><span>{swap.maker || 'Reviewed pool participant'}</span></div><div><small>{swap.timestamp || 'Time unavailable'}</small></div></div>)}</div></section>}
-       <section className="iris-section"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Jupiter Tokens V2</p><h2>Top traded on Jupiter</h2></div><span>{catalogAssets.length} assets</span></div><VirtualTable columns={assetColumns} data={catalogAssets} emptyLabel="No assets are available." filterPlaceholder="Filter assets" pageSize={25} onRowClick={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} /></section>
+       <section className="iris-catalog-lists" aria-label="Jupiter discovery catalogs">
+         <CatalogList title="Top traded" detail="Jupiter 24H activity" assets={assetsFrom(catalogs.topTraded || catalogAssets) as Asset[]} onSelect={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} />
+         <CatalogList title="Trending" detail="Jupiter 24H momentum" assets={assetsFrom(catalogs.trending) as Asset[]} onSelect={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} />
+         <CatalogList title="Recent" detail="New Jupiter pools" assets={assetsFrom(catalogs.recent) as Asset[]} onSelect={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} />
+       </section>
     </main>}
   </div>
 }
@@ -88,4 +72,8 @@ function Change({ value }: { value?: number | null }) {
 
 function PulseItem({ label, value, detail }: { label: string; value: React.ReactNode; detail?: React.ReactNode }) {
   return <div><dt>{label}</dt><dd>{value}{detail !== undefined && <small>{detail}</small>}</dd></div>
+}
+
+function CatalogList({ title, detail, assets, onSelect }: { title: string; detail: string; assets: Asset[]; onSelect: (asset: Asset) => void }) {
+  return <section className="iris-section iris-catalog-list"><div className="iris-panel-heading"><div><p className="iris-eyebrow">{detail}</p><h2>{title}</h2></div><span>{assets.length} assets</span></div>{assets.length ? <div className="iris-catalog-list-rows">{assets.slice(0, 10).map((asset) => <button key={asset.mint} onClick={() => onSelect(asset)}><AssetIcon src={asset.imageUrl} symbol={asset.symbol} /><span><strong>{asset.symbol}</strong><small>{asset.name}</small></span><span className="iris-catalog-list-price">{currency(asset.priceUsd, 5)}<Change value={asset.change24hPct} /></span></button>)}</div> : <p className="iris-empty">No assets are available.</p>}</section>
 }
