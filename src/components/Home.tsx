@@ -52,7 +52,7 @@ export default function Home() {
           <div className="iris-catalog-lists">
             <CatalogList title="Top Volume" tone="volume" assets={assetsFrom(catalogs.topTraded || catalogAssets) as Asset[]} onSelect={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} />
             <CatalogList title="Trending" tone="trending" assets={assetsFrom(catalogs.trending) as Asset[]} onSelect={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} />
-            <CatalogList title="New pools" tone="pools" assets={assetsFrom(catalogs.recent) as Asset[]} onSelect={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} />
+            <CatalogList title="New tokens" tone="pools" assets={assetsFrom(catalogs.recent) as Asset[]} onSelect={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} />
           </div>
         </section>
     </main>}

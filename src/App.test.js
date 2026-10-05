@@ -26,7 +26,7 @@ test('renders the Worker-backed portfolio shell', async () => {
   expect(screen.getByRole('heading', { name: 'Jupiter DEX' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Top Volume' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Trending' })).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: 'New pools' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'New tokens' })).toBeInTheDocument();
   expect(screen.getByText('Volume $12,345')).toBeInTheDocument();
   expect(screen.getByText('Unverified')).toBeInTheDocument();
   expect(screen.queryByText('Tracked assets')).not.toBeInTheDocument();
@@ -56,7 +56,7 @@ test('uses Home-only navigation and shows four compact market metrics', async ()
   expect(screen.getByRole('heading', { name: 'Jupiter DEX' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Top Volume' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Trending' })).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: 'New pools' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'New tokens' })).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /FDV/i })).not.toBeInTheDocument();
   expect(screen.getByText('SOL price')).toBeInTheDocument();
   expect(screen.getAllByText('+3.50%').length).toBeGreaterThan(0);
