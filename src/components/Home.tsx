@@ -48,11 +48,11 @@ export default function Home() {
        </section>
       {recentSwaps.length > 0 && <section className="iris-section"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Global reviewed-pool activity</p><h2>Recent swaps</h2></div><span>{recentSwaps.length} events</span></div><div className="iris-activity-list">{recentSwaps.map((swap: any, index: number) => <div className="iris-activity-row" key={`${swap.id || swap.timestamp}-${index}`}><div><strong>{swap.type}</strong><span>{swap.maker || 'Reviewed pool participant'}</span></div><div><small>{swap.timestamp || 'Time unavailable'}</small></div></div>)}</div></section>}
         <section className="iris-section iris-jupiter-dex" aria-label="Jupiter discovery catalogs">
-          <div className="iris-jupiter-dex-label"><h2>Jupiter DEX</h2></div>
+          <div className="iris-jupiter-dex-label"><div className="iris-jupiter-mark" aria-hidden="true"><i /><i /><i /></div><div><p>Jupiter</p><h2>Jupiter DEX</h2></div><span>DEX</span></div>
           <div className="iris-catalog-lists">
-            <CatalogList title="Top Volume" assets={assetsFrom(catalogs.topTraded || catalogAssets) as Asset[]} onSelect={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} />
-            <CatalogList title="Trending" assets={assetsFrom(catalogs.trending) as Asset[]} onSelect={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} />
-            <CatalogList title="New pools" assets={assetsFrom(catalogs.recent) as Asset[]} onSelect={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} />
+            <CatalogList title="Top Volume" tone="volume" assets={assetsFrom(catalogs.topTraded || catalogAssets) as Asset[]} onSelect={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} />
+            <CatalogList title="Trending" tone="trending" assets={assetsFrom(catalogs.trending) as Asset[]} onSelect={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} />
+            <CatalogList title="New pools" tone="pools" assets={assetsFrom(catalogs.recent) as Asset[]} onSelect={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} />
           </div>
         </section>
     </main>}
@@ -65,6 +65,6 @@ function Change({ value }: { value?: number | null }) {
   return <span className={change >= 0 ? 'iris-positive' : 'iris-negative'}>{change >= 0 ? '+' : ''}{change.toFixed(2)}%</span>
 }
 
-function CatalogList({ title, assets, onSelect }: { title: string; assets: Asset[]; onSelect: (asset: Asset) => void }) {
-  return <section className="iris-section iris-catalog-list"><div className="iris-panel-heading"><h2>{title}</h2></div>{assets.length ? <div className="iris-catalog-list-rows">{assets.map((asset) => <button key={asset.mint} onClick={() => onSelect(asset)}><AssetIcon src={asset.imageUrl} symbol={asset.symbol} /><span><strong>{asset.symbol}</strong><small>{asset.name}</small><small>Volume {currency(asset.activity?.volume24hUsd)}</small>{asset.verification?.isVerified === false && <em>Unverified</em>}</span><span className="iris-catalog-list-price">{currency(asset.priceUsd, 5)}<Change value={asset.change24hPct} /></span></button>)}</div> : <p className="iris-empty">No assets are available.</p>}</section>
+function CatalogList({ title, tone, assets, onSelect }: { title: string; tone: 'volume' | 'trending' | 'pools'; assets: Asset[]; onSelect: (asset: Asset) => void }) {
+  return <section className={`iris-section iris-catalog-list iris-catalog-list--${tone}`}><div className="iris-catalog-list-heading"><span aria-hidden="true" /><h2>{title}</h2></div>{assets.length ? <div className="iris-catalog-list-rows">{assets.map((asset) => <button key={asset.mint} onClick={() => onSelect(asset)}><AssetIcon src={asset.imageUrl} symbol={asset.symbol} /><span className="iris-catalog-list-identity"><strong>{asset.symbol}</strong><small>{asset.name}</small><small>Volume {currency(asset.activity?.volume24hUsd)}</small>{asset.verification?.isVerified === false && <em>Unverified</em>}</span><span className="iris-catalog-list-price">{currency(asset.priceUsd, 5)}<Change value={asset.change24hPct} /></span></button>)}</div> : <p className="iris-empty">No assets are available.</p>}</section>
 }
