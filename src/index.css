@@ -123,8 +123,11 @@ button, input { font: inherit; }
 .iris-catalog-card strong, .iris-catalog-card small { display: block; }
 .iris-catalog-card small { overflow: hidden; color: var(--iris-muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .iris-catalog-card > span:last-child { margin-left: auto; color: var(--iris-secondary-text); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 11px; white-space: nowrap; }
-.iris-catalog-lists { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-.iris-catalog-lists > .iris-section { margin-top: 14px; }
+.iris-jupiter-dex { display: grid; grid-template-columns: 140px minmax(0, 1fr); align-items: stretch; }
+.iris-jupiter-dex-label { display: flex; align-items: flex-start; padding: 14px 15px; border-right: 1px solid var(--iris-border); }
+.iris-jupiter-dex-label h2 { margin: 2px 0 0; color: var(--iris-text); font-family: 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif; font-size: 16px; }
+.iris-catalog-lists { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; padding: 14px; }
+.iris-catalog-lists > .iris-section { margin-top: 0; }
 .iris-catalog-list-rows { max-height: 420px; overflow-y: auto; padding: 0 14px; }
 .iris-catalog-list-rows button { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; width: 100%; align-items: center; gap: 8px; border: 0; border-bottom: 1px solid var(--iris-border); background: transparent; color: var(--iris-text); cursor: pointer; padding: 10px 0; text-align: left; }
 .iris-catalog-list-rows button:last-child { border-bottom: 0; }
@@ -153,6 +156,8 @@ button, input { font: inherit; }
   .iris-page-heading { display: block; }
   .iris-block { display: inline-block; margin-top: 12px; }
   .iris-metrics, .iris-dashboard-grid, .iris-catalog-lists { grid-template-columns: 1fr; }
+  .iris-jupiter-dex { grid-template-columns: 1fr; }
+  .iris-jupiter-dex-label { border-right: 0; border-bottom: 1px solid var(--iris-border); }
   .iris-metric-card { min-height: 96px; }
   .iris-chart-panel { min-height: 350px; }
 }

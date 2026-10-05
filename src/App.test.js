@@ -18,9 +18,10 @@ test('renders the Worker-backed portfolio shell', async () => {
   await waitFor(() => expect(screen.getByText(/no price history is available/i)).toBeInTheDocument());
   expect(screen.getByText(/global reviewed-pool activity/i)).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Market pulse' })).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: 'Top traded' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Jupiter DEX' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Top Volume' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Trending' })).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: 'Recent' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'New pools' })).toBeInTheDocument();
   expect(screen.getByText('Strongest 24H')).toBeInTheDocument();
   expect(screen.getByText('Weakest 24H')).toBeInTheDocument();
   expect(screen.queryByText('Tracked assets')).not.toBeInTheDocument();
@@ -37,9 +38,10 @@ test('uses Home-only navigation and shows four compact market metrics', async ()
   await screen.findByRole('heading', { name: 'SOL / USD' });
   expect(screen.getAllByRole('link', { name: 'Home' }).length).toBeGreaterThan(0);
   expect(screen.queryByRole('link', { name: 'Market' })).not.toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: 'Top traded' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Jupiter DEX' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Top Volume' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Trending' })).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: 'Recent' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'New pools' })).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /FDV/i })).not.toBeInTheDocument();
   expect(screen.getByText('SOL price')).toBeInTheDocument();
   expect(screen.getByText('+3.50%')).toBeInTheDocument();
