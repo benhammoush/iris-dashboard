@@ -27,13 +27,13 @@ describe('worker fixture behavior', () => {
     const { workerApi } = await import('./worker');
 
     await workerApi.asset('MintCaseSensitive123');
-    await workerApi.assetHistory('MintCaseSensitive123');
+    await workerApi.assetHistory('MintCaseSensitive123', '1d');
     await workerApi.swaps();
     await workerApi.wallet('WalletCaseSensitive123');
     await workerApi.walletTransactions('WalletCaseSensitive123', { cursor: 'next-page' });
 
     expect(fetch).toHaveBeenNthCalledWith(1, expect.stringContaining('/v3/assets/mint/MintCaseSensitive123'), expect.any(Object));
-    expect(fetch).toHaveBeenNthCalledWith(2, expect.stringContaining('/v3/assets/mint/MintCaseSensitive123/history'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(2, expect.stringContaining('/v3/assets/mint/MintCaseSensitive123/history?range=1d'), expect.any(Object));
     expect(fetch).toHaveBeenNthCalledWith(3, expect.stringContaining('/v3/swaps'), expect.any(Object));
     expect(fetch).toHaveBeenNthCalledWith(4, expect.stringContaining('/v3/wallets/WalletCaseSensitive123'), expect.any(Object));
     expect(fetch).toHaveBeenNthCalledWith(5, expect.stringContaining('/v3/wallets/WalletCaseSensitive123/transactions?'), expect.any(Object));

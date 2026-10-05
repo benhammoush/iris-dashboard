@@ -13,13 +13,14 @@ const currency = (value: number | null | undefined, digits = 5) => value === nul
 const quantity = (value: number | null | undefined) => value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : Number(value).toLocaleString('en-US', { maximumFractionDigits: 2 })
 
 export default function Asset() {
-  const { mint = '' } = useParams(); const [rangeDays, setRangeDays] = useState(365)
+  const { mint = '' } = useParams(); const [range, setRange] = useState('1d')
   const result = useWorkerResource((options: any) => workerApi.asset(mint, options), [mint]) as any
-  const historyResult = useWorkerResource((options: any) => workerApi.assetHistory(mint, options), [mint]) as any
+  const historySourceRange = range === '7d' ? '7d' : '1d'
+  const historyResult = useWorkerResource((options: any) => workerApi.assetHistory(mint, historySourceRange, options), [mint, historySourceRange]) as any
   const asset = assetsFrom(result.data?.asset || result.data ? [result.data?.asset || result.data] : [])[0] as any
   const history = assetHistoryFrom(historyResult.data).sort((left, right) => new Date(left[0]).valueOf() - new Date(right[0]).valueOf()) as [string, number][]
-  const fromDate = new Date(); fromDate.setDate(fromDate.getDate() - rangeDays)
-  const visibleHistory = history.filter(([date]) => rangeDays === 1000 || new Date(date) >= fromDate).map(([date, value]) => ({ date, value: Number(value) }))
+  const lookbackMs = { '1h': 60 * 60 * 1000, '4h': 4 * 60 * 60 * 1000, '1d': 24 * 60 * 60 * 1000, '7d': 7 * 24 * 60 * 60 * 1000 }[range] || 24 * 60 * 60 * 1000
+  const visibleHistory = history.filter(([date]) => new Date(date).valueOf() >= Date.now() - lookbackMs).map(([date, value]) => ({ date, value: Number(value) }))
   const explorerUrl = solanaExplorerUrl('address', asset?.mint)
   const metrics = asset && [
     asset.priceUsd != null && <MetricCard key="price" label="Price" value={currency(asset.priceUsd)} detail="Jupiter current metric" />,
@@ -37,7 +38,7 @@ export default function Asset() {
       {metrics.length > 0 && <section className="iris-metrics">{metrics}</section>}
        {auditIndicators.length > 0 && <p className="iris-disclosure"><strong>Jupiter audit indicators:</strong> {auditIndicators.join(', ')}. This is provider metadata, not a safety assessment or guarantee.</p>}
        {(activity?.buyVolume24hUsd != null || activity?.sellVolume24hUsd != null || activity?.volume24hUsd != null) && <section className="iris-section"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Jupiter trading activity</p><h2>24H activity</h2></div></div><div className="iris-metrics iris-panel-metrics">{activity.buyVolume24hUsd != null && <MetricCard label="Buy volume" value={currency(activity.buyVolume24hUsd)} detail="Jupiter 24H activity" />}{activity.sellVolume24hUsd != null && <MetricCard label="Sell volume" value={currency(activity.sellVolume24hUsd)} detail="Jupiter 24H activity" />}{activity.volume24hUsd != null && <MetricCard label="Total volume" value={currency(activity.volume24hUsd)} detail="Jupiter 24H activity" />}</div></section>}
-      <section className="iris-section iris-asset-chart"><div className="iris-panel-heading"><div><p className="iris-eyebrow">CoinGecko 7-day history</p><h2>{asset.symbol} / USD</h2></div><div className="iris-range" aria-label="Asset price history range">{[[7, '1W'], [30, '1M'], [365, '1Y'], [1000, 'MAX']].map(([days, label]) => <button key={label} className={rangeDays === days ? 'active' : ''} onClick={() => setRangeDays(days as number)}>{label}</button>)}</div></div>{visibleHistory.length ? <AreaChart points={visibleHistory} valueFormatter={(value) => currency(value)} /> : <p className="iris-empty">No CoinGecko history is available.</p>}</section>
+       <section className="iris-section iris-asset-chart"><div className="iris-panel-heading"><div><p className="iris-eyebrow">CoinGecko price history</p><h2>{asset.symbol} / USD</h2></div><div className="iris-range" aria-label="Asset price history range">{[['1h', '1H'], ['4h', '4H'], ['1d', '1D'], ['7d', '7D']].map(([value, label]) => <button key={value} className={range === value ? 'active' : ''} onClick={() => setRange(value)}>{label}</button>)}</div></div>{visibleHistory.length ? <AreaChart points={visibleHistory} valueFormatter={(value) => currency(value)} /> : <p className="iris-empty">No CoinGecko history is available.</p>}</section>
     </main>}
   </div>
 }

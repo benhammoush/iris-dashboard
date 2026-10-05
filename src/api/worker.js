@@ -19,7 +19,7 @@ async function withFixture(path, fixture, options) {
 export const workerApi = {
   assets: (options) => withFixture('/v3/assets', fixtures.assets, options),
   asset: (mint, options) => withFixture(`/v3/assets/mint/${encodeURIComponent(mint)}`, fixtures.assets.find((asset) => asset.mint === mint) || null, options),
-  assetHistory: (mint, options) => withFixture(`/v3/assets/mint/${encodeURIComponent(mint)}/history`, [], options),
+  assetHistory: (mint, range = '7d', options) => withFixture(`/v3/assets/mint/${encodeURIComponent(mint)}/history?range=${range}`, [], options),
   swaps: (options) => withFixture('/v3/swaps', fixtures.swaps, options),
   wallet: (address, options) => apiGet(`/v3/wallets/${encodeURIComponent(address)}`, options),
   walletTransactions: (address, options = {}) => {

@@ -82,6 +82,9 @@ button, input { font: inherit; }
 .iris-table-row--clickable:hover { background: var(--iris-hover); }
 .iris-table-cell { flex: 0 0 auto; display: flex; align-items: center; overflow: hidden; padding: 0 10px; color: var(--iris-text); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .iris-table-cell--right { justify-content: flex-end; text-align: right; }
+.iris-pagination { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 9px 14px; border-top: 1px solid var(--iris-border); background: var(--iris-secondary); color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; }
+.iris-pagination button { border: 1px solid var(--iris-border); border-radius: 3px; background: var(--iris-input); color: var(--iris-text); cursor: pointer; padding: 4px 7px; font: inherit; }
+.iris-pagination button:disabled { cursor: not-allowed; opacity: .45; }
 .iris-asset-cell { display: grid; grid-template-columns: 25px auto; column-gap: 7px; align-items: center; }
 .iris-asset-cell img { grid-row: span 2; width: 23px; height: 23px; border-radius: 50%; object-fit: cover; }
 .iris-asset-icon-fallback { display: inline-grid; width: 23px; height: 23px; place-items: center; border-radius: 50%; background: var(--iris-hover); color: var(--iris-secondary-text); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 8px; font-weight: 700; }

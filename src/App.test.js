@@ -22,6 +22,16 @@ test('renders the Worker-backed portfolio shell', async () => {
   unmount();
 });
 
+test('uses Home-only navigation and exposes the expanded market metrics', async () => {
+  render(<BrowserRouter><App /></BrowserRouter>);
+  await screen.findByText('SOL');
+  expect(screen.getAllByRole('link', { name: 'Home' }).length).toBeGreaterThan(0);
+  expect(screen.queryByRole('link', { name: 'Market' })).not.toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /FDV/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Volume 24H/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Organic score/i })).toBeInTheDocument();
+});
+
 test('asset table click and keyboard navigation open asset detail', async () => {
   render(<BrowserRouter><App /></BrowserRouter>);
   await screen.findByText('JUP');
@@ -41,9 +51,9 @@ test('asset table rows support keyboard navigation', async () => {
 test('chart range and selected mint persist in the URL', async () => {
   render(<BrowserRouter><App /></BrowserRouter>);
   await screen.findByRole('heading', { name: 'SOL / USD' });
-  await userEvent.click(screen.getByRole('button', { name: '1W' }));
+  await userEvent.click(screen.getByRole('button', { name: '7D' }));
   expect(window.location.search).toContain('mint=So111');
-  expect(window.location.search).toContain('range=7');
+  expect(window.location.search).toContain('range=7d');
   expect(screen.queryByText(/wallet lookup/i)).not.toBeInTheDocument();
   expect(screen.queryByText('Liquidity')).not.toBeInTheDocument();
 });
