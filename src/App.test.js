@@ -99,9 +99,10 @@ test('uses Home-only navigation and shows the selected market metrics in the Jup
 });
 
 test('keeps navbar market and network summaries populated outside Home', async () => {
-  window.history.pushState({}, '', '/asset/So11111111111111111111111111111111111111112');
+  window.history.pushState({}, '', '/asset/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN');
   const assetPage = render(<BrowserRouter><App /></BrowserRouter>);
   expect(await screen.findByLabelText('SOL market summary')).toHaveTextContent('SOL : $1.00');
+  expect(screen.queryByLabelText('JUP market summary')).not.toBeInTheDocument();
   expect(await screen.findByLabelText('Helius network summary')).toHaveTextContent('TPS : 123.46');
   assetPage.unmount();
 

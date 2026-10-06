@@ -22,7 +22,7 @@ function sol(lamports) {
   return lamports === null || lamports === undefined || !Number.isFinite(Number(lamports)) ? '—' : `${(Number(lamports) / 1_000_000_000).toFixed(6)} SOL`;
 }
 
-function Navbar({ market = null }) {
+function Navbar() {
   const { assets } = useCatalog();
   const { network } = useHeliusDashboard();
   const [query, setQuery] = useState('');
@@ -32,7 +32,7 @@ function Navbar({ market = null }) {
   const normalized = queryValue.toUpperCase();
   const assetMatches = queryValue ? assets.filter((asset) => asset.mint?.includes(queryValue) || [asset.symbol, asset.name].some((value) => value?.toUpperCase().includes(normalized))).slice(0, 5) : [];
   const publicAddress = looksLikeSolanaAddress(queryValue) ? queryValue : null;
-  const navbarMarket = market || assets.find((asset) => asset.symbol === 'SOL') || assets[0] || null;
+  const navbarMarket = assets.find((asset) => asset.symbol === 'SOL') || assets[0] || null;
 
   function go(path) {
     navigate(path);
