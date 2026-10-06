@@ -29,7 +29,7 @@ export default function HeliusNetworkCard({ network, loading, error, transaction
   const freshness = transactionsMeta?.recentTransactions?.freshness
   const transactionState = transactionsRefreshing ? 'UPDATING' : freshness === 'stale' ? 'STALE' : freshness === 'fresh' ? 'LIVE' : 'UNAVAILABLE'
   return <section className="iris-helius-card" aria-label="Helius Solana network and recent transactions">
-    <div className="iris-helius-topline"><img className="iris-helius-logo" src="/helius-dark.svg" alt="Helius" /><div><p>Helius</p><h2>Network and transactions</h2></div><span>{chain.state === 'fresh' && freshness === 'fresh' ? 'LIVE' : 'SNAPSHOT'}</span></div>
+    <div className="iris-helius-topline"><img className="iris-helius-logo" src="/helius-dark.svg" alt="Helius" /><span>{chain.state === 'fresh' && freshness === 'fresh' ? 'LIVE' : 'SNAPSHOT'}</span></div>
     <div className="iris-helius-grid">
       <section className="iris-helius-column" aria-label="Solana network status">
         <div className="iris-helius-column-heading"><h3>Solana network</h3><span>{chain.state === 'fresh' ? 'LIVE' : 'SNAPSHOT'}</span></div>

@@ -26,7 +26,7 @@ test('renders the Worker-backed portfolio shell', async () => {
   expect(screen.getByRole('columnheader', { name: 'Action' })).toBeInTheDocument();
   expect(screen.getByText(/RecentSi.*11111111/)).toBeInTheDocument();
   expect(screen.getByText('Swap')).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: 'Jupiter DEX' })).toBeInTheDocument();
+  expect(screen.queryByRole('heading', { name: 'Jupiter DEX' })).not.toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Top Volume' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Trending' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'New tokens' })).toBeInTheDocument();
@@ -57,7 +57,7 @@ test('uses Home-only navigation and shows the selected market metrics in the Jup
   await screen.findByRole('heading', { name: 'Market overview' });
   expect(screen.getAllByRole('link', { name: 'Home' }).length).toBeGreaterThan(0);
   expect(screen.queryByRole('link', { name: 'Market' })).not.toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: 'Jupiter DEX' })).toBeInTheDocument();
+  expect(container.querySelector('.iris-jupiter-dex-label p')).toHaveTextContent('Jupiter');
   expect(screen.getByRole('heading', { name: 'Top Volume' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Trending' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'New tokens' })).toBeInTheDocument();
