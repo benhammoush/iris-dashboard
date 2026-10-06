@@ -29,6 +29,7 @@ describe('worker fixture behavior', () => {
     await workerApi.asset('MintCaseSensitive123');
     await workerApi.assetHistory('MintCaseSensitive123', '1d');
     await workerApi.assetCandles('MintCaseSensitive123', '4h');
+    await workerApi.assetCandles('MintCaseSensitive123', '4h', undefined, 1760000000);
     await workerApi.swaps();
     await workerApi.defillama();
     await workerApi.recentTransactions();
@@ -39,11 +40,12 @@ describe('worker fixture behavior', () => {
     expect(fetch).toHaveBeenNthCalledWith(1, expect.stringContaining('?includeHistory=false'), expect.any(Object));
     expect(fetch).toHaveBeenNthCalledWith(2, expect.stringContaining('/v3/assets/mint/MintCaseSensitive123/history?range=1d'), expect.any(Object));
     expect(fetch).toHaveBeenNthCalledWith(3, expect.stringContaining('/v3/assets/mint/MintCaseSensitive123/candles?range=4h'), expect.any(Object));
-    expect(fetch).toHaveBeenNthCalledWith(4, expect.stringContaining('/v3/swaps'), expect.any(Object));
-    expect(fetch).toHaveBeenNthCalledWith(5, expect.stringContaining('/v3/defillama'), expect.any(Object));
-    expect(fetch).toHaveBeenNthCalledWith(6, expect.stringContaining('/v3/transactions/recent?limit=15'), expect.any(Object));
-    expect(fetch).toHaveBeenNthCalledWith(7, expect.stringContaining('/v3/wallets/WalletCaseSensitive123'), expect.any(Object));
-    expect(fetch).toHaveBeenNthCalledWith(8, expect.stringContaining('/v3/wallets/WalletCaseSensitive123/transactions?'), expect.any(Object));
-    expect(fetch).toHaveBeenNthCalledWith(8, expect.stringContaining('cursor=next-page'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(4, expect.stringContaining('before=1760000000'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(5, expect.stringContaining('/v3/swaps'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(6, expect.stringContaining('/v3/defillama'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(7, expect.stringContaining('/v3/transactions/recent?limit=15'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(8, expect.stringContaining('/v3/wallets/WalletCaseSensitive123'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(9, expect.stringContaining('/v3/wallets/WalletCaseSensitive123/transactions?'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(9, expect.stringContaining('cursor=next-page'), expect.any(Object));
   });
 });

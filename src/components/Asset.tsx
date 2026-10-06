@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { workerApi } from '../api/worker'
 import { assetCandlesFrom, assetsFrom } from '../data/normalizers'
@@ -14,10 +14,38 @@ const quantity = (value: number | null | undefined) => value === null || value =
 
 export default function Asset() {
   const { mint = '' } = useParams(); const [range, setRange] = useState('1d')
+  const [olderCandles, setOlderCandles] = useState<any[]>([])
+  const [canLoadEarlier, setCanLoadEarlier] = useState(true)
+  const loadingOlderRef = useRef(false)
   const result = useWorkerResource((options: any) => workerApi.asset(mint, options), [mint]) as any
   const candlesResult = useWorkerResource((options: any) => workerApi.assetCandles(mint, range, options), [mint, range]) as any
   const asset = assetsFrom(result.data?.asset || result.data ? [result.data?.asset || result.data] : [])[0] as any
-  const candles = assetCandlesFrom(candlesResult.data).sort((left: any, right: any) => new Date(left.timestamp).valueOf() - new Date(right.timestamp).valueOf())
+  const baseCandles = assetCandlesFrom(candlesResult.data)
+  const candlesByTimestamp = new Map<string, any>()
+  for (const candle of [...olderCandles, ...baseCandles]) candlesByTimestamp.set(candle.timestamp, candle)
+  const candles = [...candlesByTimestamp.values()].sort((left: any, right: any) => new Date(left.timestamp).valueOf() - new Date(right.timestamp).valueOf())
+  useEffect(() => { setOlderCandles([]); setCanLoadEarlier(true); loadingOlderRef.current = false }, [mint, range])
+  async function loadEarlierCandles() {
+    if (loadingOlderRef.current || !canLoadEarlier || !candles.length) return
+    const oldestTimestamp = Math.floor(new Date(candles[0].timestamp).valueOf() / 1000)
+    if (!Number.isSafeInteger(oldestTimestamp) || oldestTimestamp <= 0) return
+    loadingOlderRef.current = true
+    try {
+      const result = await workerApi.assetCandles(mint, range, undefined, oldestTimestamp)
+      const older = assetCandlesFrom(result.data)
+      if (!older.length) { setCanLoadEarlier(false); return }
+      setOlderCandles((current: any[]) => {
+        const existing = new Set([...current, ...baseCandles].map((candle) => candle.timestamp))
+        const additions = older.filter((candle: any) => !existing.has(candle.timestamp))
+        if (!additions.length) setCanLoadEarlier(false)
+        return [...current, ...additions]
+      })
+    } catch {
+      setCanLoadEarlier(false)
+    } finally {
+      loadingOlderRef.current = false
+    }
+  }
   const explorerUrl = solanaExplorerUrl('address', asset?.mint)
   const metrics = asset && [
     asset.priceUsd != null && <MetricCard key="price" label="Price" value={currency(asset.priceUsd)} />,
@@ -35,7 +63,7 @@ export default function Asset() {
       {metrics.length > 0 && <section className="iris-metrics">{metrics}</section>}
         {auditIndicators.length > 0 && <p className="iris-disclosure"><strong>Audit indicators:</strong> {auditIndicators.join(', ')}. This is metadata, not a safety assessment or guarantee.</p>}
         {(activity?.buyVolume24hUsd != null || activity?.sellVolume24hUsd != null || activity?.volume24hUsd != null) && <section className="iris-section"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Trading activity</p><h2>24H activity</h2></div></div><div className="iris-metrics iris-panel-metrics">{activity.buyVolume24hUsd != null && <MetricCard label="Buy volume" value={currency(activity.buyVolume24hUsd)} />}{activity.sellVolume24hUsd != null && <MetricCard label="Sell volume" value={currency(activity.sellVolume24hUsd)} />}{activity.volume24hUsd != null && <MetricCard label="Total volume" value={currency(activity.volume24hUsd)} />}</div></section>}
-        <section className="iris-section iris-asset-chart"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Price and volume</p><h2>{asset.symbol} / USD</h2></div><div className="iris-range" aria-label="Asset price history range">{[['1h', '1H'], ['4h', '4H'], ['1d', '1D'], ['7d', '7D']].map(([value, label]) => <button key={value} className={range === value ? 'active' : ''} onClick={() => setRange(value)}>{label}</button>)}</div></div>{candles.length ? <CandlestickChart candles={candles} valueFormatter={(value) => currency(value)} /> : <p className="iris-empty">No price history is available.</p>}</section>
+        <section className="iris-section iris-asset-chart"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Price and volume</p><h2>{asset.symbol} / USD</h2></div><div className="iris-range" aria-label="Asset price history range">{[['1h', '1H'], ['4h', '4H'], ['1d', '1D'], ['7d', '7D']].map(([value, label]) => <button key={value} className={range === value ? 'active' : ''} onClick={() => setRange(value)}>{label}</button>)}</div></div>{candles.length ? <CandlestickChart candles={candles} canLoadEarlier={canLoadEarlier} onLoadEarlier={loadEarlierCandles} valueFormatter={(value) => currency(value)} /> : <p className="iris-empty">No price history is available.</p>}</section>
     </main>}
   </div>
 }

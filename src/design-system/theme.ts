@@ -69,6 +69,7 @@ export function applyThemeMode(mode: UiThemeMode): ThemeTokens {
     root.style.setProperty('--iris-secondary-text', theme.colors.text.secondary)
     root.style.setProperty('--iris-muted', theme.colors.text.muted)
     root.style.setProperty('--iris-green', theme.colors.accent.green)
+    root.style.setProperty('--iris-red', theme.colors.accent.red)
     root.style.setProperty('--iris-dropdown-shadow', theme.shadows.dropdown)
   }
 

@@ -15,6 +15,8 @@ interface Props {
   candles: CandleChartPoint[]
   height?: number
   valueFormatter?: (value: number) => string
+  canLoadEarlier?: boolean
+  onLoadEarlier?: () => Promise<void>
 }
 
 function asChartCandles(candles: CandleChartPoint[]) {
@@ -26,43 +28,90 @@ function asChartCandles(candles: CandleChartPoint[]) {
   })
 }
 
-export default function CandlestickChart({ candles, height = 360, valueFormatter }: Props) {
+export default function CandlestickChart({ candles, height = 360, valueFormatter, canLoadEarlier = false, onLoadEarlier }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const chartRef = useRef<any>(null)
+  const candleSeriesRef = useRef<any>(null)
+  const volumeSeriesRef = useRef<any>(null)
+  const hasDataRef = useRef(false)
+  const canLoadEarlierRef = useRef(canLoadEarlier)
+  const onLoadEarlierRef = useRef(onLoadEarlier)
+  const valueFormatterRef = useRef(valueFormatter)
   const { mode } = useTheme()
+
+  useEffect(() => { canLoadEarlierRef.current = canLoadEarlier }, [canLoadEarlier])
+  useEffect(() => { onLoadEarlierRef.current = onLoadEarlier }, [onLoadEarlier])
+  useEffect(() => { valueFormatterRef.current = valueFormatter }, [valueFormatter])
 
   useEffect(() => {
     const container = containerRef.current
     if (!container) return undefined
 
     const style = getComputedStyle(document.documentElement)
-    const color = (name: string) => style.getPropertyValue(name).trim()
+    const color = (name: string, fallback: string) => style.getPropertyValue(name).trim() || fallback
+    const green = color('--iris-green', '#24d166')
+    const red = color('--iris-red', '#f05454')
     const chart = createChart(container, {
       autoSize: true,
       height,
-      layout: { background: { type: ColorType.Solid, color: 'transparent' }, textColor: color('--iris-muted') },
-      grid: { vertLines: { color: color('--iris-border') }, horzLines: { color: color('--iris-border') } },
-      rightPriceScale: { borderColor: color('--iris-border'), scaleMargins: { top: 0.08, bottom: 0.26 } },
-      timeScale: { borderColor: color('--iris-border'), timeVisible: true },
+      layout: { background: { type: ColorType.Solid, color: 'transparent' }, textColor: color('--iris-muted', '#66788f') },
+      grid: { vertLines: { color: color('--iris-border', '#ccd7e5') }, horzLines: { color: color('--iris-border', '#ccd7e5') } },
+      rightPriceScale: { borderColor: color('--iris-border', '#ccd7e5'), scaleMargins: { top: 0.08, bottom: 0.26 } },
+      timeScale: { borderColor: color('--iris-border', '#ccd7e5'), timeVisible: true },
       handleScroll: { vertTouchDrag: false },
       handleScale: { axisPressedMouseMove: true, mouseWheel: true, pinch: true },
     })
     const series = chart.addSeries(CandlestickSeries, {
-      upColor: color('--iris-green'),
-      downColor: color('--iris-red'),
+      upColor: green,
+      downColor: red,
       borderVisible: false,
-      wickUpColor: color('--iris-green'),
-      wickDownColor: color('--iris-red'),
-      priceFormat: valueFormatter ? { type: 'custom', formatter: valueFormatter } : undefined,
+      wickUpColor: green,
+      wickDownColor: red,
+      priceFormat: valueFormatter ? { type: 'custom', formatter: (value: number) => valueFormatterRef.current ? valueFormatterRef.current(value) : String(value) } : undefined,
     })
     const volume = chart.addSeries(HistogramSeries, { priceScaleId: 'volume', priceFormat: { type: 'volume' } })
     chart.priceScale('volume').applyOptions({ scaleMargins: { top: 0.78, bottom: 0 } })
-    const data = asChartCandles(candles)
-    series.setData(data.map(({ value, ...candle }) => candle))
-    volume.setData(data.map(({ time, value, open, close }) => ({ time, value, color: close >= open ? `${color('--iris-green')}88` : `${color('--iris-red')}88` })))
-    chart.timeScale().fitContent()
+    chartRef.current = chart
+    candleSeriesRef.current = series
+    volumeSeriesRef.current = volume
+    hasDataRef.current = false
+    let loadingEarlier = false
+    let userNavigated = false
+    const markUserNavigation = () => { userNavigated = true }
+    const loadEarlier = (visibleRange: { from: number } | null) => {
+      if (!userNavigated || !visibleRange || visibleRange.from > 3 || loadingEarlier || !canLoadEarlierRef.current || !onLoadEarlierRef.current) return
+      loadingEarlier = true
+      userNavigated = false
+      onLoadEarlierRef.current().finally(() => { loadingEarlier = false })
+    }
+    container.addEventListener('pointerdown', markUserNavigation)
+    container.addEventListener('wheel', markUserNavigation, { passive: true })
+    chart.timeScale().subscribeVisibleLogicalRangeChange(loadEarlier)
 
-    return () => chart.remove()
-  }, [candles, height, mode, valueFormatter])
+    return () => {
+      chart.timeScale().unsubscribeVisibleLogicalRangeChange(loadEarlier)
+      container.removeEventListener('pointerdown', markUserNavigation)
+      container.removeEventListener('wheel', markUserNavigation)
+      chart.remove()
+      chartRef.current = null
+      candleSeriesRef.current = null
+      volumeSeriesRef.current = null
+    }
+  }, [height, mode])
+
+  useEffect(() => {
+    if (!candleSeriesRef.current || !volumeSeriesRef.current) return
+    const style = getComputedStyle(document.documentElement)
+    const green = style.getPropertyValue('--iris-green').trim() || '#24d166'
+    const red = style.getPropertyValue('--iris-red').trim() || '#f05454'
+    const data = asChartCandles(candles)
+    candleSeriesRef.current.setData(data.map(({ value, ...candle }) => candle))
+    volumeSeriesRef.current.setData(data.map(({ time, value, open, close }) => ({ time, value, color: close >= open ? `${green}88` : `${red}88` })))
+    if (!hasDataRef.current) {
+      chartRef.current.timeScale().fitContent()
+      hasDataRef.current = true
+    }
+  }, [candles, mode])
 
   return <div ref={containerRef} style={{ height, width: '100%' }} aria-label="Historical candlestick chart with USD trading volume" />
 }
