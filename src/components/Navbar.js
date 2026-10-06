@@ -6,11 +6,11 @@ import { useTheme } from '../design-system';
 import { looksLikeSolanaAddress } from '../data/solana';
 
 function money(value, digits = 2) {
-  return value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : `$${Number(value).toLocaleString('en-US', { maximumFractionDigits: digits })}`;
+  return value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : `$${Number(value).toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
 }
 
 function millions(value) {
-  return value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : `$${(Number(value) / 1_000_000).toLocaleString('en-US', { maximumFractionDigits: 2 })}M`;
+  return value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : `$${(Number(value) / 1_000_000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`;
 }
 
 function Navbar({ market = null }) {
@@ -41,13 +41,12 @@ function Navbar({ market = null }) {
             {publicAddress && <li><button onClick={() => go(`/wallet/${publicAddress}`)}>View public wallet {publicAddress}</button></li>}
             {!assetMatches.length && !publicAddress && <li><button disabled>No loaded matches.</button></li>}
         </ul>}
-      </div>
+       </div>
        {market && <div className="iris-jupiter-market" aria-label={`${market.symbol} Jupiter market summary`}>
-         <span className="iris-jupiter-market-brand">JUPITER</span>
-         <div><small>{market.symbol} price</small><strong>{money(market.priceUsd, 5)}</strong>{market.change24hPct !== null && market.change24hPct !== undefined && <em className={Number(market.change24hPct) >= 0 ? 'iris-positive' : 'iris-negative'}>{Number(market.change24hPct) >= 0 ? '+' : ''}{Number(market.change24hPct).toFixed(2)}%</em>}</div>
-         <div><small>Market cap</small><strong>{millions(market.marketCapUsd)}</strong></div>
-         <div><small>24H volume</small><strong>{millions(market.activity?.volume24hUsd)}</strong></div>
-         <div><small>Liquidity</small><strong>{millions(market.liquidityUsd)}</strong></div>
+         <span className="iris-jupiter-market-brand">Jupiter</span>
+         <span><b>{market.symbol}</b> : {money(market.priceUsd)}</span><i>/</i>
+         <span><b>MCAP</b> : {millions(market.marketCapUsd)}</span><i>/</i>
+         <span><b>24HVOL</b> : {millions(market.activity?.volume24hUsd)}</span>
        </div>}
        <div className="iris-header-actions">
         <button className="iris-theme-button" onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')} aria-label="Toggle color theme">{mode === 'dark' ? 'LIGHT' : 'DARK'}</button>

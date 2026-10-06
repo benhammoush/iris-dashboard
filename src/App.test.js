@@ -33,7 +33,7 @@ test('renders the Worker-backed portfolio shell', async () => {
   expect(screen.queryByText('Assets priced')).not.toBeInTheDocument();
   expect(screen.queryByText('Highest 24H volume')).not.toBeInTheDocument();
   expect(screen.getByText(/no price history is available for the 1D range/i)).toBeInTheDocument();
-  expect(screen.getByText('24H volume')).toBeInTheDocument();
+  expect(screen.getByText('24HVOL')).toBeInTheDocument();
   expect(fetch.mock.calls.some(([url]) => String(url).includes('/v3/wallets'))).toBe(false);
   unmount();
 });
@@ -58,8 +58,7 @@ test('uses Home-only navigation and shows the selected market metrics in the Jup
   expect(screen.getByRole('heading', { name: 'Trending' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'New tokens' })).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /FDV/i })).not.toBeInTheDocument();
-  expect(screen.getByText('SOL price')).toBeInTheDocument();
-  expect(screen.getAllByText('+3.50%').length).toBeGreaterThan(0);
+  expect(screen.getByLabelText('SOL Jupiter market summary')).toHaveTextContent('SOL : $1.00');
   expect(container.querySelectorAll('.iris-metric-card')).toHaveLength(0);
   expect(container.querySelector('.iris-jupiter-market')).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /Chart/i })).not.toBeInTheDocument();
