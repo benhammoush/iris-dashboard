@@ -29,5 +29,5 @@ test('keeps canonical wallet identifiers and holdings truncation', () => {
 });
 
 test('recent transaction samples retain only provider-proven signature fields', () => {
-  expect(recentTransactionsFrom({ transactions: [{ signature: 'signature', slot: 12, blockTime: '2026-10-06T00:00:00.000Z', status: 'confirmed' }, { signature: '', slot: 13 }] })).toEqual([{ signature: 'signature', slot: 12, blockTime: '2026-10-06T00:00:00.000Z', status: 'confirmed' }]);
+  expect(recentTransactionsFrom({ transactions: [{ signature: 'signature', slot: 12, blockTime: '2026-10-06T00:00:00.000Z', status: 'confirmed', action: 'add_liquidity' }, { signature: '', slot: 13 }] })).toEqual([{ signature: 'signature', slot: 12, blockTime: '2026-10-06T00:00:00.000Z', status: 'confirmed', action: 'add_liquidity' }]);
 });

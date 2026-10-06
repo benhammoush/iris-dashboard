@@ -13,7 +13,7 @@ const catalogFixture = {
 beforeEach(() => {
   window.history.pushState({}, '', '/');
   global.fetch = vi.fn((url) => {
-    const data = url.includes('/history') ? { data: { history: [] } } : url.includes('/v3/swaps') ? { data: { swaps: [{ signature: 'pool-swap-1', timestamp: '2026-10-03T12:00:00Z', type: 'Swap', maker: 'ReviewedPoolWallet' }] } } : url.includes('/v3/transactions/recent') ? { data: { transactions: [{ signature: 'RecentSignature111111111111111111111111111111111', slot: 123, blockTime: '2026-10-03T12:00:00Z', status: 'confirmed' }] }, meta: { recentTransactions: { freshness: 'fresh' } } } : url.includes('/v3/network') ? { data: { chain: { processedSlot: 1, confirmedSlot: 2, blockHeight: 3, epoch: 4, state: 'fresh' }, performance: { tps: 123.456, nonVoteTps: 78.9 }, fees: { averageFeeLamports: 456789 }, economics: { totalSol: 1, circulatingSol: 1, nonCirculatingSol: 0 } } } : url.includes('/v3/catalogs') ? { data: catalogFixture } : url.includes('/v3/assets/mint/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN') ? { data: { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 } } : url.includes('/v3/assets/mint/') ? { data: { mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1, change24hPct: 3.5, marketCapUsd: 100, liquidityUsd: 50, activity: { volume24hUsd: 25 } } } : url.includes('/v3/assets') ? { data: [{ mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1 }, { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 }] } : { data: [] };
+    const data = url.includes('/history') ? { data: { history: [] } } : url.includes('/v3/transactions/recent') ? { data: { transactions: [{ signature: 'RecentSignature111111111111111111111111111111111', slot: 123, blockTime: '2026-10-03T12:00:00Z', status: 'confirmed', action: 'swap' }] }, meta: { recentTransactions: { freshness: 'fresh' } } } : url.includes('/v3/network') ? { data: { chain: { processedSlot: 1, confirmedSlot: 2, blockHeight: 3, epoch: 4, state: 'fresh' }, performance: { tps: 123.456, nonVoteTps: 78.9 }, fees: { averageFeeLamports: 456789 }, economics: { totalSol: 1, circulatingSol: 1, nonCirculatingSol: 0 } } } : url.includes('/v3/catalogs') ? { data: catalogFixture } : url.includes('/v3/assets/mint/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN') ? { data: { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 } } : url.includes('/v3/assets/mint/') ? { data: { mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1, change24hPct: 3.5, marketCapUsd: 100, liquidityUsd: 50, activity: { volume24hUsd: 25 } } } : url.includes('/v3/assets') ? { data: [{ mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1 }, { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 }] } : { data: [] };
     return Promise.resolve({ ok: true, json: () => Promise.resolve(data) });
   });
 });
@@ -21,10 +21,11 @@ beforeEach(() => {
 test('renders the Worker-backed portfolio shell', async () => {
   const { unmount } = render(<BrowserRouter><App /></BrowserRouter>);
   expect(await screen.findByPlaceholderText(/search assets or paste a wallet address/i)).toBeInTheDocument();
-  await waitFor(() => expect(screen.getByText(/no price history is available/i)).toBeInTheDocument());
-    expect(screen.getByText(/global reviewed-pool activity/i)).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Recent Solana transactions' })).toBeInTheDocument();
-    expect(screen.getByText(/RecentSi.*11111111/)).toBeInTheDocument();
+  await screen.findByRole('heading', { name: 'Recent Solana transactions' });
+  expect(screen.getByRole('columnheader', { name: 'Signature' })).toBeInTheDocument();
+  expect(screen.getByRole('columnheader', { name: 'Action' })).toBeInTheDocument();
+  expect(screen.getByText(/RecentSi.*11111111/)).toBeInTheDocument();
+  expect(screen.getByText('Swap')).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Jupiter DEX' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Top Volume' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Trending' })).toBeInTheDocument();
@@ -34,7 +35,8 @@ test('renders the Worker-backed portfolio shell', async () => {
   expect(screen.queryByText('Tracked assets')).not.toBeInTheDocument();
   expect(screen.queryByText('Assets priced')).not.toBeInTheDocument();
   expect(screen.queryByText('Highest 24H volume')).not.toBeInTheDocument();
-  expect(screen.getByText(/no price history is available for the 1D range/i)).toBeInTheDocument();
+  expect(screen.queryByText(/global reviewed-pool activity/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/price history/i)).not.toBeInTheDocument();
   expect(screen.getByText('24HVOL')).toBeInTheDocument();
   expect(fetch.mock.calls.some(([url]) => String(url).includes('/v3/wallets'))).toBe(false);
   unmount();
@@ -52,7 +54,7 @@ test('Jupiter discovery rows use the styled list structure and open canonical as
 
 test('uses Home-only navigation and shows the selected market metrics in the Jupiter navbar strip', async () => {
   const { container } = render(<BrowserRouter><App /></BrowserRouter>);
-  await screen.findByRole('heading', { name: 'SOL / USD' });
+  await screen.findByRole('heading', { name: 'Market overview' });
   expect(screen.getAllByRole('link', { name: 'Home' }).length).toBeGreaterThan(0);
   expect(screen.queryByRole('link', { name: 'Market' })).not.toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Jupiter DEX' })).toBeInTheDocument();
@@ -87,11 +89,9 @@ test('asset table rows support keyboard navigation', async () => {
   expect(window.location.pathname).toContain('/asset/JUPyiwrY');
 });
 
-test('chart range and selected mint persist in the URL', async () => {
+test('Home does not request CoinGecko history or render graph controls', async () => {
   render(<BrowserRouter><App /></BrowserRouter>);
-  await screen.findByRole('heading', { name: 'SOL / USD' });
-  await userEvent.click(screen.getByRole('button', { name: '7D' }));
-  expect(window.location.search).toContain('mint=So111');
-  expect(window.location.search).toContain('range=7d');
-  expect(screen.queryByText(/wallet lookup/i)).not.toBeInTheDocument();
+  await screen.findByRole('heading', { name: 'Market overview' });
+  expect(fetch.mock.calls.some(([url]) => String(url).includes('/history'))).toBe(false);
+  expect(screen.queryByRole('button', { name: '7D' })).not.toBeInTheDocument();
 });

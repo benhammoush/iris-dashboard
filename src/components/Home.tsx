@@ -1,57 +1,37 @@
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { workerApi } from '../api/worker'
-import { assetHistoryFrom, assetsFrom, networkFrom, recentTransactionsFrom, swapsFrom } from '../data/normalizers'
+import { assetsFrom, networkFrom, recentTransactionsFrom } from '../data/normalizers'
 import { useWorkerResource } from '../hooks/useWorkerResource'
 import { useCatalog } from '../contexts/CatalogContext'
 import DataStatus from './DataStatus'
 import AssetIcon from './AssetIcon'
 import Navbar from './Navbar'
 import HeliusNetworkCard from './HeliusNetworkCard'
-import { AreaChart, MetricCard } from '../design-system'
 
 type Asset = { mint: string; symbol: string; name?: string; imageUrl?: string; priceUsd?: number; marketCapUsd?: number; circulatingSupply?: number; totalSupply?: number; fullyDilutedValuationUsd?: number; change24hPct?: number; liquidityUsd?: number; holderCount?: number; activity?: { buyVolume24hUsd?: number; sellVolume24hUsd?: number; volume24hUsd?: number }; quality?: { organicScore?: number; organicScoreLabel?: string; audit?: Record<string, unknown> }; verification?: { isVerified?: boolean; tags?: string[] } }
 const SOL_MINT = 'So11111111111111111111111111111111111111112'
 const currency = (value: number | null | undefined, digits = 2) => value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : `$${Number(value).toLocaleString('en-US', { maximumFractionDigits: digits })}`
 
 export default function Home() {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const selectedMint = searchParams.get('mint') || SOL_MINT
-  const range = ['1h', '4h', '1d', '7d'].includes(searchParams.get('range') || '') ? searchParams.get('range')! : '1d'
   const { assets, loading: catalogLoading, meta: catalogMeta, error: catalogError } = useCatalog() as any
   const selectedResult = useWorkerResource((options: any) => workerApi.asset(selectedMint, options), [selectedMint]) as any
   const catalogsResult = useWorkerResource(workerApi.catalogs, []) as any
-  const historySourceRange = range === '7d' ? '7d' : '1d'
-  const historyResult = useWorkerResource((options: any) => workerApi.assetHistory(selectedMint, historySourceRange, options), [selectedMint, historySourceRange]) as any
-  const swapsResult = useWorkerResource(workerApi.swaps, []) as any
   const networkResult = useWorkerResource(workerApi.network, []) as any
   const recentTransactionsResult = useWorkerResource(workerApi.recentTransactions, [], 30_000) as any
   const catalogAssets = assets as Asset[]
   const catalogs = catalogsResult.data && typeof catalogsResult.data === 'object' ? catalogsResult.data : {}
   const selectedAsset = assetsFrom(selectedResult.data?.asset || selectedResult.data ? [selectedResult.data?.asset || selectedResult.data] : [])[0] || catalogAssets.find((asset) => asset.mint === selectedMint)
-  const history = assetHistoryFrom(historyResult.data).sort((left, right) => new Date(left[0]).valueOf() - new Date(right[0]).valueOf()) as [string, number][]
-  const lookbackMs = { '1h': 60 * 60 * 1000, '4h': 4 * 60 * 60 * 1000, '1d': 24 * 60 * 60 * 1000, '7d': 7 * 24 * 60 * 60 * 1000 }[range] || 24 * 60 * 60 * 1000
-  const visibleHistory = history.filter(([date]) => new Date(date).valueOf() >= Date.now() - lookbackMs).map(([date, value]) => ({ date, value: Number(value) }))
-  const metrics = [
-    selectedAsset?.priceUsd != null && <MetricCard key="price" label={`${selectedAsset.symbol} price`} value={currency(selectedAsset.priceUsd, 5)} detail={selectedAsset.change24hPct != null ? <Change value={selectedAsset.change24hPct} /> : undefined} />,
-    selectedAsset?.marketCapUsd != null && <MetricCard key="cap" label="Market cap" value={currency(selectedAsset.marketCapUsd)} />,
-    selectedAsset?.activity?.volume24hUsd != null && <MetricCard key="volume" label="24H volume" value={currency(selectedAsset.activity.volume24hUsd)} />,
-    selectedAsset?.liquidityUsd != null && <MetricCard key="liquidity" label="Liquidity" value={currency(selectedAsset.liquidityUsd)} />,
-  ].filter(Boolean)
-  const setSelection = (mint: string, nextRange = range) => setSearchParams({ mint, range: nextRange })
-  const recentSwaps = swapsFrom(swapsResult.data).slice(0, 5)
   const network = networkFrom(networkResult.data)
   const recentTransactions = recentTransactionsFrom(recentTransactionsResult.data)
 
   return <div className="iris-shell"><Navbar market={selectedAsset} network={network} />
-    <DataStatus meta={selectedResult.meta || historyResult.meta || catalogsResult.meta || catalogMeta} error={selectedResult.error || historyResult.error || catalogsResult.error || catalogError} />
-    {(selectedResult.loading || historyResult.loading || catalogsResult.loading || catalogLoading) ? <main className="iris-loading">Loading market data...</main> : <main className="iris-page">
-      <section className="iris-page-heading"><div><p className="iris-eyebrow">Market monitor</p><h1>Market overview</h1><p>Current metrics, history, and reviewed-pool activity from the Iris Worker.</p></div></section>
-      <HeliusNetworkCard network={network} loading={networkResult.loading} error={networkResult.error} transactions={recentTransactions} transactionsLoading={recentTransactionsResult.loading} transactionsError={recentTransactionsResult.error} transactionsMeta={recentTransactionsResult.meta} />
-       <section className="iris-dashboard-grid">
-         <section className="iris-section iris-asset-chart"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Price history</p><h2>{selectedAsset?.symbol || 'SOL'} / USD</h2></div><div className="iris-range" aria-label="Asset price history range">{[['1h', '1H'], ['4h', '4H'], ['1d', '1D'], ['7d', '7D']].map(([value, label]) => <button key={value} className={range === value ? 'active' : ''} onClick={() => setSelection(selectedMint, value)}>{label}</button>)}</div></div>{visibleHistory.length ? <AreaChart points={visibleHistory} valueFormatter={(value) => currency(value)} /> : <div className="iris-chart-empty"><strong>No price history is available for the {range.toUpperCase()} range.</strong><p>Try another range or select a different asset from the catalog.</p></div>}</section>
-       </section>
-      {recentSwaps.length > 0 && <section className="iris-section"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Global reviewed-pool activity</p><h2>Recent swaps</h2></div><span>{recentSwaps.length} events</span></div><div className="iris-activity-list">{recentSwaps.map((swap: any, index: number) => <div className="iris-activity-row" key={`${swap.id || swap.timestamp}-${index}`}><div><strong>{swap.type}</strong><span>{swap.maker || 'Reviewed pool participant'}</span></div><div><small>{swap.timestamp || 'Time unavailable'}</small></div></div>)}</div></section>}
+    <DataStatus meta={selectedResult.meta || catalogsResult.meta || catalogMeta} error={selectedResult.error || catalogsResult.error || catalogError} />
+    {(selectedResult.loading || catalogsResult.loading || catalogLoading) ? <main className="iris-loading">Loading market data...</main> : <main className="iris-page">
+      <section className="iris-page-heading"><div><p className="iris-eyebrow">Market monitor</p><h1>Market overview</h1><p>Live Solana network data and market discovery from the Iris Worker.</p></div></section>
+      <HeliusNetworkCard network={network} loading={networkResult.loading} error={networkResult.error} transactions={recentTransactions} transactionsLoading={recentTransactionsResult.loading} transactionsError={recentTransactionsResult.error} transactionsRefreshing={recentTransactionsResult.refreshing} transactionsMeta={recentTransactionsResult.meta} />
         <section className="iris-section iris-jupiter-dex" aria-label="Jupiter discovery catalogs">
           <div className="iris-jupiter-dex-label"><JupiterLogo /><div><p>Jupiter</p><h2>Jupiter DEX</h2></div><span>DEX</span></div>
           <div className="iris-catalog-lists">

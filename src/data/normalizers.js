@@ -65,6 +65,7 @@ export function recentTransactionsFrom(data) {
       slot: Number.isInteger(transaction.slot) && transaction.slot >= 0 ? transaction.slot : null,
       blockTime: typeof transaction.blockTime === 'string' && Number.isFinite(Date.parse(transaction.blockTime)) ? transaction.blockTime : null,
       status: transaction.status === 'confirmed' ? 'confirmed' : null,
+      action: typeof transaction.action === 'string' && transaction.action ? transaction.action : null,
     }];
   });
 }
