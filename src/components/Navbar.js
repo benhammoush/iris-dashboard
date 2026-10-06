@@ -13,7 +13,15 @@ function millions(value) {
   return value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : `$${(Number(value) / 1_000_000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`;
 }
 
-function Navbar({ market = null }) {
+function number(value, digits = 0) {
+  return value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : Number(value).toLocaleString('en-US', { maximumFractionDigits: digits });
+}
+
+function sol(lamports) {
+  return lamports === null || lamports === undefined || !Number.isFinite(Number(lamports)) ? '—' : `${(Number(lamports) / 1_000_000_000).toFixed(6)} SOL`;
+}
+
+function Navbar({ market = null, network = null }) {
   const { assets } = useCatalog();
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
@@ -42,12 +50,17 @@ function Navbar({ market = null }) {
             {!assetMatches.length && !publicAddress && <li><button disabled>No loaded matches.</button></li>}
         </ul>}
        </div>
-       {market && <div className="iris-jupiter-market" aria-label={`${market.symbol} market summary`}>
-         <span><b>{market.symbol}</b> : {money(market.priceUsd)}</span><i>/</i>
-         <span><b>MCAP</b> : {millions(market.marketCapUsd)}</span><i>/</i>
-         <span><b>24HVOL</b> : {millions(market.activity?.volume24hUsd)}</span>
-       </div>}
-       <div className="iris-header-actions">
+        {market && <div className="iris-jupiter-market" aria-label={`${market.symbol} market summary`}>
+          <span><b>{market.symbol}</b> : {money(market.priceUsd)}</span><i>/</i>
+          <span><b>MCAP</b> : {millions(market.marketCapUsd)}</span><i>/</i>
+          <span><b>24HVOL</b> : {millions(market.activity?.volume24hUsd)}</span>
+        </div>}
+        <div className="iris-helius-market" aria-label="Helius network summary">
+          <span><b>TPS</b> : {number(network?.performance?.tps, 2)}</span><i>/</i>
+          <span><b>TRUE TPS</b> : {number(network?.performance?.nonVoteTps, 2)}</span><i>/</i>
+          <span><b>AVG FEE</b> : {sol(network?.fees?.averageFeeLamports)}</span>
+        </div>
+        <div className="iris-header-actions">
         <button className="iris-theme-button" onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')} aria-label="Toggle color theme">{mode === 'dark' ? 'LIGHT' : 'DARK'}</button>
       </div>
     </header>

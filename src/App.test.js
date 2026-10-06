@@ -13,7 +13,7 @@ const catalogFixture = {
 beforeEach(() => {
   window.history.pushState({}, '', '/');
   global.fetch = vi.fn((url) => {
-    const data = url.includes('/history') ? { data: { history: [] } } : url.includes('/v3/swaps') ? { data: { swaps: [{ signature: 'pool-swap-1', timestamp: '2026-10-03T12:00:00Z', type: 'Swap', maker: 'ReviewedPoolWallet' }] } } : url.includes('/v3/catalogs') ? { data: catalogFixture } : url.includes('/v3/assets/mint/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN') ? { data: { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 } } : url.includes('/v3/assets/mint/') ? { data: { mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1, change24hPct: 3.5, marketCapUsd: 100, liquidityUsd: 50, activity: { volume24hUsd: 25 } } } : url.includes('/v3/assets') ? { data: [{ mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1 }, { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 }] } : { data: [] };
+    const data = url.includes('/history') ? { data: { history: [] } } : url.includes('/v3/swaps') ? { data: { swaps: [{ signature: 'pool-swap-1', timestamp: '2026-10-03T12:00:00Z', type: 'Swap', maker: 'ReviewedPoolWallet' }] } } : url.includes('/v3/network') ? { data: { chain: { processedSlot: 1, confirmedSlot: 2, blockHeight: 3, epoch: 4, state: 'fresh' }, performance: { tps: 123.456, nonVoteTps: 78.9 }, fees: { averageFeeLamports: 456789 }, economics: { totalSol: 1, circulatingSol: 1, nonCirculatingSol: 0 } } } : url.includes('/v3/catalogs') ? { data: catalogFixture } : url.includes('/v3/assets/mint/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN') ? { data: { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 } } : url.includes('/v3/assets/mint/') ? { data: { mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1, change24hPct: 3.5, marketCapUsd: 100, liquidityUsd: 50, activity: { volume24hUsd: 25 } } } : url.includes('/v3/assets') ? { data: [{ mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1 }, { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 }] } : { data: [] };
     return Promise.resolve({ ok: true, json: () => Promise.resolve(data) });
   });
 });
@@ -59,8 +59,11 @@ test('uses Home-only navigation and shows the selected market metrics in the Jup
   expect(screen.getByRole('heading', { name: 'New tokens' })).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /FDV/i })).not.toBeInTheDocument();
   expect(screen.getByLabelText('SOL market summary')).toHaveTextContent('SOL : $1.00');
+  expect(screen.getByLabelText('Helius network summary')).toHaveTextContent('TPS : 123.46/TRUE TPS : 78.9/AVG FEE : 0.000457 SOL');
+  expect(screen.queryByText('Average paid fee')).not.toBeInTheDocument();
   expect(container.querySelectorAll('.iris-metric-card')).toHaveLength(0);
   expect(container.querySelector('.iris-jupiter-market')).toBeInTheDocument();
+  expect(container.querySelector('.iris-helius-market')).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /Chart/i })).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /Preview/i })).not.toBeInTheDocument();
   expect(screen.getByText('Data from Jupiter and CoinGecko')).toBeInTheDocument();

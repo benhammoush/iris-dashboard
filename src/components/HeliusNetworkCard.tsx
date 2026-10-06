@@ -1,7 +1,6 @@
 type Network = { fetchedAt?: string | null; [key: string]: any }
 
 const number = (value: unknown, digits = 0) => value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : Number(value).toLocaleString('en-US', { maximumFractionDigits: digits })
-const sol = (lamports: unknown) => lamports === null || lamports === undefined || !Number.isFinite(Number(lamports)) ? '—' : `${(Number(lamports) / 1_000_000_000).toFixed(6)} SOL`
 const supply = (value: unknown) => value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : `${Number(value).toLocaleString('en-US', { maximumFractionDigits: 2 })} SOL`
 
 function Field({ label, value }: { label: string; value: string }) {
@@ -12,7 +11,6 @@ export default function HeliusNetworkCard({ network, loading, error }: { network
   if (loading && !network) return <section className="iris-helius-card" aria-label="Helius Solana network"><CardHeader live={false} /><p className="iris-helius-loading">Loading network snapshot...</p></section>
   const value = network || {}
   const chain = value.chain || { state: 'unavailable' }
-  const performance = value.performance || { state: 'unavailable' }
   const fees = value.fees || { state: 'unavailable' }
   const economics = value.economics || { state: 'unavailable' }
   return <section className="iris-helius-card" aria-label="Helius Solana network">
@@ -23,9 +21,6 @@ export default function HeliusNetworkCard({ network, loading, error }: { network
       <Field label="Confirmed slot" value={number(chain.confirmedSlot)} />
       <Field label="Block height" value={number(chain.blockHeight)} />
       <Field label="Epoch" value={number(chain.epoch)} />
-      <Field label="TPS" value={number(performance.tps, 2)} />
-      <Field label="True TPS" value={number(performance.nonVoteTps, 2)} />
-      <Field label="Average paid fee" value={sol(fees.averageFeeLamports)} />
       <Field label="Median priority fee" value={`${number(fees.medianPriorityFeeMicroLamports)} micro-lamports`} />
       <Field label="Total supply" value={supply(economics.totalSol)} />
       <Field label="Circulating supply" value={supply(economics.circulatingSol)} />
