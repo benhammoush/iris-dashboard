@@ -1,4 +1,4 @@
-import { CandlestickSeries, ColorType, createChart, HistogramSeries, type Time } from 'lightweight-charts'
+import { CandlestickSeries, ColorType, createChart, CrosshairMode, HistogramSeries, type Time } from 'lightweight-charts'
 import { useEffect, useRef } from 'react'
 import { useTheme } from '../ThemeProvider'
 
@@ -58,6 +58,7 @@ export default function CandlestickChart({ candles, height = 360, valueFormatter
       grid: { vertLines: { color: color('--iris-border', '#ccd7e5') }, horzLines: { color: color('--iris-border', '#ccd7e5') } },
       rightPriceScale: { borderColor: color('--iris-border', '#ccd7e5'), scaleMargins: { top: 0.08, bottom: 0.26 } },
       timeScale: { borderColor: color('--iris-border', '#ccd7e5'), timeVisible: true },
+      crosshair: { mode: CrosshairMode.Normal },
       handleScroll: { vertTouchDrag: false },
       handleScale: { axisPressedMouseMove: true, mouseWheel: true, pinch: true },
     })
