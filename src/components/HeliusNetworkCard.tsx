@@ -19,24 +19,22 @@ function Field({ label, value }: { label: string; value: string }) {
   return <div className="iris-helius-field"><span>{label}</span><strong>{value}</strong></div>
 }
 
-export default function HeliusNetworkCard({ network, loading, error, transactions, transactionsLoading, transactionsError, transactionsRefreshing, transactionsMeta }: { network: Network | null; loading: boolean; error: unknown; transactions: Transaction[]; transactionsLoading: boolean; transactionsError: unknown; transactionsRefreshing: boolean; transactionsMeta: any }) {
+export default function HeliusNetworkCard({ network, loading, error, transactions, transactionsLoading, transactionsError }: { network: Network | null; loading: boolean; error: unknown; transactions: Transaction[]; transactionsLoading: boolean; transactionsError: unknown }) {
   const previousSignatures = useRef<Set<string> | null>(null)
   const signatures = new Set(transactions.flatMap((transaction) => typeof transaction.signature === 'string' ? [transaction.signature] : []))
   const newSignatures = previousSignatures.current === null ? new Set<string>() : new Set([...signatures].filter((signature) => !previousSignatures.current?.has(signature)))
   useEffect(() => { previousSignatures.current = signatures }, [transactions])
   const value = network || {}
   const chain = value.chain || { state: 'unavailable' }
-  const freshness = transactionsMeta?.recentTransactions?.freshness
-  const transactionState = transactionsRefreshing ? 'UPDATING' : freshness === 'stale' ? 'STALE' : freshness === 'fresh' ? 'LIVE' : 'UNAVAILABLE'
   return <section className="iris-helius-card" aria-label="Helius Solana network and recent transactions">
-    <div className="iris-helius-topline"><img className="iris-helius-logo" src="/helius-dark.svg" alt="Helius" /><span>{chain.state === 'fresh' && freshness === 'fresh' ? 'LIVE' : 'SNAPSHOT'}</span></div>
+    <div className="iris-helius-topline"><img className="iris-helius-logo" src="/helius-dark.svg" alt="Helius" /><span>Network</span></div>
     <div className="iris-helius-grid">
       <section className="iris-helius-column" aria-label="Solana network status">
-        <div className="iris-helius-column-heading"><h3>Solana network</h3><span>{chain.state === 'fresh' ? 'LIVE' : 'SNAPSHOT'}</span></div>
+        <div className="iris-helius-column-heading"><h3>Solana network</h3></div>
         {loading && !network ? <p className="iris-helius-loading">Loading network snapshot...</p> : Boolean(error) && !network ? <p className="iris-helius-loading">Network snapshot unavailable.</p> : <div className="iris-helius-summary"><Field label="Processed slot" value={number(chain.processedSlot)} /><Field label="Confirmed slot" value={number(chain.confirmedSlot)} /><Field label="Block height" value={number(chain.blockHeight)} /><Field label="Epoch" value={number(chain.epoch)} /></div>}
       </section>
       <section className="iris-helius-column iris-helius-transactions" aria-label="Recent Solana transactions">
-        <div className="iris-helius-column-heading"><h3>Recent Solana transactions</h3><span>{transactionState}</span></div>
+        <div className="iris-helius-column-heading"><h3>Recent Solana transactions</h3></div>
         {transactionsLoading && !transactions.length && <p className="iris-helius-loading">Loading sampled transactions...</p>}
         {Boolean(transactionsError) && !transactions.length && <p className="iris-helius-loading">Recent transactions are unavailable.</p>}
         {!transactionsLoading && !transactionsError && !transactions.length && <p className="iris-helius-loading">No recent transaction sample is available.</p>}

@@ -31,9 +31,9 @@ export default function Home() {
     <DataStatus meta={selectedResult.meta || catalogsResult.meta || catalogMeta} error={selectedResult.error || catalogsResult.error || catalogError} />
     {(selectedResult.loading || catalogsResult.loading || catalogLoading) ? <main className="iris-loading">Loading market data...</main> : <main className="iris-page">
       <section className="iris-page-heading"><div><p className="iris-eyebrow">Market monitor</p><h1>Market overview</h1><p>Live Solana network data and market discovery from the Iris Worker.</p></div></section>
-      <HeliusNetworkCard network={network} loading={networkResult.loading} error={networkResult.error} transactions={recentTransactions} transactionsLoading={recentTransactionsResult.loading} transactionsError={recentTransactionsResult.error} transactionsRefreshing={recentTransactionsResult.refreshing} transactionsMeta={recentTransactionsResult.meta} />
+      <HeliusNetworkCard network={network} loading={networkResult.loading} error={networkResult.error} transactions={recentTransactions} transactionsLoading={recentTransactionsResult.loading} transactionsError={recentTransactionsResult.error} />
         <section className="iris-section iris-jupiter-dex" aria-label="Jupiter discovery catalogs">
-          <div className="iris-jupiter-dex-label"><JupiterLogo /><div><p>Jupiter</p></div></div>
+          <div className="iris-jupiter-dex-label"><JupiterLogo /><div><p>Jupiter</p></div><span>Decentralised Exchange</span></div>
           <div className="iris-catalog-lists">
             <CatalogList title="Top Volume" tone="volume" assets={assetsFrom(catalogs.topTraded || catalogAssets) as Asset[]} onSelect={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} />
             <CatalogList title="Trending" tone="trending" assets={assetsFrom(catalogs.trending) as Asset[]} onSelect={(asset) => navigate(`/asset/${encodeURIComponent(asset.mint)}`)} />
