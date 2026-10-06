@@ -7,7 +7,6 @@ import DataStatus from './DataStatus'
 import AssetIcon from './AssetIcon'
 import Navbar from './Navbar'
 import HeliusNetworkCard from './HeliusNetworkCard'
-import HeliusRecentTransactionsCard from './HeliusRecentTransactionsCard'
 import { AreaChart, MetricCard } from '../design-system'
 
 type Asset = { mint: string; symbol: string; name?: string; imageUrl?: string; priceUsd?: number; marketCapUsd?: number; circulatingSupply?: number; totalSupply?: number; fullyDilutedValuationUsd?: number; change24hPct?: number; liquidityUsd?: number; holderCount?: number; activity?: { buyVolume24hUsd?: number; sellVolume24hUsd?: number; volume24hUsd?: number }; quality?: { organicScore?: number; organicScoreLabel?: string; audit?: Record<string, unknown> }; verification?: { isVerified?: boolean; tags?: string[] } }
@@ -48,8 +47,7 @@ export default function Home() {
     <DataStatus meta={selectedResult.meta || historyResult.meta || catalogsResult.meta || catalogMeta} error={selectedResult.error || historyResult.error || catalogsResult.error || catalogError} />
     {(selectedResult.loading || historyResult.loading || catalogsResult.loading || catalogLoading) ? <main className="iris-loading">Loading market data...</main> : <main className="iris-page">
       <section className="iris-page-heading"><div><p className="iris-eyebrow">Market monitor</p><h1>Market overview</h1><p>Current metrics, history, and reviewed-pool activity from the Iris Worker.</p></div></section>
-      <HeliusNetworkCard network={network} loading={networkResult.loading} error={networkResult.error} />
-      <HeliusRecentTransactionsCard transactions={recentTransactions} loading={recentTransactionsResult.loading} error={recentTransactionsResult.error} meta={recentTransactionsResult.meta} />
+      <HeliusNetworkCard network={network} loading={networkResult.loading} error={networkResult.error} transactions={recentTransactions} transactionsLoading={recentTransactionsResult.loading} transactionsError={recentTransactionsResult.error} transactionsMeta={recentTransactionsResult.meta} />
        <section className="iris-dashboard-grid">
          <section className="iris-section iris-asset-chart"><div className="iris-panel-heading"><div><p className="iris-eyebrow">Price history</p><h2>{selectedAsset?.symbol || 'SOL'} / USD</h2></div><div className="iris-range" aria-label="Asset price history range">{[['1h', '1H'], ['4h', '4H'], ['1d', '1D'], ['7d', '7D']].map(([value, label]) => <button key={value} className={range === value ? 'active' : ''} onClick={() => setSelection(selectedMint, value)}>{label}</button>)}</div></div>{visibleHistory.length ? <AreaChart points={visibleHistory} valueFormatter={(value) => currency(value)} /> : <div className="iris-chart-empty"><strong>No price history is available for the {range.toUpperCase()} range.</strong><p>Try another range or select a different asset from the catalog.</p></div>}</section>
        </section>
