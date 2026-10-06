@@ -48,7 +48,7 @@ test('Jupiter discovery rows use the styled list structure and open canonical as
   expect(window.location.pathname).toContain('/asset/JUPyiwrY');
 });
 
-test('uses Home-only navigation and shows four compact market metrics', async () => {
+test('uses Home-only navigation and shows the selected market metrics in the Jupiter navbar strip', async () => {
   const { container } = render(<BrowserRouter><App /></BrowserRouter>);
   await screen.findByRole('heading', { name: 'SOL / USD' });
   expect(screen.getAllByRole('link', { name: 'Home' }).length).toBeGreaterThan(0);
@@ -60,7 +60,8 @@ test('uses Home-only navigation and shows four compact market metrics', async ()
   expect(screen.queryByRole('button', { name: /FDV/i })).not.toBeInTheDocument();
   expect(screen.getByText('SOL price')).toBeInTheDocument();
   expect(screen.getAllByText('+3.50%').length).toBeGreaterThan(0);
-  expect(container.querySelectorAll('.iris-metric-card')).toHaveLength(4);
+  expect(container.querySelectorAll('.iris-metric-card')).toHaveLength(0);
+  expect(container.querySelector('.iris-jupiter-market')).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /Chart/i })).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /Preview/i })).not.toBeInTheDocument();
   expect(screen.getByText('Data from Jupiter and CoinGecko')).toBeInTheDocument();

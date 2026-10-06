@@ -5,7 +5,11 @@ import { APP_DISPLAY_VERSION } from '../appVersion';
 import { useTheme } from '../design-system';
 import { looksLikeSolanaAddress } from '../data/solana';
 
-function Navbar() {
+function money(value, digits = 2) {
+  return value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : `$${Number(value).toLocaleString('en-US', { maximumFractionDigits: digits })}`;
+}
+
+function Navbar({ market = null }) {
   const { assets } = useCatalog();
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
@@ -34,7 +38,14 @@ function Navbar() {
             {!assetMatches.length && !publicAddress && <li><button disabled>No loaded matches.</button></li>}
         </ul>}
       </div>
-      <div className="iris-header-actions">
+       {market && <div className="iris-jupiter-market" aria-label={`${market.symbol} Jupiter market summary`}>
+         <span className="iris-jupiter-market-brand">JUPITER</span>
+         <div><small>{market.symbol} price</small><strong>{money(market.priceUsd, 5)}</strong>{market.change24hPct !== null && market.change24hPct !== undefined && <em className={Number(market.change24hPct) >= 0 ? 'iris-positive' : 'iris-negative'}>{Number(market.change24hPct) >= 0 ? '+' : ''}{Number(market.change24hPct).toFixed(2)}%</em>}</div>
+         <div><small>Market cap</small><strong>{money(market.marketCapUsd)}</strong></div>
+         <div><small>24H volume</small><strong>{money(market.activity?.volume24hUsd)}</strong></div>
+         <div><small>Liquidity</small><strong>{money(market.liquidityUsd)}</strong></div>
+       </div>}
+       <div className="iris-header-actions">
         <button className="iris-theme-button" onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')} aria-label="Toggle color theme">{mode === 'dark' ? 'LIGHT' : 'DARK'}</button>
       </div>
     </header>
