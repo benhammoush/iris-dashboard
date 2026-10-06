@@ -20,7 +20,7 @@ function DefiLlamaLink({ slug, children }: { slug: string | null; children: Reac
 export default function DefiLlamaCard({ dashboard, loading, error }: { dashboard: Dashboard | null; loading: boolean; error: unknown }) {
   return <section className="iris-defillama-card" aria-label="DefiLlama Solana dashboard">
     <div className="iris-defillama-topline"><img className="iris-defillama-logo" src="/assets/defillama.webp" height="37.1" width="108.5" alt="DefiLlama" {...preloadImage} loading="eager" decoding="sync" /><a href="https://defillama.com" target="_blank" rel="noreferrer">Defi</a></div>
-    {loading && !dashboard && <p className="iris-defillama-state">Loading DeFi metrics...</p>}
+    {loading && !dashboard && <div className="iris-inline-skeleton iris-defillama-state" aria-label="Loading DeFi metrics" aria-busy="true"><span /><span /><span /></div>}
     {Boolean(error) && !dashboard && <p className="iris-defillama-state">DeFi metrics are unavailable.</p>}
     {!loading && !error && !dashboard && <p className="iris-defillama-state">No DeFi metrics are available.</p>}
     {dashboard && <div className="iris-catalog-lists iris-defillama-lists">

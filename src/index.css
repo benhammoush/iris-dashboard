@@ -36,6 +36,11 @@ button, input { font: inherit; }
 
 .iris-page { width: min(1440px, 100%); margin: 0 auto; padding: 28px; }
 .iris-loading { display: grid; min-height: calc(100vh - 46px); place-items: center; color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 12px; }
+.iris-skeleton-page { width: min(1440px, 100%); min-height: calc(100vh - 46px); margin: 0 auto; padding: 28px; }
+.iris-skeleton { border-radius: 6px; background: linear-gradient(90deg, var(--iris-hover) 20%, var(--iris-border) 45%, var(--iris-hover) 70%); background-size: 280% 100%; animation: iris-skeleton-pulse 1.5s ease-in-out infinite; }
+.iris-skeleton-title { width: min(290px, 58%); height: 28px; }.iris-skeleton-subtitle { width: min(460px, 82%); height: 13px; margin-top: 10px; }.iris-skeleton-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 28px; }.iris-skeleton-metric { height: 112px; }.iris-skeleton-panel { height: 280px; margin-top: 14px; }.iris-skeleton-panel--short { height: 180px; }
+.iris-skeleton-catalog { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }.iris-skeleton-catalog span { height: 110px; }
+.iris-inline-skeleton { display: grid; gap: 9px; }.iris-inline-skeleton span { display: block; height: 12px; border-radius: 4px; background: linear-gradient(90deg, rgba(255, 255, 255, .08) 20%, rgba(255, 255, 255, .18) 45%, rgba(255, 255, 255, .08) 70%); background-size: 280% 100%; animation: iris-skeleton-pulse 1.5s ease-in-out infinite; }.iris-inline-skeleton span:nth-child(2) { width: 78%; }.iris-inline-skeleton span:nth-child(3) { width: 92%; }.iris-inline-skeleton span:nth-child(4) { width: 66%; }@keyframes iris-skeleton-pulse { to { background-position: -280% 0; } }
 .iris-page-heading, .iris-panel-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .iris-page-heading { margin-bottom: 22px; }
 .iris-page-heading h1, .iris-panel-heading h2 { margin: 2px 0 0; color: var(--iris-text); font-family: 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif; }
@@ -188,7 +193,7 @@ html[data-theme='light'] .iris-defillama-lists .iris-catalog-list-rows { scrollb
   .iris-change { display: inline-block; margin-top: 14px; }
   .iris-page-heading { display: block; }
   .iris-block { display: inline-block; margin-top: 12px; }
-  .iris-metrics, .iris-dashboard-grid, .iris-catalog-lists { grid-template-columns: 1fr; }
+  .iris-metrics, .iris-dashboard-grid, .iris-catalog-lists, .iris-skeleton-metrics, .iris-skeleton-catalog { grid-template-columns: 1fr; }
   .iris-jupiter-dex { grid-template-columns: 1fr; }
   .iris-jupiter-dex-label { flex-direction: row; align-items: center; border-right: 0; border-bottom: 1px solid rgba(255, 255, 255, .1); padding: 14px; }
    .iris-jupiter-badge { margin-top: 0; margin-left: auto; }
@@ -208,4 +213,5 @@ html[data-theme='light'] .iris-defillama-lists .iris-catalog-list-rows { scrollb
   .iris-catalog-list-rows button { transition: none; }
   .iris-catalog-list-rows button:hover { transform: none; }
   .iris-recent-transaction-row.is-new { animation: none; }
+  .iris-skeleton, .iris-inline-skeleton span { animation: none; }
 }

@@ -8,6 +8,7 @@ import Navbar from './Navbar'
 import AssetIcon from './AssetIcon'
 import { MetricCard, VirtualTable, type VirtualTableColumn } from '../design-system'
 import { solanaExplorerUrl } from '../data/solana'
+import LoadingSkeleton from './LoadingSkeleton'
 
 type Holding = { symbol?: string; mint?: string; imageUrl?: string; price?: number; value?: number; displayBalance?: string; balance?: number; rawBalance?: number }
 type Activity = { id?: string; timestamp?: string; type?: string; source?: string; status?: string; description?: string; transfers?: Array<{ symbol?: string; mint?: string; amount?: string | number; decimals?: number; kind?: 'native' | 'token' }> }
@@ -43,7 +44,7 @@ export default function Wallet() {
   async function loadMore() { if (!nextCursor || loadingMore) return; setLoadingMore(true); try { const page = await workerApi.walletTransactions(address, { cursor: nextCursor }); setExtraPages((items) => [...items, ...transactionsFrom(page.data)]); setCursor(page.data?.nextCursor ?? page.data?.pageInfo?.nextCursor ?? null) } finally { setLoadingMore(false) } }
   const valuation = wallet?.valuation || {}; const holdingCount = valuation.holdingCount; const pricedHoldingCount = valuation.pricedHoldingCount; const unpricedHoldingCount = valuation.unpricedHoldingCount
   return <div className="iris-shell"><Navbar /><DataStatus meta={summary.meta || firstPage.meta} error={summary.error || firstPage.error} />
-    {summary.loading || firstPage.loading ? <main className="iris-loading">Loading public wallet...</main> : invalidAddress ? <Unavailable address={address} text="This is not a valid Solana wallet address." /> : summary.error ? <Unavailable address={address} text="Wallet data is currently unavailable from the Worker." /> : !wallet ? <Unavailable address={address} text="No wallet data was returned." /> : <main className="iris-page">
+    {summary.loading || firstPage.loading ? <LoadingSkeleton page="wallet" /> : invalidAddress ? <Unavailable address={address} text="This is not a valid Solana wallet address." /> : summary.error ? <Unavailable address={address} text="Wallet data is currently unavailable from the Worker." /> : !wallet ? <Unavailable address={address} text="No wallet data was returned." /> : <main className="iris-page">
       <section className="iris-page-heading"><div><p className="iris-eyebrow">Public wallet</p><h1>{wallet.label || address}</h1>{wallet.description && <p>{wallet.description}</p>}{explorerUrl ? <a className="iris-wallet-address" href={explorerUrl} target="_blank" rel="noopener noreferrer">{wallet.address}</a> : <p className="iris-wallet-address">{address}</p>}</div></section>
       <p className="iris-disclosure">Public on-chain data only. Valuations can be partial when balances are not priced.</p>
       {wallet.truncated && <p className="iris-disclosure">The Worker truncated this wallet's returned balances; the displayed holdings are incomplete.</p>}

@@ -8,6 +8,7 @@ import Navbar from './Navbar'
 import AssetIcon from './AssetIcon'
 import { CandlestickChart, MetricCard } from '../design-system'
 import { solanaExplorerUrl } from '../data/solana'
+import LoadingSkeleton from './LoadingSkeleton'
 
 const currency = (value: number | null | undefined, digits = 5) => value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : `$${Number(value).toLocaleString('en-US', { maximumFractionDigits: digits })}`
 const quantity = (value: number | null | undefined) => value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : Number(value).toLocaleString('en-US', { maximumFractionDigits: 2 })
@@ -67,7 +68,7 @@ export default function Asset() {
   const activity = asset?.activity
   const auditIndicators = Object.entries(asset?.quality?.audit || {}).filter(([, value]) => value === true).map(([key]) => key)
   return <div className="iris-shell"><Navbar /><DataStatus meta={result.meta || candlesResult.meta} error={result.error || candlesResult.error} />
-    {result.loading || candlesResult.loading ? <main className="iris-loading">Loading asset data...</main> : result.error ? <main className="iris-loading">Asset data is currently unavailable from the Worker.</main> : !asset ? <main className="iris-loading">No asset was returned for {mint}.</main> : <main className="iris-page">
+    {result.loading || candlesResult.loading ? <LoadingSkeleton page="asset" /> : result.error ? <main className="iris-loading">Asset data is currently unavailable from the Worker.</main> : !asset ? <main className="iris-loading">No asset was returned for {mint}.</main> : <main className="iris-page">
       <section className="iris-asset-heading"><div className="iris-asset-identity"><AssetIcon src={asset.imageUrl} symbol={asset.symbol} /><div><p className="iris-eyebrow">Solana asset</p><h1>{asset.name} <span>{asset.symbol}</span></h1>{explorerUrl && <a href={explorerUrl} target="_blank" rel="noopener noreferrer" title={asset.mint}>{asset.mint}</a>}</div></div>{asset.change24hPct != null && <Change value={asset.change24hPct} />}</section>
       {metrics.length > 0 && <section className="iris-metrics">{metrics}</section>}
         {auditIndicators.length > 0 && <p className="iris-disclosure"><strong>Audit indicators:</strong> {auditIndicators.join(', ')}. This is metadata, not a safety assessment or guarantee.</p>}

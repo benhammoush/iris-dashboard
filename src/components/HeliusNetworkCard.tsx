@@ -31,11 +31,11 @@ export default function HeliusNetworkCard({ network, loading, error, transaction
     <div className="iris-helius-grid">
       <section className="iris-helius-column" aria-label="Solana network status">
         <div className="iris-helius-column-heading"><h3>Solana network</h3></div>
-        {loading && !network ? <p className="iris-helius-loading">Loading network snapshot...</p> : Boolean(error) && !network ? <p className="iris-helius-loading">Network snapshot unavailable.</p> : <div className="iris-helius-summary"><Field label="Processed slot" value={number(chain.processedSlot)} /><Field label="Confirmed slot" value={number(chain.confirmedSlot)} /><Field label="Block height" value={number(chain.blockHeight)} /><Field label="Epoch" value={number(chain.epoch)} /></div>}
+        {loading && !network ? <div className="iris-inline-skeleton iris-helius-loading" aria-label="Loading network snapshot" aria-busy="true"><span /><span /><span /><span /></div> : Boolean(error) && !network ? <p className="iris-helius-loading">Network snapshot unavailable.</p> : <div className="iris-helius-summary"><Field label="Processed slot" value={number(chain.processedSlot)} /><Field label="Confirmed slot" value={number(chain.confirmedSlot)} /><Field label="Block height" value={number(chain.blockHeight)} /><Field label="Epoch" value={number(chain.epoch)} /></div>}
       </section>
       <section className="iris-helius-column iris-helius-transactions" aria-label="Recent Solana transactions">
         <div className="iris-helius-column-heading"><h3>Recent Solana transactions</h3></div>
-        {transactionsLoading && !transactions.length && <p className="iris-helius-loading">Loading sampled transactions...</p>}
+        {transactionsLoading && !transactions.length && <div className="iris-inline-skeleton iris-helius-loading" aria-label="Loading sampled transactions" aria-busy="true"><span /><span /><span /></div>}
         {Boolean(transactionsError) && !transactions.length && <p className="iris-helius-loading">Recent transactions are unavailable.</p>}
         {!transactionsLoading && !transactionsError && !transactions.length && <p className="iris-helius-loading">No recent transaction sample is available.</p>}
         {transactions.length > 0 && <div className="iris-recent-transaction-list" role="table" aria-label="Latest sampled Solana transactions"><div className="iris-recent-transaction-head" role="row"><span role="columnheader">Signature</span><span role="columnheader">Time</span><span role="columnheader">Block</span><span role="columnheader">Action</span></div>{transactions.map((transaction) => {

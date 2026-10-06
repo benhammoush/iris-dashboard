@@ -8,6 +8,7 @@ import AssetIcon from './AssetIcon'
 import Navbar from './Navbar'
 import HeliusNetworkCard from './HeliusNetworkCard'
 import DefiLlamaCard from './DefiLlamaCard'
+import LoadingSkeleton from './LoadingSkeleton'
 import { useHeliusDashboard } from '../contexts/HeliusDashboardContext'
 
 type Asset = { mint: string; symbol: string; name?: string; imageUrl?: string; priceUsd?: number; marketCapUsd?: number; circulatingSupply?: number; totalSupply?: number; fullyDilutedValuationUsd?: number; change24hPct?: number; liquidityUsd?: number; holderCount?: number; activity?: { buyVolume24hUsd?: number; sellVolume24hUsd?: number; volume24hUsd?: number }; quality?: { organicScore?: number; organicScoreLabel?: string; audit?: Record<string, unknown> }; verification?: { isVerified?: boolean; tags?: string[] } }
@@ -30,7 +31,7 @@ export default function Home() {
 
   return <div className="iris-shell"><Navbar />
     <DataStatus meta={selectedResult.meta || catalogsResult.meta || catalogMeta} error={selectedResult.error || catalogsResult.error || catalogError} />
-    {(selectedResult.loading || catalogsResult.loading || catalogLoading) ? <main className="iris-loading">Loading market data...</main> : <main className="iris-page">
+    {(selectedResult.loading || catalogsResult.loading || catalogLoading) ? <LoadingSkeleton page="home" /> : <main className="iris-page">
       <section className="iris-page-heading"><div><p className="iris-eyebrow">Market monitor</p><h1>Market overview</h1><p>Live Solana network data and market discovery from the Iris Worker.</p></div></section>
       <HeliusNetworkCard network={heliusDashboard.network} loading={heliusDashboard.loading} error={heliusDashboard.error} transactions={heliusDashboard.transactions} transactionsLoading={heliusDashboard.loading} transactionsError={heliusDashboard.error} />
       <DefiLlamaCard dashboard={defillama} loading={defillamaDashboardResult.loading} error={defillamaDashboardResult.error} />
