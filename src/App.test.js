@@ -53,7 +53,8 @@ test('renders the DefiLlama dashboard after Helius and before Jupiter with safe 
   await screen.findByRole('heading', { name: 'Top DEXes' });
   expect(fetch.mock.calls.some(([url]) => String(url).includes('/v3/defillama'))).toBe(true);
   expect(screen.getByText('Kamino')).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: 'Kamino' })).toHaveAttribute('href', 'https://defillama.com/protocol/kamino-finance');
+  expect(screen.getByRole('link', { name: /Kamino/ })).toHaveAttribute('href', 'https://defillama.com/protocol/kamino-finance');
+  expect(container.querySelectorAll('.iris-defillama-lists .iris-catalog-list')).toHaveLength(2);
   const cards = [...container.querySelector('.iris-page').children];
   expect(cards.indexOf(container.querySelector('.iris-helius-card'))).toBeLessThan(cards.indexOf(container.querySelector('.iris-defillama-card')));
   expect(cards.indexOf(container.querySelector('.iris-defillama-card'))).toBeLessThan(cards.indexOf(container.querySelector('.iris-jupiter-dex')));
@@ -63,7 +64,7 @@ test('Jupiter discovery rows use the styled list structure and open canonical as
   const { container } = render(<BrowserRouter><App /></BrowserRouter>);
   await screen.findByText('JUP');
   expect(container.querySelector('.iris-jupiter-mark')).toBeInTheDocument();
-  expect(container.querySelectorAll('.iris-catalog-list')).toHaveLength(3);
+  expect(container.querySelectorAll('.iris-jupiter-dex .iris-catalog-list')).toHaveLength(3);
   expect(screen.queryByText('Jupiter 24H activity')).not.toBeInTheDocument();
   await userEvent.click(screen.getByText('JUP'));
   expect(window.location.pathname).toContain('/asset/JUPyiwrY');
