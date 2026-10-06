@@ -125,7 +125,7 @@ button, input { font: inherit; }
 .iris-jupiter-mark svg { width: 33px; height: 32px; filter: drop-shadow(0 5px 12px rgba(54, 215, 255, .24)); }
 .iris-jupiter-dex-label > div { text-align: left; }.iris-jupiter-dex-label p { margin: 0 0 3px; color: #b6ffc9; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 13px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
 .iris-jupiter-dex-label h2 { margin: 0; color: #fff; font-family: 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif; font-size: 20px; letter-spacing: -.5px; }
-.iris-jupiter-dex-label > span { margin-left: auto; padding: 4px 7px; border: 1px solid rgba(125, 249, 179, .35); border-radius: 999px; background: rgba(125, 249, 179, .1); color: #b8ffcb; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 9px; font-weight: 800; letter-spacing: .8px; }
+.iris-jupiter-badge { margin-left: auto; padding: 4px 7px; border: 1px solid rgba(125, 249, 179, .35); border-radius: 999px; background: rgba(125, 249, 179, .1); color: #b8ffcb; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 9px; font-weight: 800; letter-spacing: .8px; }
 .iris-catalog-lists { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 10px; }
 .iris-catalog-lists > .iris-section { margin-top: 0; }
 .iris-catalog-list { min-width: 0; border-color: rgba(255, 255, 255, .1); border-radius: 12px; background: linear-gradient(160deg, rgba(32, 34, 50, .88), rgba(16, 17, 28, .92)); box-shadow: inset 0 1px rgba(255, 255, 255, .045); }
@@ -169,7 +169,7 @@ button, input { font: inherit; }
   .iris-metrics, .iris-dashboard-grid, .iris-catalog-lists { grid-template-columns: 1fr; }
   .iris-jupiter-dex { grid-template-columns: 1fr; }
   .iris-jupiter-dex-label { flex-direction: row; align-items: center; border-right: 0; border-bottom: 1px solid rgba(255, 255, 255, .1); padding: 14px; }
-  .iris-jupiter-dex-label > span { margin-top: 0; margin-left: auto; }
+   .iris-jupiter-badge { margin-top: 0; margin-left: auto; }
   .iris-metric-card { min-height: 96px; }
    .iris-helius-grid { grid-template-columns: 1fr; }.iris-helius-column + .iris-helius-column { border-top: 1px solid rgba(255, 171, 99, .22); border-left: 0; }
    .iris-recent-transaction-head, .iris-recent-transaction-row { grid-template-columns: minmax(88px, 1.2fr) 54px 68px minmax(64px, .9fr); column-gap: 7px; }
@@ -179,7 +179,7 @@ button, input { font: inherit; }
 @media (min-width: 721px) and (max-width: 1060px) {
   .iris-jupiter-dex { grid-template-columns: 1fr; }
   .iris-jupiter-dex-label { flex-direction: row; align-items: center; border-right: 0; border-bottom: 1px solid rgba(255, 255, 255, .1); padding: 14px 18px; }
-  .iris-jupiter-dex-label > span { margin-top: 0; margin-left: auto; }
+   .iris-jupiter-badge { margin-top: 0; margin-left: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {
