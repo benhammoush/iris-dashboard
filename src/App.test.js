@@ -58,7 +58,7 @@ test('uses Home-only navigation and shows the selected market metrics in the Jup
   expect(screen.getByRole('heading', { name: 'Trending' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'New tokens' })).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /FDV/i })).not.toBeInTheDocument();
-  expect(screen.getByLabelText('SOL Jupiter market summary')).toHaveTextContent('SOL : $1.00');
+  expect(screen.getByLabelText('SOL market summary')).toHaveTextContent('SOL : $1.00');
   expect(container.querySelectorAll('.iris-metric-card')).toHaveLength(0);
   expect(container.querySelector('.iris-jupiter-market')).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /Chart/i })).not.toBeInTheDocument();

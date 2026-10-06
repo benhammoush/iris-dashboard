@@ -42,8 +42,7 @@ function Navbar({ market = null }) {
             {!assetMatches.length && !publicAddress && <li><button disabled>No loaded matches.</button></li>}
         </ul>}
        </div>
-       {market && <div className="iris-jupiter-market" aria-label={`${market.symbol} Jupiter market summary`}>
-         <span className="iris-jupiter-market-brand">Jupiter</span>
+       {market && <div className="iris-jupiter-market" aria-label={`${market.symbol} market summary`}>
          <span><b>{market.symbol}</b> : {money(market.priceUsd)}</span><i>/</i>
          <span><b>MCAP</b> : {millions(market.marketCapUsd)}</span><i>/</i>
          <span><b>24HVOL</b> : {millions(market.activity?.volume24hUsd)}</span>
