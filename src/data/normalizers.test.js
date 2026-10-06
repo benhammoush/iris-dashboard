@@ -33,7 +33,7 @@ test('recent transaction samples retain only provider-proven signature fields', 
 });
 
 test('normalizes the DefiLlama dashboard payload', () => {
-  const dashboard = defillamaFrom({ dexes: { total24hUsd: '1234', total7dUsd: 5678, items: [{ name: 'Jupiter', slug: 'jupiter', total24hUsd: '500', total7dUsd: 3500, change1dPct: '2.5' }] }, protocols: { total: 42, items: [{ name: 'Kamino', slug: 'kamino-finance', category: 'Lending', solanaTvlUsd: 999, change1dPct: -1, change7dPct: '3.25' }] } });
+  const dashboard = defillamaFrom({ dexes: { total24hUsd: '1234', total7dUsd: 5678, items: [{ name: 'Jupiter', slug: 'jupiter', logo: ' https://example.com/jupiter.png ', total24hUsd: '500', total7dUsd: 3500, change1dPct: '2.5' }] }, protocols: { total: 42, items: [{ name: 'Kamino', slug: 'kamino-finance', logo: ' ', category: 'Lending', solanaTvlUsd: 999, change1dPct: -1, change7dPct: '3.25' }] } });
 
-  expect(dashboard).toEqual({ dexes: { total24hUsd: 1234, total7dUsd: 5678, items: [{ name: 'Jupiter', slug: 'jupiter', total24hUsd: 500, total7dUsd: 3500, change1dPct: 2.5 }] }, protocols: { total: 42, items: [{ name: 'Kamino', slug: 'kamino-finance', category: 'Lending', solanaTvlUsd: 999, change1dPct: -1, change7dPct: 3.25 }] } });
+  expect(dashboard).toEqual({ dexes: { total24hUsd: 1234, total7dUsd: 5678, items: [{ name: 'Jupiter', slug: 'jupiter', logo: 'https://example.com/jupiter.png', total24hUsd: 500, total7dUsd: 3500, change1dPct: 2.5 }] }, protocols: { total: 42, items: [{ name: 'Kamino', slug: 'kamino-finance', logo: null, category: 'Lending', solanaTvlUsd: 999, change1dPct: -1, change7dPct: 3.25 }] } });
 });

@@ -112,6 +112,7 @@ export function defillamaFrom(data) {
     return {
       name: typeof item.name === 'string' && item.name.trim() ? item.name.trim() : slug || 'Unknown',
       slug,
+      logo: typeof item.logo === 'string' && item.logo.trim() ? item.logo.trim() : null,
       ...Object.fromEntries(fields.map((field) => [field, numberOrNull(item[field])])),
       ...(fields.includes('category') ? { category: typeof item.category === 'string' && item.category.trim() ? item.category.trim() : null } : {}),
     };

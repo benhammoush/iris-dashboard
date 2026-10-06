@@ -11,8 +11,8 @@ const catalogFixture = {
 };
 
 const defillamaFixture = {
-  dexes: { total24hUsd: 1250000, total7dUsd: 7000000, items: [{ name: 'Jupiter', slug: 'jupiter', total24hUsd: 750000, total7dUsd: 4500000, change1dPct: 2.5 }] },
-  protocols: { total: 42, items: [{ name: 'Kamino', slug: 'kamino-finance', category: 'Lending', solanaTvlUsd: 125000000, change1dPct: -1.5, change7dPct: 4.25 }] },
+  dexes: { total24hUsd: 1250000, total7dUsd: 7000000, items: [{ name: 'Jupiter', slug: 'jupiter', logo: 'https://example.com/jupiter.png', total24hUsd: 750000, total7dUsd: 4500000, change1dPct: 2.5 }] },
+  protocols: { total: 42, items: [{ name: 'Kamino', slug: 'kamino-finance', logo: null, category: 'Lending', solanaTvlUsd: 125000000, change1dPct: -1.5, change7dPct: 4.25 }] },
 };
 
 beforeEach(() => {
@@ -54,6 +54,13 @@ test('renders the DefiLlama dashboard after Helius and before Jupiter with safe 
   expect(fetch.mock.calls.some(([url]) => String(url).includes('/v3/defillama'))).toBe(true);
   expect(screen.getByText('Kamino')).toBeInTheDocument();
   expect(screen.getByRole('link', { name: /Kamino/ })).toHaveAttribute('href', 'https://defillama.com/protocol/kamino-finance');
+  expect(container.querySelector('img[src="https://example.com/jupiter.png"]')).toBeInTheDocument();
+  expect(container.querySelector('.iris-defillama-lists .iris-asset-icon-fallback')).toHaveTextContent('1');
+  expect(container.querySelector('.iris-catalog-list--volume .iris-catalog-list-identity small')).toHaveTextContent('1D +2.50%');
+  expect(container.querySelector('.iris-catalog-list--trending .iris-catalog-list-identity small')).toHaveTextContent('1D -1.50% · 7D +4.25%');
+  expect(screen.getByText('24H $750K')).toBeInTheDocument();
+  expect(screen.getByText('7D $4.5M')).toBeInTheDocument();
+  expect(screen.getByText('Solana TVL $125M')).toBeInTheDocument();
   expect(container.querySelectorAll('.iris-defillama-lists .iris-catalog-list')).toHaveLength(2);
   const cards = [...container.querySelector('.iris-page').children];
   expect(cards.indexOf(container.querySelector('.iris-helius-card'))).toBeLessThan(cards.indexOf(container.querySelector('.iris-defillama-card')));
