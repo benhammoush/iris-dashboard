@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export function useWorkerResource(load, dependencies = []) {
+export function useWorkerResource(load, dependencies = [], pollIntervalMs = 0) {
   const [reload, setReload] = useState(0);
   const [state, setState] = useState({ loading: true, refreshing: false, data: null, meta: null, error: null });
 
@@ -18,6 +18,12 @@ export function useWorkerResource(load, dependencies = []) {
     // Callers define dependencies for their stable resource loader.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...dependencies, reload]);
+
+  useEffect(() => {
+    if (!pollIntervalMs) return undefined;
+    const interval = setInterval(() => setReload((value) => value + 1), pollIntervalMs);
+    return () => clearInterval(interval);
+  }, [pollIntervalMs]);
 
   return { ...state, refetch: () => setReload((value) => value + 1) };
 }

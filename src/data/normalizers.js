@@ -56,6 +56,19 @@ export function swapsFrom(data) {
   }));
 }
 
+export function recentTransactionsFrom(data) {
+  const transactions = Array.isArray(data?.transactions) ? data.transactions : [];
+  return transactions.flatMap((transaction) => {
+    if (!transaction || typeof transaction.signature !== 'string' || !transaction.signature) return [];
+    return [{
+      signature: transaction.signature,
+      slot: Number.isInteger(transaction.slot) && transaction.slot >= 0 ? transaction.slot : null,
+      blockTime: typeof transaction.blockTime === 'string' && Number.isFinite(Date.parse(transaction.blockTime)) ? transaction.blockTime : null,
+      status: transaction.status === 'confirmed' ? 'confirmed' : null,
+    }];
+  });
+}
+
 function transactionFrom(transaction) {
   return {
     ...transaction,

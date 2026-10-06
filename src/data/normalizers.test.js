@@ -1,4 +1,4 @@
-import { assetHistoryFrom, assetsFrom, transactionsFrom, walletFrom } from './normalizers';
+import { assetHistoryFrom, assetsFrom, recentTransactionsFrom, transactionsFrom, walletFrom } from './normalizers';
 
 test('normalizes canonical v3 assets and atomic transaction events', () => {
   const [asset] = assetsFrom({ assets: [{ mint: 'MintCaseSensitiveABC', symbol: 'TEST', iconUrl: '/test.png', priceUsd: 2, quality: { organicScore: 84 } }] });
@@ -26,4 +26,8 @@ test('keeps canonical wallet identifiers and holdings truncation', () => {
   expect(wallet.address).toBe('WalletCaseSensitiveABC');
   expect(wallet.truncated).toBe(true);
   expect(wallet.transactions[0]).toMatchObject({ id: 'SignatureABC', type: 'swap' });
+});
+
+test('recent transaction samples retain only provider-proven signature fields', () => {
+  expect(recentTransactionsFrom({ transactions: [{ signature: 'signature', slot: 12, blockTime: '2026-10-06T00:00:00.000Z', status: 'confirmed' }, { signature: '', slot: 13 }] })).toEqual([{ signature: 'signature', slot: 12, blockTime: '2026-10-06T00:00:00.000Z', status: 'confirmed' }]);
 });

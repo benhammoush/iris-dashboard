@@ -13,7 +13,7 @@ const catalogFixture = {
 beforeEach(() => {
   window.history.pushState({}, '', '/');
   global.fetch = vi.fn((url) => {
-    const data = url.includes('/history') ? { data: { history: [] } } : url.includes('/v3/swaps') ? { data: { swaps: [{ signature: 'pool-swap-1', timestamp: '2026-10-03T12:00:00Z', type: 'Swap', maker: 'ReviewedPoolWallet' }] } } : url.includes('/v3/network') ? { data: { chain: { processedSlot: 1, confirmedSlot: 2, blockHeight: 3, epoch: 4, state: 'fresh' }, performance: { tps: 123.456, nonVoteTps: 78.9 }, fees: { averageFeeLamports: 456789 }, economics: { totalSol: 1, circulatingSol: 1, nonCirculatingSol: 0 } } } : url.includes('/v3/catalogs') ? { data: catalogFixture } : url.includes('/v3/assets/mint/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN') ? { data: { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 } } : url.includes('/v3/assets/mint/') ? { data: { mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1, change24hPct: 3.5, marketCapUsd: 100, liquidityUsd: 50, activity: { volume24hUsd: 25 } } } : url.includes('/v3/assets') ? { data: [{ mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1 }, { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 }] } : { data: [] };
+    const data = url.includes('/history') ? { data: { history: [] } } : url.includes('/v3/swaps') ? { data: { swaps: [{ signature: 'pool-swap-1', timestamp: '2026-10-03T12:00:00Z', type: 'Swap', maker: 'ReviewedPoolWallet' }] } } : url.includes('/v3/transactions/recent') ? { data: { transactions: [{ signature: 'RecentSignature111111111111111111111111111111111', slot: 123, blockTime: '2026-10-03T12:00:00Z', status: 'confirmed' }] }, meta: { recentTransactions: { freshness: 'fresh' } } } : url.includes('/v3/network') ? { data: { chain: { processedSlot: 1, confirmedSlot: 2, blockHeight: 3, epoch: 4, state: 'fresh' }, performance: { tps: 123.456, nonVoteTps: 78.9 }, fees: { averageFeeLamports: 456789 }, economics: { totalSol: 1, circulatingSol: 1, nonCirculatingSol: 0 } } } : url.includes('/v3/catalogs') ? { data: catalogFixture } : url.includes('/v3/assets/mint/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN') ? { data: { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 } } : url.includes('/v3/assets/mint/') ? { data: { mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1, change24hPct: 3.5, marketCapUsd: 100, liquidityUsd: 50, activity: { volume24hUsd: 25 } } } : url.includes('/v3/assets') ? { data: [{ mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1 }, { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 }] } : { data: [] };
     return Promise.resolve({ ok: true, json: () => Promise.resolve(data) });
   });
 });
@@ -22,7 +22,9 @@ test('renders the Worker-backed portfolio shell', async () => {
   const { unmount } = render(<BrowserRouter><App /></BrowserRouter>);
   expect(await screen.findByPlaceholderText(/search assets or paste a wallet address/i)).toBeInTheDocument();
   await waitFor(() => expect(screen.getByText(/no price history is available/i)).toBeInTheDocument());
-  expect(screen.getByText(/global reviewed-pool activity/i)).toBeInTheDocument();
+    expect(screen.getByText(/global reviewed-pool activity/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Recent Solana transactions' })).toBeInTheDocument();
+    expect(screen.getByText(/RecentSi.*11111111/)).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Jupiter DEX' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Top Volume' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Trending' })).toBeInTheDocument();
