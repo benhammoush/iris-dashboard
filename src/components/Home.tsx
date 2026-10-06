@@ -20,7 +20,7 @@ export default function Home() {
   const selectedResult = useWorkerResource((options: any) => workerApi.asset(selectedMint, options), [selectedMint]) as any
   const catalogsResult = useWorkerResource(workerApi.catalogs, []) as any
   const networkResult = useWorkerResource(workerApi.network, []) as any
-  const recentTransactionsResult = useWorkerResource(workerApi.recentTransactions, [], 30_000) as any
+  const recentTransactionsResult = useWorkerResource(workerApi.recentTransactions, [], 15_000) as any
   const catalogAssets = assets as Asset[]
   const catalogs = catalogsResult.data && typeof catalogsResult.data === 'object' ? catalogsResult.data : {}
   const selectedAsset = assetsFrom(selectedResult.data?.asset || selectedResult.data ? [selectedResult.data?.asset || selectedResult.data] : [])[0] || catalogAssets.find((asset) => asset.mint === selectedMint)
