@@ -1,12 +1,13 @@
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { workerApi } from '../api/worker'
-import { assetsFrom, networkFrom, recentTransactionsFrom } from '../data/normalizers'
+import { assetsFrom, defillamaFrom, networkFrom, recentTransactionsFrom } from '../data/normalizers'
 import { useWorkerResource } from '../hooks/useWorkerResource'
 import { useCatalog } from '../contexts/CatalogContext'
 import DataStatus from './DataStatus'
 import AssetIcon from './AssetIcon'
 import Navbar from './Navbar'
 import HeliusNetworkCard from './HeliusNetworkCard'
+import DefiLlamaCard from './DefiLlamaCard'
 
 type Asset = { mint: string; symbol: string; name?: string; imageUrl?: string; priceUsd?: number; marketCapUsd?: number; circulatingSupply?: number; totalSupply?: number; fullyDilutedValuationUsd?: number; change24hPct?: number; liquidityUsd?: number; holderCount?: number; activity?: { buyVolume24hUsd?: number; sellVolume24hUsd?: number; volume24hUsd?: number }; quality?: { organicScore?: number; organicScoreLabel?: string; audit?: Record<string, unknown> }; verification?: { isVerified?: boolean; tags?: string[] } }
 const SOL_MINT = 'So11111111111111111111111111111111111111112'
@@ -20,17 +21,20 @@ export default function Home() {
   const selectedResult = useWorkerResource((options: any) => workerApi.asset(selectedMint, options), [selectedMint]) as any
   const catalogsResult = useWorkerResource(workerApi.catalogs, []) as any
   const heliusDashboardResult = useWorkerResource(workerApi.recentTransactions, [], 15_000) as any
+  const defillamaDashboardResult = useWorkerResource(workerApi.defillama, []) as any
   const catalogAssets = assets as Asset[]
   const catalogs = catalogsResult.data && typeof catalogsResult.data === 'object' ? catalogsResult.data : {}
   const selectedAsset = assetsFrom(selectedResult.data?.asset || selectedResult.data ? [selectedResult.data?.asset || selectedResult.data] : [])[0] || catalogAssets.find((asset) => asset.mint === selectedMint)
   const network = networkFrom(heliusDashboardResult.data?.network)
   const recentTransactions = recentTransactionsFrom(heliusDashboardResult.data)
+  const defillama = defillamaDashboardResult.data ? defillamaFrom(defillamaDashboardResult.data) as any : null
 
   return <div className="iris-shell"><Navbar market={selectedAsset} network={network} />
     <DataStatus meta={selectedResult.meta || catalogsResult.meta || catalogMeta} error={selectedResult.error || catalogsResult.error || catalogError} />
     {(selectedResult.loading || catalogsResult.loading || catalogLoading) ? <main className="iris-loading">Loading market data...</main> : <main className="iris-page">
       <section className="iris-page-heading"><div><p className="iris-eyebrow">Market monitor</p><h1>Market overview</h1><p>Live Solana network data and market discovery from the Iris Worker.</p></div></section>
       <HeliusNetworkCard network={network} loading={heliusDashboardResult.loading} error={heliusDashboardResult.error} transactions={recentTransactions} transactionsLoading={heliusDashboardResult.loading} transactionsError={heliusDashboardResult.error} />
+      <DefiLlamaCard dashboard={defillama} loading={defillamaDashboardResult.loading} error={defillamaDashboardResult.error} />
         <section className="iris-section iris-jupiter-dex" aria-label="Jupiter discovery catalogs">
           <div className="iris-jupiter-dex-label"><JupiterLogo /><div><p>Jupiter</p></div><span className="iris-jupiter-badge">Decentralised Exchange</span></div>
           <div className="iris-catalog-lists">

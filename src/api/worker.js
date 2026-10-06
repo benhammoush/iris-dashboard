@@ -23,6 +23,7 @@ export const workerApi = {
   assetHistory: (mint, range = '7d', options) => withFixture(`/v3/assets/mint/${encodeURIComponent(mint)}/history?range=${range}`, [], options),
   swaps: (options) => withFixture('/v3/swaps', fixtures.swaps, options),
   network: (options) => withFixture('/v3/network', null, options),
+  defillama: (options) => apiGet('/v3/defillama', options),
   recentTransactions: (options = {}) => {
     const { limit = 15, ...requestOptions } = options;
     return apiGet(`/v3/transactions/recent?limit=${limit}`, requestOptions);

@@ -103,3 +103,30 @@ export function assetHistoryFrom(asset) {
 export function networkFrom(data) {
   return data && typeof data === 'object' && !Array.isArray(data) ? data : null;
 }
+
+export function defillamaFrom(data) {
+  const dashboard = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+  const numberOrNull = (value) => Number.isFinite(Number(value)) ? Number(value) : null;
+  const itemsFrom = (items, fields) => (Array.isArray(items) ? items : []).filter((item) => item && typeof item === 'object' && !Array.isArray(item)).map((item) => {
+    const slug = typeof item.slug === 'string' && item.slug.trim() ? item.slug.trim() : null;
+    return {
+      name: typeof item.name === 'string' && item.name.trim() ? item.name.trim() : slug || 'Unknown',
+      slug,
+      ...Object.fromEntries(fields.map((field) => [field, numberOrNull(item[field])])),
+      ...(fields.includes('category') ? { category: typeof item.category === 'string' && item.category.trim() ? item.category.trim() : null } : {}),
+    };
+  });
+  const dexes = dashboard.dexes && typeof dashboard.dexes === 'object' && !Array.isArray(dashboard.dexes) ? dashboard.dexes : {};
+  const protocols = dashboard.protocols && typeof dashboard.protocols === 'object' && !Array.isArray(dashboard.protocols) ? dashboard.protocols : {};
+  return {
+    dexes: {
+      total24hUsd: numberOrNull(dexes.total24hUsd),
+      total7dUsd: numberOrNull(dexes.total7dUsd),
+      items: itemsFrom(dexes.items, ['total24hUsd', 'total7dUsd', 'change1dPct']),
+    },
+    protocols: {
+      total: numberOrNull(protocols.total),
+      items: itemsFrom(protocols.items, ['category', 'solanaTvlUsd', 'change1dPct', 'change7dPct']),
+    },
+  };
+}

@@ -1,4 +1,4 @@
-import { assetHistoryFrom, assetsFrom, recentTransactionsFrom, transactionsFrom, walletFrom } from './normalizers';
+import { assetHistoryFrom, assetsFrom, defillamaFrom, recentTransactionsFrom, transactionsFrom, walletFrom } from './normalizers';
 
 test('normalizes canonical v3 assets and atomic transaction events', () => {
   const [asset] = assetsFrom({ assets: [{ mint: 'MintCaseSensitiveABC', symbol: 'TEST', iconUrl: '/test.png', priceUsd: 2, quality: { organicScore: 84 } }] });
@@ -30,4 +30,10 @@ test('keeps canonical wallet identifiers and holdings truncation', () => {
 
 test('recent transaction samples retain only provider-proven signature fields', () => {
   expect(recentTransactionsFrom({ transactions: [{ signature: 'signature', slot: 12, blockTime: '2026-10-06T00:00:00.000Z', status: 'confirmed', action: 'add_liquidity' }, { signature: '', slot: 13 }] })).toEqual([{ signature: 'signature', slot: 12, blockTime: '2026-10-06T00:00:00.000Z', status: 'confirmed', action: 'add_liquidity' }]);
+});
+
+test('normalizes the DefiLlama dashboard payload', () => {
+  const dashboard = defillamaFrom({ dexes: { total24hUsd: '1234', total7dUsd: 5678, items: [{ name: 'Jupiter', slug: 'jupiter', total24hUsd: '500', total7dUsd: 3500, change1dPct: '2.5' }] }, protocols: { total: 42, items: [{ name: 'Kamino', slug: 'kamino-finance', category: 'Lending', solanaTvlUsd: 999, change1dPct: -1, change7dPct: '3.25' }] } });
+
+  expect(dashboard).toEqual({ dexes: { total24hUsd: 1234, total7dUsd: 5678, items: [{ name: 'Jupiter', slug: 'jupiter', total24hUsd: 500, total7dUsd: 3500, change1dPct: 2.5 }] }, protocols: { total: 42, items: [{ name: 'Kamino', slug: 'kamino-finance', category: 'Lending', solanaTvlUsd: 999, change1dPct: -1, change7dPct: 3.25 }] } });
 });

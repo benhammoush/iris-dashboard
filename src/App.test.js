@@ -10,10 +10,15 @@ const catalogFixture = {
   recent: [{ mint: 'NewPool111111111111111111111111111111111111', symbol: 'NEW', name: 'New pool', priceUsd: 0.1, change24hPct: -1.25, activity: { volume24hUsd: 10000 } }],
 };
 
+const defillamaFixture = {
+  dexes: { total24hUsd: 1250000, total7dUsd: 7000000, items: [{ name: 'Jupiter', slug: 'jupiter', total24hUsd: 750000, total7dUsd: 4500000, change1dPct: 2.5 }] },
+  protocols: { total: 42, items: [{ name: 'Kamino', slug: 'kamino-finance', category: 'Lending', solanaTvlUsd: 125000000, change1dPct: -1.5, change7dPct: 4.25 }] },
+};
+
 beforeEach(() => {
   window.history.pushState({}, '', '/');
   global.fetch = vi.fn((url) => {
-    const data = url.includes('/history') ? { data: { history: [] } } : url.includes('/v3/transactions/recent') ? { data: { network: { chain: { processedSlot: 1, confirmedSlot: 2, blockHeight: 3, epoch: 4, state: 'fresh' }, performance: { tps: 123.456, nonVoteTps: 78.9 }, fees: { averageFeeLamports: 456789 } }, transactions: [{ signature: 'RecentSignature111111111111111111111111111111111', slot: 123, blockTime: '2026-10-03T12:00:00Z', status: 'confirmed', action: 'swap' }] }, meta: { recentTransactions: { freshness: 'fresh' } } } : url.includes('/v3/network') ? { data: { chain: { processedSlot: 1, confirmedSlot: 2, blockHeight: 3, epoch: 4, state: 'fresh' }, performance: { tps: 123.456, nonVoteTps: 78.9 }, fees: { averageFeeLamports: 456789 } } } : url.includes('/v3/catalogs') ? { data: catalogFixture } : url.includes('/v3/assets/mint/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN') ? { data: { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 } } : url.includes('/v3/assets/mint/') ? { data: { mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1, change24hPct: 3.5, marketCapUsd: 100, liquidityUsd: 50, activity: { volume24hUsd: 25 } } } : url.includes('/v3/assets') ? { data: [{ mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1 }, { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 }] } : { data: [] };
+    const data = url.includes('/history') ? { data: { history: [] } } : url.includes('/v3/defillama') ? { data: defillamaFixture } : url.includes('/v3/transactions/recent') ? { data: { network: { chain: { processedSlot: 1, confirmedSlot: 2, blockHeight: 3, epoch: 4, state: 'fresh' }, performance: { tps: 123.456, nonVoteTps: 78.9 }, fees: { averageFeeLamports: 456789 } }, transactions: [{ signature: 'RecentSignature111111111111111111111111111111111', slot: 123, blockTime: '2026-10-03T12:00:00Z', status: 'confirmed', action: 'swap' }] }, meta: { recentTransactions: { freshness: 'fresh' } } } : url.includes('/v3/network') ? { data: { chain: { processedSlot: 1, confirmedSlot: 2, blockHeight: 3, epoch: 4, state: 'fresh' }, performance: { tps: 123.456, nonVoteTps: 78.9 }, fees: { averageFeeLamports: 456789 } } } : url.includes('/v3/catalogs') ? { data: catalogFixture } : url.includes('/v3/assets/mint/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN') ? { data: { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 } } : url.includes('/v3/assets/mint/') ? { data: { mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1, change24hPct: 3.5, marketCapUsd: 100, liquidityUsd: 50, activity: { volume24hUsd: 25 } } } : url.includes('/v3/assets') ? { data: [{ mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1 }, { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 }] } : { data: [] };
     return Promise.resolve({ ok: true, json: () => Promise.resolve(data) });
   });
 });
@@ -41,6 +46,17 @@ test('renders the Worker-backed portfolio shell', async () => {
   expect(fetch.mock.calls.some(([url]) => String(url).includes('/v3/wallets'))).toBe(false);
   expect(fetch.mock.calls.some(([url]) => String(url).includes('/v3/network'))).toBe(false);
   unmount();
+});
+
+test('renders the DefiLlama dashboard after Helius and before Jupiter with safe protocol links', async () => {
+  const { container } = render(<BrowserRouter><App /></BrowserRouter>);
+  await screen.findByRole('heading', { name: 'Top DEXes' });
+  expect(fetch.mock.calls.some(([url]) => String(url).includes('/v3/defillama'))).toBe(true);
+  expect(screen.getByText('Kamino')).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: 'Kamino' })).toHaveAttribute('href', 'https://defillama.com/protocol/kamino-finance');
+  const cards = [...container.querySelector('.iris-page').children];
+  expect(cards.indexOf(container.querySelector('.iris-helius-card'))).toBeLessThan(cards.indexOf(container.querySelector('.iris-defillama-card')));
+  expect(cards.indexOf(container.querySelector('.iris-defillama-card'))).toBeLessThan(cards.indexOf(container.querySelector('.iris-jupiter-dex')));
 });
 
 test('Jupiter discovery rows use the styled list structure and open canonical asset detail', async () => {
@@ -71,7 +87,7 @@ test('uses Home-only navigation and shows the selected market metrics in the Jup
   expect(container.querySelector('.iris-helius-market')).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /Chart/i })).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /Preview/i })).not.toBeInTheDocument();
-  expect(screen.getByText('Data from Jupiter and CoinGecko')).toBeInTheDocument();
+  expect(screen.getByText('Data from Jupiter, CoinGecko, and DefiLlama')).toBeInTheDocument();
 });
 
 test('asset table click and keyboard navigation open asset detail', async () => {
