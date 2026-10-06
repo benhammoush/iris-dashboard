@@ -21,7 +21,7 @@ export const workerApi = {
   catalogs: (options) => withFixture('/v3/catalogs', { topTraded: fixtures.assets, trending: [], recent: [] }, options),
   asset: (mint, options) => withFixture(`/v3/assets/mint/${encodeURIComponent(mint)}?includeHistory=false`, fixtures.assets.find((asset) => asset.mint === mint) || null, options),
   assetHistory: (mint, range = '7d', options) => withFixture(`/v3/assets/mint/${encodeURIComponent(mint)}/history?range=${range}`, [], options),
-  assetCandles: (mint, range = '7d', options, before = /** @type {number | null} */ (null)) => withFixture(`/v3/assets/mint/${encodeURIComponent(mint)}/candles?${new URLSearchParams({ range, ...(before === null ? {} : { before: String(before) }) })}`, { candles: [] }, options),
+  assetCandles: (mint, timeframe = '1H', options, before = /** @type {number | null} */ (null)) => withFixture(`/v3/assets/mint/${encodeURIComponent(mint)}/candles?${new URLSearchParams({ timeframe, ...(before === null ? {} : { before: String(before) }) })}`, { candles: [] }, options),
   swaps: (options) => withFixture('/v3/swaps', fixtures.swaps, options),
   network: (options) => withFixture('/v3/network', null, options),
   defillama: (options) => apiGet('/v3/defillama', options),

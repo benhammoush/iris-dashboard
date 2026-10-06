@@ -28,8 +28,8 @@ describe('worker fixture behavior', () => {
 
     await workerApi.asset('MintCaseSensitive123');
     await workerApi.assetHistory('MintCaseSensitive123', '1d');
-    await workerApi.assetCandles('MintCaseSensitive123', '4h');
-    await workerApi.assetCandles('MintCaseSensitive123', '4h', undefined, 1760000000);
+    await workerApi.assetCandles('MintCaseSensitive123', '4H');
+    await workerApi.assetCandles('MintCaseSensitive123', '4H', undefined, 1760000000);
     await workerApi.swaps();
     await workerApi.defillama();
     await workerApi.recentTransactions();
@@ -39,7 +39,7 @@ describe('worker fixture behavior', () => {
     expect(fetch).toHaveBeenNthCalledWith(1, expect.stringContaining('/v3/assets/mint/MintCaseSensitive123'), expect.any(Object));
     expect(fetch).toHaveBeenNthCalledWith(1, expect.stringContaining('?includeHistory=false'), expect.any(Object));
     expect(fetch).toHaveBeenNthCalledWith(2, expect.stringContaining('/v3/assets/mint/MintCaseSensitive123/history?range=1d'), expect.any(Object));
-    expect(fetch).toHaveBeenNthCalledWith(3, expect.stringContaining('/v3/assets/mint/MintCaseSensitive123/candles?range=4h'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(3, expect.stringContaining('/v3/assets/mint/MintCaseSensitive123/candles?timeframe=4H'), expect.any(Object));
     expect(fetch).toHaveBeenNthCalledWith(4, expect.stringContaining('before=1760000000'), expect.any(Object));
     expect(fetch).toHaveBeenNthCalledWith(5, expect.stringContaining('/v3/swaps'), expect.any(Object));
     expect(fetch).toHaveBeenNthCalledWith(6, expect.stringContaining('/v3/defillama'), expect.any(Object));
