@@ -19,19 +19,18 @@ export default function Home() {
   const { assets, loading: catalogLoading, meta: catalogMeta, error: catalogError } = useCatalog() as any
   const selectedResult = useWorkerResource((options: any) => workerApi.asset(selectedMint, options), [selectedMint]) as any
   const catalogsResult = useWorkerResource(workerApi.catalogs, []) as any
-  const networkResult = useWorkerResource(workerApi.network, []) as any
-  const recentTransactionsResult = useWorkerResource(workerApi.recentTransactions, [], 15_000) as any
+  const heliusDashboardResult = useWorkerResource(workerApi.recentTransactions, [], 15_000) as any
   const catalogAssets = assets as Asset[]
   const catalogs = catalogsResult.data && typeof catalogsResult.data === 'object' ? catalogsResult.data : {}
   const selectedAsset = assetsFrom(selectedResult.data?.asset || selectedResult.data ? [selectedResult.data?.asset || selectedResult.data] : [])[0] || catalogAssets.find((asset) => asset.mint === selectedMint)
-  const network = networkFrom(networkResult.data)
-  const recentTransactions = recentTransactionsFrom(recentTransactionsResult.data)
+  const network = networkFrom(heliusDashboardResult.data?.network)
+  const recentTransactions = recentTransactionsFrom(heliusDashboardResult.data)
 
   return <div className="iris-shell"><Navbar market={selectedAsset} network={network} />
     <DataStatus meta={selectedResult.meta || catalogsResult.meta || catalogMeta} error={selectedResult.error || catalogsResult.error || catalogError} />
     {(selectedResult.loading || catalogsResult.loading || catalogLoading) ? <main className="iris-loading">Loading market data...</main> : <main className="iris-page">
       <section className="iris-page-heading"><div><p className="iris-eyebrow">Market monitor</p><h1>Market overview</h1><p>Live Solana network data and market discovery from the Iris Worker.</p></div></section>
-      <HeliusNetworkCard network={network} loading={networkResult.loading} error={networkResult.error} transactions={recentTransactions} transactionsLoading={recentTransactionsResult.loading} transactionsError={recentTransactionsResult.error} />
+      <HeliusNetworkCard network={network} loading={heliusDashboardResult.loading} error={heliusDashboardResult.error} transactions={recentTransactions} transactionsLoading={heliusDashboardResult.loading} transactionsError={heliusDashboardResult.error} />
         <section className="iris-section iris-jupiter-dex" aria-label="Jupiter discovery catalogs">
           <div className="iris-jupiter-dex-label"><JupiterLogo /><div><p>Jupiter</p></div><span className="iris-jupiter-badge">Decentralised Exchange</span></div>
           <div className="iris-catalog-lists">
