@@ -18,7 +18,7 @@ const defillamaFixture = {
 beforeEach(() => {
   window.history.pushState({}, '', '/');
   global.fetch = vi.fn((url) => {
-    const data = url.includes('/history') ? { data: { history: [] } } : url.includes('/v3/defillama') ? { data: defillamaFixture } : url.includes('/v3/transactions/recent') ? { data: { network: { chain: { processedSlot: 1, confirmedSlot: 2, blockHeight: 3, epoch: 4, state: 'fresh' }, performance: { tps: 123.456, nonVoteTps: 78.9 }, fees: { averageFeeLamports: 456789 } }, transactions: [{ signature: 'RecentSignature111111111111111111111111111111111', slot: 123, blockTime: '2026-10-03T12:00:00Z', status: 'confirmed', action: 'swap' }] }, meta: { recentTransactions: { freshness: 'fresh' } } } : url.includes('/v3/network') ? { data: { chain: { processedSlot: 1, confirmedSlot: 2, blockHeight: 3, epoch: 4, state: 'fresh' }, performance: { tps: 123.456, nonVoteTps: 78.9 }, fees: { averageFeeLamports: 456789 } } } : url.includes('/v3/catalogs') ? { data: catalogFixture } : url.includes('/v3/assets/mint/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN') ? { data: { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 } } : url.includes('/v3/assets/mint/') ? { data: { mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1, change24hPct: 3.5, marketCapUsd: 100, liquidityUsd: 50, activity: { volume24hUsd: 25 } } } : url.includes('/v3/assets') ? { data: [{ mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1 }, { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 }] } : { data: [] };
+   const data = url.includes('/candles') ? { data: { candles: [] } } : url.includes('/history') ? { data: { history: [] } } : url.includes('/v3/defillama') ? { data: defillamaFixture } : url.includes('/v3/transactions/recent') ? { data: { network: { chain: { processedSlot: 1, confirmedSlot: 2, blockHeight: 3, epoch: 4, state: 'fresh' }, performance: { tps: 123.456, nonVoteTps: 78.9 }, fees: { averageFeeLamports: 456789 } }, transactions: [{ signature: 'RecentSignature111111111111111111111111111111111', slot: 123, blockTime: '2026-10-03T12:00:00Z', status: 'confirmed', action: 'swap' }] }, meta: { recentTransactions: { freshness: 'fresh' } } } : url.includes('/v3/network') ? { data: { chain: { processedSlot: 1, confirmedSlot: 2, blockHeight: 3, epoch: 4, state: 'fresh' }, performance: { tps: 123.456, nonVoteTps: 78.9 }, fees: { averageFeeLamports: 456789 } } } : url.includes('/v3/catalogs') ? { data: catalogFixture } : url.includes('/v3/assets/mint/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN') ? { data: { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 } } : url.includes('/v3/assets/mint/') ? { data: { mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1, change24hPct: 3.5, marketCapUsd: 100, liquidityUsd: 50, activity: { volume24hUsd: 25 } } } : url.includes('/v3/assets') ? { data: [{ mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', name: 'Solana', priceUsd: 1 }, { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', name: 'Jupiter', priceUsd: 1 }] } : { data: [] };
     return Promise.resolve({ ok: true, json: () => Promise.resolve(data) });
   });
 });
@@ -95,7 +95,7 @@ test('uses Home-only navigation and shows the selected market metrics in the Jup
   expect(container.querySelector('.iris-helius-market')).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /Chart/i })).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /Preview/i })).not.toBeInTheDocument();
-  expect(screen.getByText('Data from Jupiter, CoinGecko, and DefiLlama')).toBeInTheDocument();
+  expect(screen.getByText('Data from Jupiter, Birdeye, and DefiLlama')).toBeInTheDocument();
 });
 
 test('asset table click and keyboard navigation open asset detail', async () => {
@@ -114,9 +114,9 @@ test('asset table rows support keyboard navigation', async () => {
   expect(window.location.pathname).toContain('/asset/JUPyiwrY');
 });
 
-test('Home does not request CoinGecko history or render graph controls', async () => {
+test('Home does not request Birdeye candles or render graph controls', async () => {
   render(<BrowserRouter><App /></BrowserRouter>);
   await screen.findByRole('heading', { name: 'Market overview' });
-  expect(fetch.mock.calls.some(([url]) => String(url).includes('/history'))).toBe(false);
+  expect(fetch.mock.calls.some(([url]) => String(url).includes('/candles'))).toBe(false);
   expect(screen.queryByRole('button', { name: '7D' })).not.toBeInTheDocument();
 });

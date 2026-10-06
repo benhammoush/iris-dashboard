@@ -1,4 +1,4 @@
-import { assetHistoryFrom, assetsFrom, defillamaFrom, recentTransactionsFrom, transactionsFrom, walletFrom } from './normalizers';
+import { assetCandlesFrom, assetHistoryFrom, assetsFrom, defillamaFrom, recentTransactionsFrom, transactionsFrom, walletFrom } from './normalizers';
 
 test('normalizes canonical v3 assets and atomic transaction events', () => {
   const [asset] = assetsFrom({ assets: [{ mint: 'MintCaseSensitiveABC', symbol: 'TEST', iconUrl: '/test.png', priceUsd: 2, quality: { organicScore: 84 } }] });
@@ -16,6 +16,7 @@ test('keeps nullable Worker market fields and ignores unavailable history', () =
   expect(asset.marketCapUsd).toBeNull();
   expect(assetHistoryFrom({ history: null })).toEqual([]);
   expect(assetHistoryFrom({ history: [{ timestamp: '2026-10-01T00:00:00Z', priceUsd: 2 }] })).toEqual([['2026-10-01T00:00:00Z', 2]]);
+  expect(assetCandlesFrom({ candles: [{ timestamp: '2026-10-01T00:00:00Z', openUsd: 1, highUsd: 3, lowUsd: 0.5, closeUsd: 2, volumeUsd: 100 }, { timestamp: 'invalid', openUsd: 1, highUsd: 1, lowUsd: 1, closeUsd: 1, volumeUsd: 1 }] })).toEqual([{ timestamp: '2026-10-01T00:00:00Z', openUsd: 1, highUsd: 3, lowUsd: 0.5, closeUsd: 2, volumeUsd: 100 }]);
 });
 
 test('keeps canonical wallet identifiers and holdings truncation', () => {

@@ -9,6 +9,7 @@ from `design-system`, rather than individual implementation files.
 - `MetricCard` for compact dashboard metrics.
 - `VirtualTable` for searchable, sortable virtualized data grids.
 - `AreaChart` for responsive time-series charts.
+- `CandlestickChart` for OHLC price candles with USD volume.
 
 ## Boundary
 

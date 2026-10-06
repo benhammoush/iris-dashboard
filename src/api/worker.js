@@ -19,8 +19,9 @@ async function withFixture(path, fixture, options) {
 export const workerApi = {
   assets: (options) => withFixture('/v3/assets', fixtures.assets, options),
   catalogs: (options) => withFixture('/v3/catalogs', { topTraded: fixtures.assets, trending: [], recent: [] }, options),
-  asset: (mint, options) => withFixture(`/v3/assets/mint/${encodeURIComponent(mint)}`, fixtures.assets.find((asset) => asset.mint === mint) || null, options),
+  asset: (mint, options) => withFixture(`/v3/assets/mint/${encodeURIComponent(mint)}?includeHistory=false`, fixtures.assets.find((asset) => asset.mint === mint) || null, options),
   assetHistory: (mint, range = '7d', options) => withFixture(`/v3/assets/mint/${encodeURIComponent(mint)}/history?range=${range}`, [], options),
+  assetCandles: (mint, range = '7d', options) => withFixture(`/v3/assets/mint/${encodeURIComponent(mint)}/candles?range=${range}`, { candles: [] }, options),
   swaps: (options) => withFixture('/v3/swaps', fixtures.swaps, options),
   network: (options) => withFixture('/v3/network', null, options),
   defillama: (options) => apiGet('/v3/defillama', options),

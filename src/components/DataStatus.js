@@ -2,7 +2,7 @@ function DataStatus({ meta, error }) {
   if (!meta && !error) return null;
   return (
     <div className="iris-data-status" role="status">
-      <p>{error ? `Data unavailable: ${error.message}` : 'Data from Jupiter, CoinGecko, and DefiLlama'}</p>
+      <p>{error ? `Data unavailable: ${error.message}` : 'Data from Jupiter, Birdeye, and DefiLlama'}</p>
     </div>
   );
 }

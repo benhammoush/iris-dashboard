@@ -4,11 +4,11 @@ Iris is a Vite market monitor and public-wallet viewer backed only by the Iris W
 
 ## Architecture
 
-`src/api/client.js` is the sole HTTP client. It reads `VITE_API_BASE`, adds request IDs, applies a 10-second timeout, parses Worker response envelopes (`{ data, meta }`), and normalizes failures. `src/api/worker.js` calls the Worker `/v3` routes for assets, per-mint history, the DefiLlama dashboard, wallet summaries, and cursor-paginated wallet transactions.
+`src/api/client.js` is the sole HTTP client. It reads `VITE_API_BASE`, adds request IDs, applies a 10-second timeout, parses Worker response envelopes (`{ data, meta }`), and normalizes failures. `src/api/worker.js` calls the Worker `/v3` routes for assets, per-mint Birdeye candles and compatibility history, the DefiLlama dashboard, wallet summaries, and cursor-paginated wallet transactions.
 
 Worker errors are shown to users. Market, asset catalog, and swap requests use local, non-sensitive emergency display fixtures only when `VITE_ENABLE_FIXTURES=true`; the status line identifies fixture data. Wallet details never use a fixture address: an unconfigured or unknown address is shown as not tracked.
 
-The Home chart defaults to SOL. Its selected mint and range are URL query parameters, while catalog rows open asset detail. Current metrics are labeled as Jupiter, history as CoinGecko, and volume as reviewed-pool swaps. Between the Helius and Jupiter cards, DefiLlama shows aggregate Solana DEX volume and tracked DeFi protocols ranked by Solana TVL; it is not an inventory of all Solana programs. Optional metrics stay hidden if absent. Asset audit metadata is displayed as an indicator only and never as a safety claim. Wallets show priced subtotals and valuation coverage when pricing is partial, and load transaction pages using Worker cursors.
+Asset detail renders Birdeye USD candlesticks and USD volume for its selected mint and `1H`, `4H`, `1D`, or `7D` range. Current metrics are labeled as Jupiter. Between the Helius and Jupiter cards, DefiLlama shows aggregate Solana DEX volume and tracked DeFi protocols ranked by Solana TVL; it is not an inventory of all Solana programs. Optional metrics stay hidden if absent. Asset audit metadata is displayed as an indicator only and never as a safety claim. Wallets show priced subtotals and valuation coverage when pricing is partial, and load transaction pages using Worker cursors.
 
 The compact status display shows Worker provenance and freshness only when supplied, with diagnostics for errors.
 

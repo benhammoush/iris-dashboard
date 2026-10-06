@@ -22,12 +22,13 @@ describe('worker fixture behavior', () => {
     await expect(workerApi.assets()).resolves.toMatchObject({ data: expect.any(Array), meta: { source: 'fixture', stale: true } });
   });
 
-  test('uses v3 asset, DefiLlama, global swaps, recent transactions, and canonical wallet transaction routes', async () => {
+  test('uses v3 asset, candle, DefiLlama, global swaps, recent transactions, and canonical wallet transaction routes', async () => {
     vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ data: {} }) })));
     const { workerApi } = await import('./worker');
 
     await workerApi.asset('MintCaseSensitive123');
     await workerApi.assetHistory('MintCaseSensitive123', '1d');
+    await workerApi.assetCandles('MintCaseSensitive123', '4h');
     await workerApi.swaps();
     await workerApi.defillama();
     await workerApi.recentTransactions();
@@ -35,12 +36,14 @@ describe('worker fixture behavior', () => {
     await workerApi.walletTransactions('WalletCaseSensitive123', { cursor: 'next-page' });
 
     expect(fetch).toHaveBeenNthCalledWith(1, expect.stringContaining('/v3/assets/mint/MintCaseSensitive123'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(1, expect.stringContaining('?includeHistory=false'), expect.any(Object));
     expect(fetch).toHaveBeenNthCalledWith(2, expect.stringContaining('/v3/assets/mint/MintCaseSensitive123/history?range=1d'), expect.any(Object));
-    expect(fetch).toHaveBeenNthCalledWith(3, expect.stringContaining('/v3/swaps'), expect.any(Object));
-    expect(fetch).toHaveBeenNthCalledWith(4, expect.stringContaining('/v3/defillama'), expect.any(Object));
-    expect(fetch).toHaveBeenNthCalledWith(5, expect.stringContaining('/v3/transactions/recent?limit=15'), expect.any(Object));
-    expect(fetch).toHaveBeenNthCalledWith(6, expect.stringContaining('/v3/wallets/WalletCaseSensitive123'), expect.any(Object));
-    expect(fetch).toHaveBeenNthCalledWith(7, expect.stringContaining('/v3/wallets/WalletCaseSensitive123/transactions?'), expect.any(Object));
-    expect(fetch).toHaveBeenNthCalledWith(7, expect.stringContaining('cursor=next-page'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(3, expect.stringContaining('/v3/assets/mint/MintCaseSensitive123/candles?range=4h'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(4, expect.stringContaining('/v3/swaps'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(5, expect.stringContaining('/v3/defillama'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(6, expect.stringContaining('/v3/transactions/recent?limit=15'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(7, expect.stringContaining('/v3/wallets/WalletCaseSensitive123'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(8, expect.stringContaining('/v3/wallets/WalletCaseSensitive123/transactions?'), expect.any(Object));
+    expect(fetch).toHaveBeenNthCalledWith(8, expect.stringContaining('cursor=next-page'), expect.any(Object));
   });
 });

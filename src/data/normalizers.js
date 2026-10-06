@@ -100,6 +100,18 @@ export function assetHistoryFrom(asset) {
   return history.map((point) => [point.date || point.timestamp, point.priceUsd ?? point.price]).filter(([date, price]) => date && Number.isFinite(Number(price)));
 }
 
+export function assetCandlesFrom(data) {
+  const candles = Array.isArray(data?.candles) ? data.candles : [];
+  return candles.flatMap((candle) => {
+    const timestamp = typeof candle?.timestamp === 'string' && Number.isFinite(Date.parse(candle.timestamp)) ? candle.timestamp : null;
+    const values = ['openUsd', 'highUsd', 'lowUsd', 'closeUsd', 'volumeUsd'].map((field) => Number(candle?.[field]));
+    const [openUsd, highUsd, lowUsd, closeUsd, volumeUsd] = values;
+    return timestamp && values.every(Number.isFinite) && highUsd >= openUsd && highUsd >= closeUsd && lowUsd <= openUsd && lowUsd <= closeUsd
+      ? [{ timestamp, openUsd, highUsd, lowUsd, closeUsd, volumeUsd }]
+      : [];
+  });
+}
+
 export function networkFrom(data) {
   return data && typeof data === 'object' && !Array.isArray(data) ? data : null;
 }
