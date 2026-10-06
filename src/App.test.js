@@ -98,6 +98,19 @@ test('uses Home-only navigation and shows the selected market metrics in the Jup
   expect(screen.getByText('Data from Jupiter, Birdeye, and DefiLlama')).toBeInTheDocument();
 });
 
+test('keeps navbar market and network summaries populated outside Home', async () => {
+  window.history.pushState({}, '', '/asset/So11111111111111111111111111111111111111112');
+  const assetPage = render(<BrowserRouter><App /></BrowserRouter>);
+  expect(await screen.findByLabelText('SOL market summary')).toHaveTextContent('SOL : $1.00');
+  expect(await screen.findByLabelText('Helius network summary')).toHaveTextContent('TPS : 123.46');
+  assetPage.unmount();
+
+  window.history.pushState({}, '', '/wallet/So11111111111111111111111111111111111111112');
+  render(<BrowserRouter><App /></BrowserRouter>);
+  expect(await screen.findByLabelText('SOL market summary')).toHaveTextContent('SOL : $1.00');
+  expect(await screen.findByLabelText('Helius network summary')).toHaveTextContent('TPS : 123.46');
+});
+
 test('asset table click and keyboard navigation open asset detail', async () => {
   render(<BrowserRouter><App /></BrowserRouter>);
   await screen.findByText('JUP');

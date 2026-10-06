@@ -68,6 +68,7 @@ button, input { font: inherit; }
 .iris-timeframe-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
 .iris-timeframe-group p { grid-column: 1 / -1; margin: 0 0 2px; color: var(--iris-muted); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
 .iris-timeframe-popover button { padding: 4px 3px; }
+.iris-defillama-logo { width: 155px; height: 53px; object-fit: contain; object-position: left; }
 .iris-empty { margin: 0; padding: 40px 20px; color: var(--iris-muted); text-align: center; font-size: 12px; }
 .iris-chart-empty { display: grid; min-height: 290px; place-content: center; gap: 8px; padding: 32px; color: var(--iris-secondary-text); text-align: center; font-size: 12px; }
 .iris-chart-empty strong { color: var(--iris-text); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 12px; }

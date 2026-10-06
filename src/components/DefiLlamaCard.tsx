@@ -6,6 +6,7 @@ type Dashboard = { dexes: { total24hUsd: number | null; total7dUsd: number | nul
 
 const currency = (value: number | null | undefined) => value === null || value === undefined || !Number.isFinite(value) ? '—' : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: 2 }).format(value)
 const count = (value: number | null | undefined) => value === null || value === undefined || !Number.isFinite(value) ? '—' : value.toLocaleString('en-US')
+const preloadImage = { fetchpriority: 'high' } as unknown as React.ImgHTMLAttributes<HTMLImageElement>
 
 function Change({ value }: { value: number | null }) {
   if (value === null || !Number.isFinite(value)) return <span className="iris-muted">—</span>
@@ -18,7 +19,7 @@ function DefiLlamaLink({ slug, children }: { slug: string | null; children: Reac
 
 export default function DefiLlamaCard({ dashboard, loading, error }: { dashboard: Dashboard | null; loading: boolean; error: unknown }) {
   return <section className="iris-defillama-card" aria-label="DefiLlama Solana dashboard">
-    <div className="iris-defillama-topline"><div><p>DefiLlama</p><h2>Solana DeFi</h2></div><a href="https://defillama.com" target="_blank" rel="noreferrer">View on DefiLlama</a></div>
+    <div className="iris-defillama-topline"><img className="iris-defillama-logo" src="/assets/defillama.webp" height="53" width="155" alt="DefiLlama" {...preloadImage} loading="eager" decoding="sync" /><a href="https://defillama.com" target="_blank" rel="noreferrer">Defi</a></div>
     {loading && !dashboard && <p className="iris-defillama-state">Loading DeFi metrics...</p>}
     {Boolean(error) && !dashboard && <p className="iris-defillama-state">DeFi metrics are unavailable.</p>}
     {!loading && !error && !dashboard && <p className="iris-defillama-state">No DeFi metrics are available.</p>}

@@ -4,6 +4,7 @@ import { useCatalog } from '../contexts/CatalogContext';
 import { APP_DISPLAY_VERSION } from '../appVersion';
 import { useTheme } from '../design-system';
 import { looksLikeSolanaAddress } from '../data/solana';
+import { useHeliusDashboard } from '../contexts/HeliusDashboardContext';
 
 function money(value, digits = 2) {
   return value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : `$${Number(value).toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
@@ -21,8 +22,9 @@ function sol(lamports) {
   return lamports === null || lamports === undefined || !Number.isFinite(Number(lamports)) ? '—' : `${(Number(lamports) / 1_000_000_000).toFixed(6)} SOL`;
 }
 
-function Navbar({ market = null, network = null }) {
+function Navbar({ market = null }) {
   const { assets } = useCatalog();
+  const { network } = useHeliusDashboard();
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
   const { mode, setMode } = useTheme();
@@ -30,6 +32,7 @@ function Navbar({ market = null, network = null }) {
   const normalized = queryValue.toUpperCase();
   const assetMatches = queryValue ? assets.filter((asset) => asset.mint?.includes(queryValue) || [asset.symbol, asset.name].some((value) => value?.toUpperCase().includes(normalized))).slice(0, 5) : [];
   const publicAddress = looksLikeSolanaAddress(queryValue) ? queryValue : null;
+  const navbarMarket = market || assets.find((asset) => asset.symbol === 'SOL') || assets[0] || null;
 
   function go(path) {
     navigate(path);
@@ -50,10 +53,10 @@ function Navbar({ market = null, network = null }) {
             {!assetMatches.length && !publicAddress && <li><button disabled>No loaded matches.</button></li>}
         </ul>}
        </div>
-        {market && <div className="iris-jupiter-market" aria-label={`${market.symbol} market summary`}>
-          <span><b>{market.symbol}</b> : {money(market.priceUsd)}</span><i>/</i>
-          <span><b>MCAP</b> : {millions(market.marketCapUsd)}</span><i>/</i>
-          <span><b>24HVOL</b> : {millions(market.activity?.volume24hUsd)}</span>
+        {navbarMarket && <div className="iris-jupiter-market" aria-label={`${navbarMarket.symbol} market summary`}>
+          <span><b>{navbarMarket.symbol}</b> : {money(navbarMarket.priceUsd)}</span><i>/</i>
+          <span><b>MCAP</b> : {millions(navbarMarket.marketCapUsd)}</span><i>/</i>
+          <span><b>24HVOL</b> : {millions(navbarMarket.activity?.volume24hUsd)}</span>
         </div>}
         <div className="iris-helius-market" aria-label="Helius network summary">
           <span><b>TPS</b> : {number(network?.performance?.tps, 2)}</span><i>/</i>

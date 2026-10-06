@@ -5,6 +5,7 @@ import Asset from './components/Asset';
 import NoMatch from './components/NoMatch';
 import Catalog from './components/Catalog';
 import { CatalogProvider } from './contexts/CatalogContext';
+import { HeliusDashboardProvider } from './contexts/HeliusDashboardContext';
 import { apiConfigurationError } from './api/client';
 import { ThemeProvider } from './design-system';
 function App() {
@@ -15,7 +16,7 @@ function App() {
   }
 
   return (
-    <ThemeProvider><CatalogProvider><div className="scroll-smooth">
+    <ThemeProvider><CatalogProvider><HeliusDashboardProvider><div className="scroll-smooth">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/assets" element={<Catalog kind="assets" />} />
@@ -34,7 +35,7 @@ function App() {
           {' '}
         </Route>
       </Routes>
-    </div></CatalogProvider></ThemeProvider>
+    </div></HeliusDashboardProvider></CatalogProvider></ThemeProvider>
   );
 }
 export default App;
