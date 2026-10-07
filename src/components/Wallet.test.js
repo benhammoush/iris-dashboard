@@ -72,3 +72,16 @@ test('renders multi-transfer activity without unreliable flattened value columns
   await userEvent.click(screen.getByRole('button', { name: 'Load more' }));
   expect(await screen.findByText('solana-tx-26')).toBeInTheDocument();
 });
+
+test('keeps the wallet layout and table columns visible while initial data loads', () => {
+  workerApi.wallet.mockReturnValue(new Promise(() => {}));
+  workerApi.walletTransactions.mockReturnValue(new Promise(() => {}));
+  const { container } = renderWallet();
+
+  expect(screen.getByRole('heading', { name: 'Holdings' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Transactions' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Asset' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Date' })).toBeInTheDocument();
+  expect(container.querySelectorAll('.iris-value-skeleton').length).toBeGreaterThan(0);
+  expect(screen.queryByLabelText('Loading content')).not.toBeInTheDocument();
+});

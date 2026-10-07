@@ -5,6 +5,7 @@ import { APP_DISPLAY_VERSION } from '../appVersion';
 import { useTheme } from '../design-system';
 import { looksLikeSolanaAddress } from '../data/solana';
 import { useHeliusDashboard } from '../contexts/HeliusDashboardContext';
+import ValueSkeleton from './ValueSkeleton';
 
 function money(value, digits = 2) {
   return value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : `$${Number(value).toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
@@ -53,12 +54,12 @@ function Navbar() {
             {!assetMatches.length && !publicAddress && <li><button disabled>No loaded matches.</button></li>}
         </ul>}
        </div>
-        {assetsLoading && !navbarMarket ? <MarketSkeleton className="iris-jupiter-market" label="Loading Jupiter market summary" /> : navbarMarket && <div className="iris-jupiter-market" aria-label={`${navbarMarket.symbol} market summary`}>
+        {assetsLoading && !navbarMarket ? <MarketSkeleton className="iris-jupiter-market" label="Loading Jupiter market summary" labels={['SOL', 'MCAP', '24HVOL']} /> : navbarMarket && <div className="iris-jupiter-market" aria-label={`${navbarMarket.symbol} market summary`}>
           <span><b>{navbarMarket.symbol}</b> : {money(navbarMarket.priceUsd)}</span><i>/</i>
           <span><b>MCAP</b> : {millions(navbarMarket.marketCapUsd)}</span><i>/</i>
           <span><b>24HVOL</b> : {millions(navbarMarket.activity?.volume24hUsd)}</span>
         </div>}
-        {networkLoading && !network ? <MarketSkeleton className="iris-helius-market" label="Loading Helius network summary" /> : <div className="iris-helius-market" aria-label="Helius network summary">
+        {networkLoading && !network ? <MarketSkeleton className="iris-helius-market" label="Loading Helius network summary" labels={['TPS', 'TRUE TPS', 'AVG FEE']} /> : <div className="iris-helius-market" aria-label="Helius network summary">
           <span><b>TPS</b> : {number(network?.performance?.tps, 2)}</span><i>/</i>
           <span><b>TRUE TPS</b> : {number(network?.performance?.nonVoteTps, 2)}</span><i>/</i>
           <span><b>AVG FEE</b> : {sol(network?.fees?.averageFeeLamports)}</span>
@@ -71,8 +72,8 @@ function Navbar() {
   </>;
 }
 
-function MarketSkeleton({ className, label }) {
-  return <div className={`${className} iris-navbar-market-skeleton`} aria-label={label} aria-busy="true"><span /><span /><span /></div>;
+function MarketSkeleton({ className, label, labels }) {
+  return <div className={className} aria-label={label} aria-busy="true"><span><b>{labels[0]}</b> : <ValueSkeleton width="28px" /></span><i>/</i><span><b>{labels[1]}</b> : <ValueSkeleton width="32px" /></span><i>/</i><span><b>{labels[2]}</b> : <ValueSkeleton width="32px" /></span></div>;
 }
 
 export default Navbar;
