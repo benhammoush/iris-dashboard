@@ -21,8 +21,29 @@ export function useWorkerResource(load, dependencies = [], pollIntervalMs = 0) {
 
   useEffect(() => {
     if (!pollIntervalMs) return undefined;
-    const interval = setInterval(() => setReload((value) => value + 1), pollIntervalMs);
-    return () => clearInterval(interval);
+    let interval = null;
+    const startPolling = () => {
+      if (!document.hidden && interval === null) interval = setInterval(() => setReload((value) => value + 1), pollIntervalMs);
+    };
+    const stopPolling = () => {
+      if (interval !== null) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+    const onVisibilityChange = () => {
+      if (document.hidden) stopPolling();
+      else {
+        startPolling();
+        setReload((value) => value + 1);
+      }
+    };
+    startPolling();
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      stopPolling();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
   }, [pollIntervalMs]);
 
   return { ...state, refetch: () => setReload((value) => value + 1) };
