@@ -8,6 +8,7 @@ export interface VirtualTableColumn<T> {
   value: (row: T) => string | number
   cell: (row: T) => ReactNode
   align?: 'left' | 'right'
+  grow?: number
 }
 
 interface Props<T> {
@@ -51,13 +52,13 @@ export default function VirtualTable<T>({ columns, data, emptyLabel, filterPlace
     {!rows.length ? <p className="iris-empty">{filter ? 'No rows match this search.' : emptyLabel}</p> : <>
       <div ref={scrollRef} className="iris-table-scroll" style={{ height: Math.min(Math.max(displayedRows.length * rowHeight + rowHeight, rowHeight * 2), 360) }}>
         <div className="iris-table-head" role="row">
-          {columns.map((column) => <button key={column.id} style={{ width: column.width }} className={`iris-table-cell iris-table-cell--${column.align || 'left'}`} onClick={() => toggleSort(column.id)}>{column.label} {sort?.id === column.id ? (sort.direction === 'asc' ? '▲' : '▼') : '⇅'}</button>)}
+          {columns.map((column) => <button key={column.id} style={{ width: column.width, ...(column.grow ? { flex: `${column.grow} 1 ${column.width}px` } : {}) }} className={`iris-table-cell iris-table-cell--${column.align || 'left'}`} onClick={() => toggleSort(column.id)}>{column.label} {sort?.id === column.id ? (sort.direction === 'asc' ? '▲' : '▼') : '⇅'}</button>)}
         </div>
-        <div style={{ height: virtualizer.getTotalSize(), position: 'relative', minWidth: columns.reduce((width, column) => width + column.width, 0) }}>
+        <div style={{ height: virtualizer.getTotalSize(), position: 'relative', minWidth: columns.reduce((width, column) => width + column.width, 0), width: '100%' }}>
           {renderedRows.map((virtualRow) => {
             const row = displayedRows[virtualRow.index]
             return <div key={virtualRow.key} className={`iris-table-row${onRowClick ? ' iris-table-row--clickable' : ''}`} style={{ height: rowHeight, transform: `translateY(${virtualRow.start}px)` }} onClick={() => onRowClick?.(row)} onKeyDown={(event) => { if (onRowClick && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); onRowClick(row) } }} role={onRowClick ? 'button' : 'row'} tabIndex={onRowClick ? 0 : undefined}>
-              {columns.map((column) => <div key={column.id} style={{ width: column.width }} className={`iris-table-cell iris-table-cell--${column.align || 'left'}`}>{column.cell(row)}</div>)}
+              {columns.map((column) => <div key={column.id} style={{ width: column.width, ...(column.grow ? { flex: `${column.grow} 1 ${column.width}px` } : {}) }} className={`iris-table-cell iris-table-cell--${column.align || 'left'}`}>{column.cell(row)}</div>)}
             </div>
           })}
         </div>

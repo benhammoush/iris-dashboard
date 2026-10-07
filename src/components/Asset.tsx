@@ -20,20 +20,20 @@ type DistributionAccount = { rank: number, tokenAccount: string, owner: string |
 const dateTime = (value: string | null) => value && Number.isFinite(Date.parse(value)) ? new Date(value).toLocaleString('en-US') : 'Unknown time'
 const currentUsdValue = (amount: string | null, priceUsd: number | null) => amount === null || priceUsd === null || !Number.isFinite(Number(amount)) || !Number.isFinite(priceUsd) ? '—' : currency(Number(amount) * priceUsd, 2)
 const transactionColumns = (priceUsd: number | null): VirtualTableColumn<MintTransaction>[] => [
-  { id: 'time', label: 'Time', width: 190, value: (transaction) => transaction.timestamp || '', cell: (transaction) => dateTime(transaction.timestamp) },
-  { id: 'action', label: 'Action', width: 140, value: (transaction) => transaction.action || 'Unknown', cell: (transaction) => transaction.action || 'Unknown' },
-  { id: 'sender', label: 'Sender', width: 220, value: (transaction) => transaction.sender || '', cell: (transaction) => transaction.sender ? <a href={`/wallet/${encodeURIComponent(transaction.sender)}`} title={`Open ${transaction.sender} in Iris`}>{short(transaction.sender)}</a> : 'Mint' },
-  { id: 'recipient', label: 'Recipient', width: 220, value: (transaction) => transaction.recipient || '', cell: (transaction) => transaction.recipient ? <a href={`/wallet/${encodeURIComponent(transaction.recipient)}`} title={`Open ${transaction.recipient} in Iris`}>{short(transaction.recipient)}</a> : 'Burned' },
-  { id: 'amount', label: 'Amount', width: 190, value: (transaction) => transaction.amount || '', cell: (transaction) => transaction.amount || '—', align: 'right' },
-  { id: 'value', label: 'Value', width: 170, value: (transaction) => currentUsdValue(transaction.amount, priceUsd), cell: (transaction) => currentUsdValue(transaction.amount, priceUsd), align: 'right' },
-  { id: 'signature', label: 'Transaction', width: 210, value: (transaction) => transaction.signature, cell: (transaction) => { const url = solanaExplorerUrl('tx', transaction.signature); return url ? <a href={url} target="_blank" rel="noopener noreferrer" title={transaction.signature}>{short(transaction.signature)}</a> : short(transaction.signature) } },
+  { id: 'time', label: 'Time', width: 150, grow: 1, value: (transaction) => transaction.timestamp || '', cell: (transaction) => dateTime(transaction.timestamp) },
+  { id: 'action', label: 'Action', width: 115, grow: 1, value: (transaction) => transaction.action || 'Unknown', cell: (transaction) => transaction.action || 'Unknown' },
+  { id: 'sender', label: 'Sender', width: 150, grow: 2, value: (transaction) => transaction.sender || '', cell: (transaction) => transaction.sender ? <a href={`/wallet/${encodeURIComponent(transaction.sender)}`} title={`Open ${transaction.sender} in Iris`}>{short(transaction.sender)}</a> : 'Mint' },
+  { id: 'recipient', label: 'Recipient', width: 150, grow: 2, value: (transaction) => transaction.recipient || '', cell: (transaction) => transaction.recipient ? <a href={`/wallet/${encodeURIComponent(transaction.recipient)}`} title={`Open ${transaction.recipient} in Iris`}>{short(transaction.recipient)}</a> : 'Burned' },
+  { id: 'amount', label: 'Amount', width: 140, grow: 1, value: (transaction) => transaction.amount || '', cell: (transaction) => transaction.amount || '—', align: 'right' },
+  { id: 'value', label: 'Value', width: 140, grow: 1.3, value: (transaction) => currentUsdValue(transaction.amount, priceUsd), cell: (transaction) => currentUsdValue(transaction.amount, priceUsd), align: 'right' },
+  { id: 'signature', label: 'Transaction', width: 170, grow: 1.5, value: (transaction) => transaction.signature, cell: (transaction) => { const url = solanaExplorerUrl('tx', transaction.signature); return url ? <a href={url} target="_blank" rel="noopener noreferrer" title={transaction.signature}>{short(transaction.signature)}</a> : short(transaction.signature) } },
 ]
 const distributionColumns = (priceUsd: number | null): VirtualTableColumn<DistributionAccount>[] => [
-  { id: 'rank', label: 'Rank', width: 90, value: (account) => account.rank, cell: (account) => `#${account.rank}` },
-  { id: 'owner', label: 'Wallet', width: 350, value: (account) => account.owner || account.tokenAccount, cell: (account) => account.owner ? <a href={`/wallet/${encodeURIComponent(account.owner)}`} title={`Open ${account.owner} in Iris`}>{short(account.owner)}</a> : short(account.tokenAccount) },
-  { id: 'amount', label: 'Amount', width: 390, value: (account) => account.amount, cell: (account) => account.amount, align: 'right' },
-  { id: 'value', label: 'Value', width: 330, value: (account) => currentUsdValue(account.amount, priceUsd), cell: (account) => currentUsdValue(account.amount, priceUsd), align: 'right' },
-  { id: 'share', label: 'Supply share', width: 240, value: (account) => account.supplyPercent || '', cell: (account) => account.supplyPercent === null ? '—' : `${account.supplyPercent}%`, align: 'right' },
+  { id: 'rank', label: 'Rank', width: 70, grow: .5, value: (account) => account.rank, cell: (account) => `#${account.rank}` },
+  { id: 'owner', label: 'Wallet', width: 260, grow: 2, value: (account) => account.owner || account.tokenAccount, cell: (account) => account.owner ? <a href={`/wallet/${encodeURIComponent(account.owner)}`} title={`Open ${account.owner} in Iris`}>{short(account.owner)}</a> : short(account.tokenAccount) },
+  { id: 'amount', label: 'Amount', width: 220, grow: 2, value: (account) => account.amount, cell: (account) => account.amount, align: 'right' },
+  { id: 'value', label: 'Value', width: 220, grow: 2, value: (account) => currentUsdValue(account.amount, priceUsd), cell: (account) => currentUsdValue(account.amount, priceUsd), align: 'right' },
+  { id: 'share', label: 'Supply share', width: 160, grow: 1.3, value: (account) => account.supplyPercent || '', cell: (account) => account.supplyPercent === null ? '—' : `${account.supplyPercent}%`, align: 'right' },
 ]
 
 export default function Asset() {
