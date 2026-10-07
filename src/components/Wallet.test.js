@@ -18,9 +18,8 @@ const walletFixture = {
     mint: 'So11111111111111111111111111111111111111112',
     symbol: 'SOL',
     iconUrl: '/sol.png',
-    rawBalance: '42500000',
-    balance: 42.5,
-    displayBalance: '42.5 SOL',
+    atomicAmount: '42500000',
+    amount: '42.5',
     priceUsd: 2.5,
     valueUsd: 106.25,
   }],
@@ -54,26 +53,26 @@ test('renders a populated Worker wallet portfolio summary', async () => {
   expect(screen.getByText('1 / 2')).toBeInTheDocument();
   expect(screen.getByText(/1 unpriced holding/i)).toBeInTheDocument();
   expect(screen.getByText(/returned balances.*incomplete/i)).toBeInTheDocument();
-  expect(screen.getByText('42.5 SOL')).toBeInTheDocument();
+  expect(screen.getByText('42.5')).toBeInTheDocument();
   expect(screen.getByText('$106.25')).toBeInTheDocument();
   expect(screen.getByText('Priced')).toBeInTheDocument();
   expect(container.querySelector('img[src="/sol.png"]')).toBeInTheDocument();
 });
 
-test('renders multi-transfer activity without unreliable flattened value columns and loads cursor pages', async () => {
+test('renders asset-style per-transfer activity rows and loads cursor pages', async () => {
   renderWallet();
 
-  expect(await screen.findByText('solana-tx-1')).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: 'solana-tx-1' })).toHaveAttribute('rel', 'noopener noreferrer');
+  expect((await screen.findAllByTitle('solana-tx-1')).length).toBe(2);
+  expect(screen.getAllByTitle('solana-tx-1')[0]).toHaveAttribute('rel', 'noopener noreferrer');
   expect(screen.getAllByText('Sent').length).toBeGreaterThan(0);
-  expect(screen.getAllByText('Native SOL').length).toBeGreaterThan(0);
-  expect(screen.getAllByText('42500000 atomic units · decimals: 9').length).toBeGreaterThan(0);
-  expect(screen.getAllByText('JUP').length).toBeGreaterThan(0);
-  expect(screen.getAllByText('2000000 atomic units · decimals: 6').length).toBeGreaterThan(0);
-  expect(screen.queryByText('Value')).not.toBeInTheDocument();
+  expect(screen.getAllByText('42500000 atomic units (decimals: 9)').length).toBeGreaterThan(0);
+  expect(screen.getAllByText('2000000 atomic units (decimals: 6)').length).toBeGreaterThan(0);
+  expect(screen.getByRole('button', { name: /Sender/ })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Recipient/ })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Amount/ })).toBeInTheDocument();
   workerApi.walletTransactions.mockResolvedValueOnce({ data: { events: [{ id: 'solana-tx-26', type: 'Swap', source: 'Helius', status: 'Confirmed', description: 'Swap event', transfers: [{ symbol: 'JUP', mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', amount: '2', decimals: 6 }] }] } });
   await userEvent.click(screen.getByRole('button', { name: 'Load more' }));
-  expect(await screen.findByText('solana-tx-26')).toBeInTheDocument();
+  expect(await screen.findByTitle('solana-tx-26')).toBeInTheDocument();
 });
 
 test('shows an explicit transaction error and retries the initial activity request', async () => {
@@ -82,18 +81,18 @@ test('shows an explicit transaction error and retries the initial activity reque
 
   expect(await screen.findByText(/transaction history is unavailable/i)).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: 'Retry activity' }));
-  expect(await screen.findByText('solana-tx-1')).toBeInTheDocument();
+  expect((await screen.findAllByTitle('solana-tx-1')).length).toBe(2);
 });
 
 test('keeps loaded activity visible when loading a later page fails', async () => {
   renderWallet();
 
-  expect(await screen.findByText('solana-tx-1')).toBeInTheDocument();
+  expect((await screen.findAllByTitle('solana-tx-1')).length).toBe(2);
   workerApi.walletTransactions.mockRejectedValueOnce(new Error('Later page unavailable'));
   await userEvent.click(screen.getByRole('button', { name: 'Load more' }));
 
   expect(await screen.findByText(/could not load more transactions/i)).toBeInTheDocument();
-  expect(screen.getByText('solana-tx-1')).toBeInTheDocument();
+  expect(screen.getAllByTitle('solana-tx-1')[0]).toBeInTheDocument();
 });
 
 test('keeps the wallet layout and table columns visible while initial data loads', () => {
@@ -104,7 +103,7 @@ test('keeps the wallet layout and table columns visible while initial data loads
   expect(screen.getByRole('heading', { name: 'Holdings' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Transactions' })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Asset' })).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: 'Date' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Time' })).toBeInTheDocument();
   expect(container.querySelectorAll('.iris-value-skeleton').length).toBeGreaterThan(0);
   expect(screen.queryByLabelText('Loading content')).not.toBeInTheDocument();
 });
