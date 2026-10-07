@@ -101,7 +101,7 @@ test('keeps the wallet layout and table columns visible while initial data loads
   const { container } = renderWallet();
 
   expect(screen.getByRole('heading', { name: 'Holdings' })).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: 'Transactions' })).toBeInTheDocument();
+  expect(screen.getByRole('tab', { name: 'Transactions' })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Asset' })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Time' })).toBeInTheDocument();
   expect(container.querySelectorAll('.iris-value-skeleton').length).toBeGreaterThan(0);
