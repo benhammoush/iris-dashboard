@@ -52,10 +52,11 @@ test('renders a populated Worker wallet portfolio summary', async () => {
   expect(screen.getByText('$1,234.56')).toBeInTheDocument();
   expect(screen.getByText(/valuations can be partial/i)).toBeInTheDocument();
   expect(screen.getByText('1 / 2')).toBeInTheDocument();
-  expect(screen.getByText(/1 holdings are unpriced/i)).toBeInTheDocument();
+  expect(screen.getByText(/1 unpriced holding/i)).toBeInTheDocument();
   expect(screen.getByText(/returned balances.*incomplete/i)).toBeInTheDocument();
   expect(screen.getByText('42.5 SOL')).toBeInTheDocument();
   expect(screen.getByText('$106.25')).toBeInTheDocument();
+  expect(screen.getByText('Priced')).toBeInTheDocument();
   expect(container.querySelector('img[src="/sol.png"]')).toBeInTheDocument();
 });
 
@@ -64,13 +65,35 @@ test('renders multi-transfer activity without unreliable flattened value columns
 
   expect(await screen.findByText('solana-tx-1')).toBeInTheDocument();
   expect(screen.getByRole('link', { name: 'solana-tx-1' })).toHaveAttribute('rel', 'noopener noreferrer');
-  expect(screen.getAllByText(/Helius - Confirmed - Token transfer/).length).toBeGreaterThan(0);
-  expect(screen.getAllByText(/Native SOL: 42500000 atomic units \(decimals: 9\)/).length).toBeGreaterThan(0);
-  expect(screen.getAllByText(/JUP \(JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN\): 2000000 atomic units \(decimals: 6\)/).length).toBeGreaterThan(0);
+  expect(screen.getAllByText('Sent').length).toBeGreaterThan(0);
+  expect(screen.getAllByText('Native SOL').length).toBeGreaterThan(0);
+  expect(screen.getAllByText('42500000 atomic units · decimals: 9').length).toBeGreaterThan(0);
+  expect(screen.getAllByText('JUP').length).toBeGreaterThan(0);
+  expect(screen.getAllByText('2000000 atomic units · decimals: 6').length).toBeGreaterThan(0);
   expect(screen.queryByText('Value')).not.toBeInTheDocument();
   workerApi.walletTransactions.mockResolvedValueOnce({ data: { events: [{ id: 'solana-tx-26', type: 'Swap', source: 'Helius', status: 'Confirmed', description: 'Swap event', transfers: [{ symbol: 'JUP', mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', amount: '2', decimals: 6 }] }] } });
   await userEvent.click(screen.getByRole('button', { name: 'Load more' }));
   expect(await screen.findByText('solana-tx-26')).toBeInTheDocument();
+});
+
+test('shows an explicit transaction error and retries the initial activity request', async () => {
+  workerApi.walletTransactions.mockRejectedValueOnce(new Error('Helius unavailable'));
+  renderWallet();
+
+  expect(await screen.findByText(/transaction history is unavailable/i)).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'Retry activity' }));
+  expect(await screen.findByText('solana-tx-1')).toBeInTheDocument();
+});
+
+test('keeps loaded activity visible when loading a later page fails', async () => {
+  renderWallet();
+
+  expect(await screen.findByText('solana-tx-1')).toBeInTheDocument();
+  workerApi.walletTransactions.mockRejectedValueOnce(new Error('Later page unavailable'));
+  await userEvent.click(screen.getByRole('button', { name: 'Load more' }));
+
+  expect(await screen.findByText(/could not load more transactions/i)).toBeInTheDocument();
+  expect(screen.getByText('solana-tx-1')).toBeInTheDocument();
 });
 
 test('keeps the wallet layout and table columns visible while initial data loads', () => {

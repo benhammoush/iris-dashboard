@@ -29,8 +29,10 @@ export function walletFrom(data) {
     assets: (Array.isArray(wallet.balances) ? wallet.balances : []).map((asset) => ({
       ...asset,
       symbol: asset.symbol,
+      name: asset.name || asset.symbol,
       mint: asset.mint,
       imageUrl: asset.iconUrl,
+      atomicAmount: asset.atomicAmount,
       rawBalance: asset.rawBalance,
       balance: asset.balance,
       displayBalance: asset.displayBalance,
