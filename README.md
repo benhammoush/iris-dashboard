@@ -2,6 +2,8 @@
 
 Iris is a Vite market monitor and public-wallet viewer backed only by the Iris Worker API. The browser never contacts chain, pricing, or legacy application providers directly.
 
+For the detailed frontend-to-Worker organigram, request map, cache layers, provider boundaries, and refresh flow, see the Worker repository's [`ARCHITECTURE.md`](https://github.com/benhammoush/iris-worker-api/blob/main/ARCHITECTURE.md).
+
 ## Architecture
 
 `src/api/client.js` is the sole HTTP client. It reads `VITE_API_BASE`, adds request IDs, applies a 10-second timeout, parses Worker response envelopes (`{ data, meta }`), and normalizes failures. `src/api/worker.js` calls the Worker `/v3` routes for assets, per-mint Birdeye candles and compatibility history, the DefiLlama dashboard, wallet summaries, and cursor-paginated wallet transactions.
