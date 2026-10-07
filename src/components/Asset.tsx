@@ -20,17 +20,17 @@ type DistributionAccount = { rank: number, tokenAccount: string, owner: string |
 const dateTime = (value: string | null) => value && Number.isFinite(Date.parse(value)) ? new Date(value).toLocaleString('en-US') : 'Unknown time'
 const transferSummary = (transaction: MintTransaction) => transaction.transfers.length ? transaction.transfers.map((transfer) => `${transfer.amount} ${transfer.from ? `from ${short(transfer.from)}` : 'minted'} ${transfer.to ? `to ${short(transfer.to)}` : 'burned'}`).join(', ') : transaction.summary || 'Transfer details unavailable'
 const transactionColumns: VirtualTableColumn<MintTransaction>[] = [
-  { id: 'time', label: 'Time', width: 170, value: (transaction) => transaction.timestamp || '', cell: (transaction) => dateTime(transaction.timestamp) },
-  { id: 'action', label: 'Action', width: 150, value: (transaction) => transaction.action || 'Unknown', cell: (transaction) => transaction.action || 'Unknown' },
-  { id: 'transfers', label: 'Transfers', width: 340, value: transferSummary, cell: transferSummary },
-  { id: 'protocol', label: 'Protocol', width: 140, value: (transaction) => transaction.protocol || 'On-chain', cell: (transaction) => transaction.protocol || 'On-chain' },
-  { id: 'signature', label: 'Signature', width: 160, value: (transaction) => transaction.signature, cell: (transaction) => { const url = solanaExplorerUrl('tx', transaction.signature); return url ? <a href={url} target="_blank" rel="noopener noreferrer" title={transaction.signature}>{short(transaction.signature)}</a> : short(transaction.signature) } },
+  { id: 'time', label: 'Time', width: 210, value: (transaction) => transaction.timestamp || '', cell: (transaction) => dateTime(transaction.timestamp) },
+  { id: 'action', label: 'Action', width: 160, value: (transaction) => transaction.action || 'Unknown', cell: (transaction) => transaction.action || 'Unknown' },
+  { id: 'transfers', label: 'Transfers', width: 610, value: transferSummary, cell: transferSummary },
+  { id: 'protocol', label: 'Protocol', width: 190, value: (transaction) => transaction.protocol || 'On-chain', cell: (transaction) => transaction.protocol || 'On-chain' },
+  { id: 'signature', label: 'Signature', width: 210, value: (transaction) => transaction.signature, cell: (transaction) => { const url = solanaExplorerUrl('tx', transaction.signature); return url ? <a href={url} target="_blank" rel="noopener noreferrer" title={transaction.signature}>{short(transaction.signature)}</a> : short(transaction.signature) } },
 ]
 const distributionColumns: VirtualTableColumn<DistributionAccount>[] = [
-  { id: 'rank', label: 'Rank', width: 70, value: (account) => account.rank, cell: (account) => `#${account.rank}` },
-  { id: 'owner', label: 'Wallet', width: 220, value: (account) => account.owner || account.tokenAccount, cell: (account) => account.owner ? <a href={`/wallet/${encodeURIComponent(account.owner)}`} title={`Open ${account.owner} in Iris`}>{short(account.owner)}</a> : short(account.tokenAccount) },
-  { id: 'balance', label: 'Balance', width: 230, value: (account) => account.amount, cell: (account) => account.amount, align: 'right' },
-  { id: 'share', label: 'Supply share', width: 110, value: (account) => account.supplyPercent || '', cell: (account) => account.supplyPercent === null ? '—' : `${account.supplyPercent}%`, align: 'right' },
+  { id: 'rank', label: 'Rank', width: 100, value: (account) => account.rank, cell: (account) => `#${account.rank}` },
+  { id: 'owner', label: 'Wallet', width: 420, value: (account) => account.owner || account.tokenAccount, cell: (account) => account.owner ? <a href={`/wallet/${encodeURIComponent(account.owner)}`} title={`Open ${account.owner} in Iris`}>{short(account.owner)}</a> : short(account.tokenAccount) },
+  { id: 'balance', label: 'Balance', width: 520, value: (account) => account.amount, cell: (account) => account.amount, align: 'right' },
+  { id: 'share', label: 'Supply share', width: 330, value: (account) => account.supplyPercent || '', cell: (account) => account.supplyPercent === null ? '—' : `${account.supplyPercent}%`, align: 'right' },
 ]
 
 export default function Asset() {
