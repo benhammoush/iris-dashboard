@@ -23,8 +23,8 @@ function sol(lamports) {
 }
 
 function Navbar() {
-  const { assets } = useCatalog();
-  const { network } = useHeliusDashboard();
+  const { assets, loading: assetsLoading } = useCatalog();
+  const { network, loading: networkLoading } = useHeliusDashboard();
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
   const { mode, setMode } = useTheme();
@@ -53,22 +53,26 @@ function Navbar() {
             {!assetMatches.length && !publicAddress && <li><button disabled>No loaded matches.</button></li>}
         </ul>}
        </div>
-        {navbarMarket && <div className="iris-jupiter-market" aria-label={`${navbarMarket.symbol} market summary`}>
+        {assetsLoading && !navbarMarket ? <MarketSkeleton className="iris-jupiter-market" label="Loading Jupiter market summary" /> : navbarMarket && <div className="iris-jupiter-market" aria-label={`${navbarMarket.symbol} market summary`}>
           <span><b>{navbarMarket.symbol}</b> : {money(navbarMarket.priceUsd)}</span><i>/</i>
           <span><b>MCAP</b> : {millions(navbarMarket.marketCapUsd)}</span><i>/</i>
           <span><b>24HVOL</b> : {millions(navbarMarket.activity?.volume24hUsd)}</span>
         </div>}
-        <div className="iris-helius-market" aria-label="Helius network summary">
+        {networkLoading && !network ? <MarketSkeleton className="iris-helius-market" label="Loading Helius network summary" /> : <div className="iris-helius-market" aria-label="Helius network summary">
           <span><b>TPS</b> : {number(network?.performance?.tps, 2)}</span><i>/</i>
           <span><b>TRUE TPS</b> : {number(network?.performance?.nonVoteTps, 2)}</span><i>/</i>
           <span><b>AVG FEE</b> : {sol(network?.fees?.averageFeeLamports)}</span>
-        </div>
+        </div>}
         <div className="iris-header-actions">
         <button className="iris-theme-button" onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')} aria-label="Toggle color theme">{mode === 'dark' ? 'LIGHT' : 'DARK'}</button>
       </div>
     </header>
     <nav className="iris-mobile-nav" aria-label="Mobile navigation"><NavLink to="/" end>Home</NavLink></nav>
   </>;
+}
+
+function MarketSkeleton({ className, label }) {
+  return <div className={`${className} iris-navbar-market-skeleton`} aria-label={label} aria-busy="true"><span /><span /><span /></div>;
 }
 
 export default Navbar;
