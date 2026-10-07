@@ -20,6 +20,8 @@ export const workerApi = {
   assets: (options) => withFixture('/v3/assets', fixtures.assets, options),
   catalogs: (options) => withFixture('/v3/catalogs', { topTraded: fixtures.assets, trending: [], recent: [] }, options),
   asset: (mint, options) => withFixture(`/v3/assets/mint/${encodeURIComponent(mint)}?includeHistory=false`, fixtures.assets.find((asset) => asset.mint === mint) || null, options),
+  assetOnchain: (mint, options) => apiGet(`/v3/assets/mint/${encodeURIComponent(mint)}/onchain`, options),
+  assetHolders: (mint, page = 1, options) => apiGet(`/v3/assets/mint/${encodeURIComponent(mint)}/holders?page=${page}`, options),
   assetHistory: (mint, range = '7d', options) => withFixture(`/v3/assets/mint/${encodeURIComponent(mint)}/history?range=${range}`, [], options),
   assetCandles: (mint, timeframe = '1H', options, before = /** @type {number | null} */ (null)) => withFixture(`/v3/assets/mint/${encodeURIComponent(mint)}/candles?${new URLSearchParams({ timeframe, ...(before === null ? {} : { before: String(before) }) })}`, { candles: [] }, options),
   swaps: (options) => withFixture('/v3/swaps', fixtures.swaps, options),

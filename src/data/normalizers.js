@@ -112,6 +112,24 @@ export function assetCandlesFrom(data) {
   });
 }
 
+export function assetOnchainFrom(data) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+  const mintState = data.mintState && typeof data.mintState === 'object' ? data.mintState : {};
+  const metadata = data.metadata && typeof data.metadata === 'object' ? data.metadata : {};
+  return {
+    mint: typeof data.mint === 'string' ? data.mint : null,
+    interface: typeof data.interface === 'string' ? data.interface : null,
+    tokenProgram: typeof data.tokenProgram === 'string' ? data.tokenProgram : null,
+    metadata: { description: typeof metadata.description === 'string' ? metadata.description : null },
+    mintState: { supplyAtomic: typeof mintState.supplyAtomic === 'string' ? mintState.supplyAtomic : null, supply: typeof mintState.supply === 'string' ? mintState.supply : null, mintAuthority: typeof mintState.mintAuthority === 'string' ? mintState.mintAuthority : null, freezeAuthority: typeof mintState.freezeAuthority === 'string' ? mintState.freezeAuthority : null, isMutable: typeof mintState.isMutable === 'boolean' ? mintState.isMutable : null, extensions: Array.isArray(mintState.extensions) ? mintState.extensions.filter((extension) => typeof extension === 'string') : [] }
+  };
+}
+
+export function assetHoldersFrom(data) {
+  const holders = Array.isArray(data?.holders) ? data.holders : [];
+  return { holders: holders.flatMap((holder) => typeof holder?.owner === 'string' && typeof holder?.amount === 'string' ? [{ tokenAccount: typeof holder.tokenAccount === 'string' ? holder.tokenAccount : null, owner: holder.owner, amount: holder.amount, frozen: typeof holder.frozen === 'boolean' ? holder.frozen : null }] : []), total: Number.isInteger(data?.total) ? data.total : null };
+}
+
 export function networkFrom(data) {
   return data && typeof data === 'object' && !Array.isArray(data) ? data : null;
 }
