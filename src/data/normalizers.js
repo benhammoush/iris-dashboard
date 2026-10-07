@@ -130,6 +130,16 @@ export function assetHoldersFrom(data) {
   return { holders: holders.flatMap((holder) => typeof holder?.owner === 'string' && typeof holder?.amount === 'string' ? [{ tokenAccount: typeof holder.tokenAccount === 'string' ? holder.tokenAccount : null, owner: holder.owner, amount: holder.amount, frozen: typeof holder.frozen === 'boolean' ? holder.frozen : null }] : []), total: Number.isInteger(data?.total) ? data.total : null };
 }
 
+export function assetDistributionFrom(data) {
+  const accounts = Array.isArray(data?.accounts) ? data.accounts : [];
+  return accounts.flatMap((account) => Number.isInteger(account?.rank) && typeof account?.tokenAccount === 'string' && typeof account?.amount === 'string' ? [{ rank: account.rank, tokenAccount: account.tokenAccount, owner: typeof account.owner === 'string' ? account.owner : null, amount: account.amount, supplyPercent: typeof account.supplyPercent === 'string' ? account.supplyPercent : null, frozen: typeof account.frozen === 'boolean' ? account.frozen : null }] : []);
+}
+
+export function assetTransactionsFrom(data) {
+  const transactions = Array.isArray(data?.transactions) ? data.transactions : [];
+  return transactions.flatMap((transaction) => typeof transaction?.signature === 'string' ? [{ signature: transaction.signature, timestamp: typeof transaction.timestamp === 'string' ? transaction.timestamp : null, status: transaction.status === 'success' || transaction.status === 'failed' ? transaction.status : null, action: typeof transaction.action === 'string' ? transaction.action : null, protocol: typeof transaction.protocol === 'string' ? transaction.protocol : null, summary: typeof transaction.summary === 'string' ? transaction.summary : null }] : []);
+}
+
 export function networkFrom(data) {
   return data && typeof data === 'object' && !Array.isArray(data) ? data : null;
 }

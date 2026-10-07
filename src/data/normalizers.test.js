@@ -1,4 +1,4 @@
-import { assetCandlesFrom, assetHoldersFrom, assetHistoryFrom, assetOnchainFrom, assetsFrom, defillamaFrom, recentTransactionsFrom, transactionsFrom, walletFrom } from './normalizers';
+import { assetCandlesFrom, assetDistributionFrom, assetHoldersFrom, assetHistoryFrom, assetOnchainFrom, assetTransactionsFrom, assetsFrom, defillamaFrom, recentTransactionsFrom, transactionsFrom, walletFrom } from './normalizers';
 
 test('normalizes canonical v3 assets and atomic transaction events', () => {
   const [asset] = assetsFrom({ assets: [{ mint: 'MintCaseSensitiveABC', symbol: 'TEST', iconUrl: '/test.png', priceUsd: 2, quality: { organicScore: 84 } }] });
@@ -22,6 +22,8 @@ test('keeps nullable Worker market fields and ignores unavailable history', () =
 test('normalizes Helius on-chain profiles and token account records without number conversion', () => {
   expect(assetOnchainFrom({ mint: 'MintCaseSensitiveABC', interface: 'FungibleToken', tokenProgram: 'Tokenkeg', metadata: { description: 'Example token' }, mintState: { supplyAtomic: '9007199254740993123', supply: '9007199254740.993123', mintAuthority: null, freezeAuthority: 'authority', isMutable: false, extensions: ['transferFeeConfig'] } })).toMatchObject({ mint: 'MintCaseSensitiveABC', interface: 'FungibleToken', mintState: { supplyAtomic: '9007199254740993123', supply: '9007199254740.993123', extensions: ['transferFeeConfig'] } });
   expect(assetHoldersFrom({ total: 1, holders: [{ tokenAccount: 'account', owner: 'owner', amount: '2.5', atomicAmount: '2500000', frozen: false }] })).toEqual({ total: 1, holders: [{ tokenAccount: 'account', owner: 'owner', amount: '2.5', frozen: false }] });
+  expect(assetDistributionFrom({ accounts: [{ rank: 1, tokenAccount: 'account', owner: 'owner', amount: '2.5', supplyPercent: '25.00', frozen: false }] })).toEqual([{ rank: 1, tokenAccount: 'account', owner: 'owner', amount: '2.5', supplyPercent: '25.00', frozen: false }]);
+  expect(assetTransactionsFrom({ transactions: [{ signature: 'signature', status: 'success', action: 'mint' }] })).toEqual([{ signature: 'signature', timestamp: null, status: 'success', action: 'mint', protocol: null, summary: null }]);
 });
 
 test('keeps canonical wallet identifiers and holdings truncation', () => {
