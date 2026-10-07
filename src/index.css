@@ -20,7 +20,7 @@ button, input { font: inherit; }
 .iris-nav a { padding: 4px 9px; border: 1px solid transparent; border-radius: 3px; color: var(--iris-secondary-text); font-size: 12px; text-decoration: none; }
 .iris-nav a:hover, .iris-nav a.active { border-color: var(--iris-border-strong); background: var(--iris-hover); color: var(--iris-text); }
 .iris-search { position: relative; flex: 0 0 min(460px, 32vw); width: min(460px, 32vw); margin-left: 4px; }
-.iris-search-input-wrap { display: flex; align-items: center; }
+.iris-search-input-wrap { display: flex; width: 100%; align-items: center; }
 .iris-search input { width: 100%; border: 1px solid var(--iris-border); border-radius: 4px; outline: none; background: var(--iris-input); color: var(--iris-text); padding: 5px 9px; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 11px; }
 .iris-search input:focus { border-color: var(--iris-border-strong); }
 .iris-search-close, .iris-mobile-search-toggle { display: none; }
