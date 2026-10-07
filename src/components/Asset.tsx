@@ -15,24 +15,22 @@ const compactCurrency = (value: number | null | undefined) => value === null || 
 const compactQuantity = (value: number | null | undefined) => value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 }).format(Number(value))
 const timeframeGroups: [string, string[]][] = [['Seconds', ['1s', '15s', '30s']], ['Minutes', ['1m', '3m', '5m', '15m', '30m']], ['Hours', ['1H', '2H', '4H', '6H', '8H', '12H']], ['Days+', ['1D', '3D', '1W', '1M']]]
 const primaryTimeframes = [['1m', '1m'], ['30m', '30m'], ['1h', '1H'], ['1d', '1D'], ['1mn', '1M']]
-type MintTransaction = { signature: string, timestamp: string | null, status: string | null, action: string | null, protocol: string | null, summary: string | null }
+type MintTransaction = { signature: string, timestamp: string | null, action: string | null, protocol: string | null, summary: string | null, transfers: Array<{ amount: string, from: string | null, to: string | null }> }
 type DistributionAccount = { rank: number, tokenAccount: string, owner: string | null, amount: string, supplyPercent: string | null, frozen: boolean | null }
 const dateTime = (value: string | null) => value && Number.isFinite(Date.parse(value)) ? new Date(value).toLocaleString('en-US') : 'Unknown time'
+const transferSummary = (transaction: MintTransaction) => transaction.transfers.length ? transaction.transfers.map((transfer) => `${transfer.amount} ${transfer.from ? `from ${short(transfer.from)}` : 'minted'} ${transfer.to ? `to ${short(transfer.to)}` : 'burned'}`).join(', ') : transaction.summary || 'Transfer details unavailable'
 const transactionColumns: VirtualTableColumn<MintTransaction>[] = [
   { id: 'time', label: 'Time', width: 170, value: (transaction) => transaction.timestamp || '', cell: (transaction) => dateTime(transaction.timestamp) },
   { id: 'action', label: 'Action', width: 150, value: (transaction) => transaction.action || 'Unknown', cell: (transaction) => transaction.action || 'Unknown' },
-  { id: 'summary', label: 'Provider summary', width: 300, value: (transaction) => transaction.summary || '', cell: (transaction) => transaction.summary || 'Unavailable' },
+  { id: 'transfers', label: 'Transfers', width: 340, value: transferSummary, cell: transferSummary },
   { id: 'protocol', label: 'Protocol', width: 140, value: (transaction) => transaction.protocol || 'On-chain', cell: (transaction) => transaction.protocol || 'On-chain' },
-  { id: 'status', label: 'Status', width: 90, value: (transaction) => transaction.status || 'Unknown', cell: (transaction) => transaction.status || 'Unknown' },
   { id: 'signature', label: 'Signature', width: 160, value: (transaction) => transaction.signature, cell: (transaction) => { const url = solanaExplorerUrl('tx', transaction.signature); return url ? <a href={url} target="_blank" rel="noopener noreferrer" title={transaction.signature}>{short(transaction.signature)}</a> : short(transaction.signature) } },
 ]
 const distributionColumns: VirtualTableColumn<DistributionAccount>[] = [
   { id: 'rank', label: 'Rank', width: 70, value: (account) => account.rank, cell: (account) => `#${account.rank}` },
-  { id: 'owner', label: 'Owner', width: 150, value: (account) => account.owner || account.tokenAccount, cell: (account) => account.owner ? <a href={`/wallet/${encodeURIComponent(account.owner)}`} title={`Open ${account.owner} in Iris`}>{short(account.owner)}</a> : short(account.tokenAccount) },
-  { id: 'account', label: 'Token account', width: 160, value: (account) => account.tokenAccount, cell: (account) => { const url = solanaExplorerUrl('address', account.tokenAccount); return url ? <a href={url} target="_blank" rel="noopener noreferrer" title={account.tokenAccount}>{short(account.tokenAccount)}</a> : short(account.tokenAccount) } },
-  { id: 'balance', label: 'Balance', width: 180, value: (account) => account.amount, cell: (account) => account.amount, align: 'right' },
+  { id: 'owner', label: 'Wallet', width: 220, value: (account) => account.owner || account.tokenAccount, cell: (account) => account.owner ? <a href={`/wallet/${encodeURIComponent(account.owner)}`} title={`Open ${account.owner} in Iris`}>{short(account.owner)}</a> : short(account.tokenAccount) },
+  { id: 'balance', label: 'Balance', width: 230, value: (account) => account.amount, cell: (account) => account.amount, align: 'right' },
   { id: 'share', label: 'Supply share', width: 110, value: (account) => account.supplyPercent || '', cell: (account) => account.supplyPercent === null ? '—' : `${account.supplyPercent}%`, align: 'right' },
-  { id: 'state', label: 'State', width: 90, value: (account) => account.frozen ? 'Frozen' : 'Active', cell: (account) => account.frozen ? 'Frozen' : 'Active' },
 ]
 
 export default function Asset() {

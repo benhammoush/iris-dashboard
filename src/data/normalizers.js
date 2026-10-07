@@ -137,7 +137,7 @@ export function assetDistributionFrom(data) {
 
 export function assetTransactionsFrom(data) {
   const transactions = Array.isArray(data?.transactions) ? data.transactions : [];
-  return transactions.flatMap((transaction) => typeof transaction?.signature === 'string' ? [{ signature: transaction.signature, timestamp: typeof transaction.timestamp === 'string' ? transaction.timestamp : null, status: transaction.status === 'success' || transaction.status === 'failed' ? transaction.status : null, action: typeof transaction.action === 'string' ? transaction.action : null, protocol: typeof transaction.protocol === 'string' ? transaction.protocol : null, summary: typeof transaction.summary === 'string' ? transaction.summary : null }] : []);
+  return transactions.flatMap((transaction) => typeof transaction?.signature === 'string' ? [{ signature: transaction.signature, timestamp: typeof transaction.timestamp === 'string' ? transaction.timestamp : null, action: typeof transaction.action === 'string' ? transaction.action : null, protocol: typeof transaction.protocol === 'string' ? transaction.protocol : null, summary: typeof transaction.summary === 'string' ? transaction.summary : null, transfers: Array.isArray(transaction.transfers) ? transaction.transfers.flatMap((transfer) => typeof transfer?.amount === 'string' ? [{ amount: transfer.amount, from: typeof transfer.from === 'string' ? transfer.from : null, to: typeof transfer.to === 'string' ? transfer.to : null }] : []) : [] }] : []);
 }
 
 export function networkFrom(data) {
