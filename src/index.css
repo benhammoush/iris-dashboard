@@ -202,6 +202,7 @@ html[data-theme='light'] .iris-defillama-lists .iris-catalog-list-rows { scrollb
   .iris-jupiter-dex-label { flex-direction: row; align-items: center; border-right: 0; border-bottom: 1px solid rgba(255, 255, 255, .1); padding: 14px; }
    .iris-jupiter-badge { margin-top: 0; margin-left: auto; }
   .iris-metric-card { min-height: 96px; }
+  .iris-jupiter-market-data .iris-panel-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
      .iris-helius-grid, .iris-defillama-lists { grid-template-columns: 1fr; }.iris-helius-column + .iris-helius-column { border-top: 1px solid rgba(255, 255, 255, .1); border-left: 0; }
    .iris-recent-transaction-head, .iris-recent-transaction-row { grid-template-columns: minmax(88px, 1.2fr) 54px 68px minmax(64px, .9fr); column-gap: 7px; }
    .iris-chart-panel { min-height: 350px; }
@@ -209,9 +210,14 @@ html[data-theme='light'] .iris-defillama-lists .iris-catalog-list-rows { scrollb
 }
 
 @media (min-width: 721px) and (max-width: 1060px) {
+  .iris-jupiter-market-data .iris-panel-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .iris-jupiter-dex { grid-template-columns: 1fr; }
   .iris-jupiter-dex-label { flex-direction: row; align-items: center; border-right: 0; border-bottom: 1px solid rgba(255, 255, 255, .1); padding: 14px 18px; }
    .iris-jupiter-badge { margin-top: 0; margin-left: auto; }
+}
+
+@media (max-width: 380px) {
+  .iris-jupiter-market-data .iris-panel-metrics { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
