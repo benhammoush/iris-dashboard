@@ -20,14 +20,19 @@ button, input { font: inherit; }
 .iris-nav a { padding: 4px 9px; border: 1px solid transparent; border-radius: 3px; color: var(--iris-secondary-text); font-size: 12px; text-decoration: none; }
 .iris-nav a:hover, .iris-nav a.active { border-color: var(--iris-border-strong); background: var(--iris-hover); color: var(--iris-text); }
 .iris-search { position: relative; width: min(360px, 30vw); margin-left: 4px; }
+.iris-search-input-wrap { display: flex; align-items: center; }
 .iris-search input { width: 100%; border: 1px solid var(--iris-border); border-radius: 4px; outline: none; background: var(--iris-input); color: var(--iris-text); padding: 5px 9px; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 11px; }
 .iris-search input:focus { border-color: var(--iris-border-strong); }
+.iris-search-close, .iris-mobile-search-toggle { display: none; }
+.iris-search-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 .iris-jupiter-market { align-self: center; display: flex; min-width: 0; align-items: center; gap: 6px; height: 27px; margin-left: 0; padding: 0 9px; overflow: hidden; border: 1px solid rgba(125, 249, 179, .42); border-left: 3px solid #76dca9; border-radius: 4px; background: radial-gradient(circle at 0 0, rgba(54, 215, 255, .2), transparent 62%), linear-gradient(135deg, rgba(13, 50, 47, .98), #0a0d0e 72%); color: #f6fffc; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; white-space: nowrap; }.iris-jupiter-market b { color: #fff; font-size: 9px; letter-spacing: .3px; }.iris-jupiter-market i { color: rgba(202, 255, 232, .48); font-style: normal; }.iris-jupiter-market + .iris-header-actions { margin-left: auto; }
 .iris-helius-market { align-self: center; display: flex; min-width: 0; align-items: center; gap: 6px; height: 27px; margin-left: 0; padding: 0 9px; overflow: hidden; border: 1px solid rgba(255, 163, 77, .48); border-left: 3px solid #ff9a45; border-radius: 4px; background: radial-gradient(circle at 0 0, rgba(255, 143, 54, .25), transparent 62%), linear-gradient(135deg, rgba(70, 32, 10, .98), #0d0a08 72%); color: #fff9f2; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 10px; white-space: nowrap; }.iris-helius-market b { color: #fff; font-size: 9px; letter-spacing: .3px; }.iris-helius-market i { color: rgba(255, 201, 151, .56); font-style: normal; }.iris-helius-market + .iris-header-actions { margin-left: auto; }
 .iris-navbar-market-skeleton { gap: 5px; }.iris-navbar-market-skeleton span { display: block; height: 7px; border-radius: 999px; background: linear-gradient(90deg, rgba(255, 255, 255, .12) 20%, rgba(255, 255, 255, .35) 45%, rgba(255, 255, 255, .12) 70%); background-size: 280% 100%; animation: iris-skeleton-pulse 1.5s ease-in-out infinite; }.iris-navbar-market-skeleton span:nth-child(1) { width: 32px; }.iris-navbar-market-skeleton span:nth-child(2) { width: 46px; }.iris-navbar-market-skeleton span:nth-child(3) { width: 40px; }
-.iris-results { position: absolute; top: calc(100% + 5px); right: 0; left: 0; margin: 0; padding: 4px; list-style: none; border: 1px solid var(--iris-border); border-radius: 4px; background: var(--iris-secondary); box-shadow: var(--iris-dropdown-shadow); }
-.iris-results button { width: 100%; border: 0; border-radius: 3px; background: transparent; color: var(--iris-text); cursor: pointer; padding: 6px 8px; text-align: left; font-size: 11px; }
-.iris-results button:hover { background: var(--iris-hover); }
+.iris-results { position: absolute; z-index: 70; top: calc(100% + 5px); right: 0; left: 0; max-height: min(310px, calc(100vh - 80px)); margin: 0; overflow-y: auto; padding: 4px; list-style: none; border: 1px solid var(--iris-border); border-radius: 4px; background: var(--iris-secondary); box-shadow: var(--iris-dropdown-shadow); }
+.iris-results button { display: grid; gap: 2px; width: 100%; border: 0; border-radius: 3px; background: transparent; color: var(--iris-text); cursor: pointer; padding: 7px 8px; text-align: left; font-size: 11px; }
+.iris-results button small { overflow: hidden; color: var(--iris-muted); font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.iris-results button:hover, .iris-results button.active, .iris-results button:focus-visible { background: var(--iris-hover); outline: none; }
+.iris-search-message { padding: 8px; color: var(--iris-muted); font-size: 11px; line-height: 1.4; }
 .iris-header-actions { gap: 8px; margin-left: auto; }
 .iris-theme-button { cursor: pointer; border: 1px solid var(--iris-border); border-radius: 3px; background: transparent; padding: 3px 8px; }
 .iris-theme-button:hover { background: var(--iris-hover); color: var(--iris-text); }
@@ -195,7 +200,15 @@ html[data-theme='light'] .iris-wallet-hero { border-color: rgba(8, 145, 178, .28
 
 @media (max-width: 720px) {
   .iris-header { height: 48px; padding: 0 14px; }
-  .iris-header .iris-divider, .iris-nav, .iris-search, .iris-status, .iris-jupiter-market, .iris-helius-market { display: none; }
+  .iris-header .iris-divider, .iris-nav, .iris-status, .iris-jupiter-market, .iris-helius-market { display: none; }
+  .iris-search { display: none; }
+  .iris-search[data-mobile-open] { position: absolute; top: 48px; right: 0; left: 0; z-index: 70; display: block; width: auto; margin: 0; padding: 10px 14px; border-bottom: 1px solid var(--iris-border); background: var(--iris-secondary); box-shadow: var(--iris-dropdown-shadow); }
+  .iris-search[data-mobile-open] .iris-search-input-wrap { gap: 8px; }
+  .iris-search[data-mobile-open] .iris-search-close { display: block; border: 1px solid var(--iris-border); border-radius: 3px; background: transparent; color: var(--iris-secondary-text); cursor: pointer; padding: 5px 8px; font: 10px ui-monospace, 'Cascadia Code', Consolas, monospace; }
+  .iris-search[data-mobile-open] .iris-search-close:hover, .iris-search[data-mobile-open] .iris-search-close:focus-visible { background: var(--iris-hover); color: var(--iris-text); outline: none; }
+  .iris-search[data-mobile-open] .iris-results { top: calc(100% - 1px); right: 14px; left: 14px; max-height: min(360px, calc(100vh - 130px)); border-top-left-radius: 0; border-top-right-radius: 0; }
+  .iris-mobile-search-toggle { display: block; border: 1px solid var(--iris-border); border-radius: 3px; background: transparent; color: var(--iris-muted); cursor: pointer; padding: 3px 7px; font: 10px ui-monospace, 'Cascadia Code', Consolas, monospace; }
+  .iris-mobile-search-toggle:hover, .iris-mobile-search-toggle:focus-visible { background: var(--iris-hover); color: var(--iris-text); outline: none; }
   .iris-brand-name { font-size: 13px; }
   .iris-header-actions { margin-left: auto; }
   .iris-mobile-nav { position: fixed; right: 0; bottom: 0; left: 0; z-index: 50; display: flex; height: calc(56px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); background: var(--iris-secondary); border-top: 1px solid var(--iris-border); }
