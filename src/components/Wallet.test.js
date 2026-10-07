@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { vi } from 'vitest';
@@ -50,8 +50,15 @@ test('renders a populated Worker wallet portfolio summary', async () => {
   expect(await screen.findByText('Curated Wallet')).toBeInTheDocument();
   expect(screen.getByText('$1,234.56')).toBeInTheDocument();
   expect(screen.getByText(/valuations can be partial/i)).toBeInTheDocument();
-  expect(screen.getByText('1 / 2')).toBeInTheDocument();
-  expect(screen.getByText(/1 unpriced holding/i)).toBeInTheDocument();
+  const metrics = within(container.querySelector('.iris-wallet-hero-metrics'));
+  expect(metrics.getByText('Assets')).toBeInTheDocument();
+  expect(metrics.getByText('Transactions')).toBeInTheDocument();
+  expect(metrics.getByText('1')).toBeInTheDocument();
+  expect(metrics.getByText('25')).toBeInTheDocument();
+  expect(metrics.getByText('Assets returned by the Worker')).toBeInTheDocument();
+  expect(metrics.getByText('Transactions returned by Helius')).toBeInTheDocument();
+  expect(screen.queryByText('Valuation coverage')).not.toBeInTheDocument();
+  expect(screen.queryByText('Reported balances')).not.toBeInTheDocument();
   expect(screen.getByText(/returned balances.*incomplete/i)).toBeInTheDocument();
   expect(screen.getByText('42.5')).toBeInTheDocument();
   expect(screen.getByText('$106.25')).toBeInTheDocument();
