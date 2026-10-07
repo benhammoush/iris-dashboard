@@ -137,7 +137,12 @@ export function assetDistributionFrom(data) {
 
 export function assetTransactionsFrom(data) {
   const transactions = Array.isArray(data?.transactions) ? data.transactions : [];
-  return transactions.flatMap((transaction) => typeof transaction?.signature === 'string' ? [{ signature: transaction.signature, timestamp: typeof transaction.timestamp === 'string' ? transaction.timestamp : null, action: typeof transaction.action === 'string' ? transaction.action : null, protocol: typeof transaction.protocol === 'string' ? transaction.protocol : null, summary: typeof transaction.summary === 'string' ? transaction.summary : null, transfers: Array.isArray(transaction.transfers) ? transaction.transfers.flatMap((transfer) => typeof transfer?.amount === 'string' ? [{ amount: transfer.amount, from: typeof transfer.from === 'string' ? transfer.from : null, to: typeof transfer.to === 'string' ? transfer.to : null }] : []) : [] }] : []);
+  return transactions.flatMap((transaction) => {
+    if (typeof transaction?.signature !== 'string') return [];
+    const base = { signature: transaction.signature, timestamp: typeof transaction.timestamp === 'string' ? transaction.timestamp : null, action: typeof transaction.action === 'string' ? transaction.action : null, protocol: typeof transaction.protocol === 'string' ? transaction.protocol : null, summary: typeof transaction.summary === 'string' ? transaction.summary : null };
+    const transfers = Array.isArray(transaction.transfers) ? transaction.transfers.flatMap((transfer) => typeof transfer?.amount === 'string' ? [{ amount: transfer.amount, from: typeof transfer.from === 'string' ? transfer.from : null, to: typeof transfer.to === 'string' ? transfer.to : null }] : []) : [];
+    return transfers.length ? transfers.map((transfer, index) => ({ ...base, transferIndex: index, sender: transfer.from, recipient: transfer.to, amount: transfer.amount })) : [{ ...base, transferIndex: 0, sender: null, recipient: null, amount: null }];
+  });
 }
 
 export function networkFrom(data) {
