@@ -1,6 +1,6 @@
 # Iris
 
-Iris is a Vite market monitor and public-wallet viewer backed only by the Iris Worker API. The browser never contacts chain, pricing, or legacy application providers directly.
+Iris is a Vite market monitor and public-wallet viewer backed only by the Iris Worker API. The browser never contacts chain, pricing, or legacy application providers directly. Visit `/api-docs` for Swagger UI documentation of the Worker API.
 
 For the detailed frontend-to-Worker organigram, request map, cache layers, provider boundaries, and refresh flow, see the Worker repository's [`ARCHITECTURE.md`](https://github.com/benhammoush/iris-worker-api/blob/main/ARCHITECTURE.md).
 
@@ -26,4 +26,4 @@ Use `CI=true npm test -- --watchAll=false` for a non-watch test run and `npm run
 
 Vercel uses Node 24 (`.nvmrc`) and `vercel.json` to build `dist/`. The SPA fallback explicitly excludes `/api` so it cannot return `index.html` for API requests. This app does not configure an `/api/:path*` proxy because it calls the Worker directly.
 
-In Vercel Project Settings -> Environment Variables, set `VITE_API_BASE` to the public Worker origin for Production, Preview, and Development as needed. Redeploy after changing it because Vite embeds `VITE_*` values at build time. Production without this value renders `CONFIGURATION_ERROR` instead of guessing a Worker hostname. Set `VITE_ENABLE_FIXTURES=true` only for an intentional emergency display-fixture deployment; otherwise leave it unset or `false`. These values are public browser configuration, not secrets.
+In Vercel Project Settings -> Environment Variables, set `VITE_API_BASE` to the public Worker origin for Production, Preview, and Development as needed. Set `VITE_OPENAPI_URL` to the published Worker `openapi.yaml` when production documentation should follow a different branch or release; it otherwise uses the canonical GitHub document. Redeploy after changing either because Vite embeds `VITE_*` values at build time. Production without `VITE_API_BASE` renders `CONFIGURATION_ERROR` on product routes instead of guessing a Worker hostname; `/api-docs` remains available because it loads its own public specification URL. Set `VITE_ENABLE_FIXTURES=true` only for an intentional emergency display-fixture deployment; otherwise leave it unset or `false`. These values are public browser configuration, not secrets.

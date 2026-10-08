@@ -39,7 +39,7 @@ function Navbar() {
     <header className="iris-header">
       <Link className="iris-brand" to="/"><span className="iris-brand-mark"><img src="/logoiris.png" alt="" /></span><span className="iris-brand-name">IRIS</span><span className="iris-version">{APP_DISPLAY_VERSION}</span></Link>
       <span className="iris-divider" />
-      <nav className="iris-nav" aria-label="Main navigation"><NavLink to="/" end>Home</NavLink></nav>
+      <nav className="iris-nav" aria-label="Main navigation"><NavLink to="/" end>Home</NavLink><NavLink to="/api-docs">API Docs</NavLink></nav>
       <NavbarSearch assets={assets} loading={assetsLoading} error={assetsError} navigate={go} mobileOpen={mobileSearchOpen} setMobileOpen={setMobileSearchOpen} />
         {assetsLoading && !navbarMarket ? <MarketSkeleton className="iris-jupiter-market" label="Loading Jupiter market summary" labels={['SOL', 'MCAP', '24HVOL']} /> : navbarMarket && <div className="iris-jupiter-market" aria-label={`${navbarMarket.symbol} market summary`}>
           <span><b>{navbarMarket.symbol}</b> : {money(navbarMarket.priceUsd)}</span><i>/</i>
@@ -56,7 +56,7 @@ function Navbar() {
         <button className="iris-theme-button" onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')} aria-label="Toggle color theme">{mode === 'dark' ? 'LIGHT' : 'DARK'}</button>
       </div>
     </header>
-    <nav className="iris-mobile-nav" aria-label="Mobile navigation"><NavLink to="/" end>Home</NavLink></nav>
+    <nav className="iris-mobile-nav" aria-label="Mobile navigation"><NavLink to="/" end>Home</NavLink><NavLink to="/api-docs">API Docs</NavLink></nav>
   </>;
 }
 
