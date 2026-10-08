@@ -1,6 +1,6 @@
 {
   "name": "project-iris",
-  "version": "1.22.1",
+  "version": "1.22.2",
   "private": true,
   "engines": {
     "node": "24.x"
@@ -19,7 +19,10 @@
     "check": "tsc --noEmit",
     "check:versions": "node scripts/check-version.mjs",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build:e2e": "vite build --mode e2e",
+    "preview:e2e": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
+    "test:e2e": "npm run build:e2e && playwright test"
   },
   "browserslist": {
     "production": [
@@ -34,6 +37,7 @@
     ]
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
