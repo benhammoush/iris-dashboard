@@ -1,9 +1,7 @@
-import { expect, test } from '@playwright/test';
-import { installWorkerMock, sol } from './support/workerMock';
+import { expect, test } from './support/test';
+import { sol } from './support/workerMock';
 
-test('renders asset intelligence and requests the selected candle timeframe', async ({ page }) => {
-  const candleTimeframes: string[] = [];
-  await installWorkerMock(page, (url) => candleTimeframes.push(url.searchParams.get('timeframe') || ''));
+test('renders asset intelligence and requests the selected candle timeframe', async ({ page, api }) => {
 
   await page.goto(`/asset/${sol.mint}`);
 
@@ -16,5 +14,5 @@ test('renders asset intelligence and requests the selected candle timeframe', as
   await expect(page.getByText('5000000')).toBeVisible();
 
   await page.getByRole('button', { name: '30m' }).click();
-  await expect.poll(() => candleTimeframes).toContain('30m');
+  await expect.poll(() => api.requests.map((url) => url.searchParams.get('timeframe'))).toContain('30m');
 });

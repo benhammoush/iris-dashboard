@@ -1,8 +1,7 @@
-import { expect, test } from '@playwright/test';
-import { installWorkerMock, sol } from './support/workerMock';
+import { expect, test } from './support/test';
+import { sol } from './support/workerMock';
 
 test('opens the dashboard and navigates to a catalog asset', async ({ page }) => {
-  await installWorkerMock(page);
 
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Market overview' })).toBeVisible();
