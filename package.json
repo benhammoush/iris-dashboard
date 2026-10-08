@@ -1,6 +1,6 @@
 {
   "name": "project-iris",
-  "version": "1.22.4",
+  "version": "1.23.0",
   "private": true,
   "engines": {
     "node": "24.x"
@@ -22,7 +22,10 @@
     "test:watch": "vitest",
     "build:e2e": "vite build --mode e2e",
     "preview:e2e": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
-    "test:e2e": "npm run build:e2e && playwright test"
+    "test:e2e": "npm run build:e2e && playwright test",
+    "build:vertical": "vite build --mode vertical",
+    "preview:vertical": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
+    "test:vertical": "npm run build:vertical && playwright test --config=playwright.vertical.config.ts"
   },
   "browserslist": {
     "production": [
