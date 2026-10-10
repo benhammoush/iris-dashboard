@@ -20,9 +20,17 @@ The compact status display shows Worker provenance and freshness only when suppl
 2. Run `npm ci`.
 3. Run `npm start`.
 
-Use `CI=true npm test -- --watchAll=false` for a non-watch test run and `npm run build` for a production build.
+The frontend runs at `http://localhost:5173`. Start the sibling Worker's local server with `npm run dev` on port 8787. Use `npm test` for a non-watch test run and `npm run build` for a production build.
+
+## Testing
+
+`npm test` runs frontend unit and component tests. `npm run test:e2e` runs deterministic browser journeys with Worker requests intercepted by test fixtures.
+
+`npm run test:vertical` runs the built frontend against a real local Wrangler Worker and fresh local KV records. It requires the Worker checkout as a sibling named `Iris-Worker-Api-Public`, or `IRIS_WORKER_ROOT` can point to another checkout. The suite disables provider access in the Worker and fails if the browser calls a provider directly. CI requires the explicit compatible Worker SHA in `IRIS_WORKER_SHA`; it never guesses a matching branch.
 
 ## Vercel
+
+Git auto-deployment is disabled in repository configuration. See [ENVIRONMENTS.md](./ENVIRONMENTS.md) for separate dev/staging/production projects: existing CI deploys dev automatically and staging/production manually. Configure native approvals and provider settings before enabling deployments.
 
 Vercel uses Node 24 (`.nvmrc`) and `vercel.json` to build `dist/`. The SPA fallback explicitly excludes `/api` so it cannot return `index.html` for API requests. This app does not configure an `/api/:path*` proxy because it calls the Worker directly.
 
